@@ -28,16 +28,9 @@ public class Menu extends JPanel {
         {"~MAIN~"},
         {"Dashboard"},
         {"~WEB APP~"},
-        {"Email", "Inbox", "Read", "Compost"},
-        {"Chat"},
-        {"Calendar"},
-        {"~COMPONENT~"},
-        {"Advanced UI", "Cropper", "Owl Carousel", "Sweet Alert"},
-        {"Forms", "Basic Elements", "Advanced Elements", "Editors", "Wizard"},
-        {"~OTHER~"},
-        {"Charts", "Apex", "Flot", "Peity", "Sparkline"},
-        {"Icons", "Feather Icons", "Flag Icons", "Mdi Icons"},
-        {"Special Pages", "Blank page", "Faq", "Invoice", "Profile", "Pricing", "Timeline"},
+        {"Kasir"},
+        {"Gudang", "Master Produk", "Produk Masuk"},
+        {"Manajemen User"},
         {"Logout"}
     };
 
@@ -65,7 +58,7 @@ public class Menu extends JPanel {
 
     private final List<MenuEvent> events = new ArrayList<>();
     private boolean menuFull = true;
-    private final String headerName = "Raven Channel";
+    private final String headerName = "Toko Keren";
 
     protected final boolean hideMenuTitleOnMinimum = true;
     protected final int menuTitleLeftInset = 5;
