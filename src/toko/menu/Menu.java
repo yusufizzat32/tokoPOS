@@ -1,6 +1,6 @@
-package raven.menu;
+package toko.menu;
 
-import raven.menu.mode.LightDarkMode;
+import toko.menu.mode.LightDarkMode;
 import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.ui.FlatUIUtils;
 import com.formdev.flatlaf.util.UIScale;
@@ -16,7 +16,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
-import raven.menu.mode.ToolBarAccentColor;
+import toko.menu.mode.ToolBarAccentColor;
 
 /**
  *

@@ -34,7 +34,7 @@
     </DimensionLayout>
   </Layout>
   <SubComponents>
-    <Container class="raven.application.form.PanelLogin" name="panelLogin1">
+    <Container class="toko.application.form.PanelLogin" name="panelLogin1">
       <SubComponents>
         <Component class="javax.swing.JLabel" name="lbTitle">
           <Properties>

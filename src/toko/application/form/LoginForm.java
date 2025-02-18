@@ -1,8 +1,8 @@
-package raven.application.form;
+package toko.application.form;
 
 import com.formdev.flatlaf.FlatClientProperties;
 import net.miginfocom.swing.MigLayout;
-import raven.application.Application;
+import toko.application.Application;
 
 /**
  *
@@ -35,7 +35,7 @@ public class LoginForm extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        panelLogin1 = new raven.application.form.PanelLogin();
+        panelLogin1 = new toko.application.form.PanelLogin();
         lbTitle = new javax.swing.JLabel();
         lbUser = new javax.swing.JLabel();
         txtUser = new javax.swing.JTextField();
@@ -90,7 +90,7 @@ public class LoginForm extends javax.swing.JPanel {
     private javax.swing.JLabel lbPass;
     private javax.swing.JLabel lbTitle;
     private javax.swing.JLabel lbUser;
-    private raven.application.form.PanelLogin panelLogin1;
+    private toko.application.form.PanelLogin panelLogin1;
     private javax.swing.JPasswordField txtPass;
     private javax.swing.JTextField txtUser;
     // End of variables declaration//GEN-END:variables

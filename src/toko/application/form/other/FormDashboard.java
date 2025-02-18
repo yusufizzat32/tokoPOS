@@ -1,14 +1,15 @@
-package raven.application.form.other;
+package toko.application.form.other;
 
 import com.formdev.flatlaf.FlatClientProperties;
+import raven.toast.Notifications;
 
 /**
  *
  * @author Raven
  */
-public class FormRead extends javax.swing.JPanel {
+public class FormDashboard extends javax.swing.JPanel {
 
-    public FormRead() {
+    public FormDashboard() {
         initComponents();
         lb.putClientProperty(FlatClientProperties.STYLE, ""
                 + "font:$h1.font");
@@ -21,7 +22,7 @@ public class FormRead extends javax.swing.JPanel {
         lb = new javax.swing.JLabel();
 
         lb.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lb.setText("Read");
+        lb.setText("Dashboard");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -36,8 +37,8 @@ public class FormRead extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(lb, javax.swing.GroupLayout.DEFAULT_SIZE, 448, Short.MAX_VALUE)
-                .addContainerGap())
+                .addComponent(lb)
+                .addContainerGap(433, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
