@@ -1,5 +1,4 @@
 package raven.menu.mode;
-
 import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.FlatLaf;
 import com.formdev.flatlaf.extras.FlatAnimatedLafChange;
@@ -76,16 +75,17 @@ public class LightDarkMode extends JPanel {
 
     private void changeMode(boolean dark) {
         if (FlatLaf.isLafDark() != dark) {
-            if (dark) {
+            if (!dark) {
                 EventQueue.invokeLater(() -> {
                     FlatAnimatedLafChange.showSnapshot();
-                    FlatMacDarkLaf.setup();
+                    FlatMacLightLaf.setup();
                     FlatLaf.updateUI();
                     checkStyle();
                     FlatAnimatedLafChange.hideSnapshotWithAnimation();
                 });
             } else {
                 EventQueue.invokeLater(() -> {
+                    
                     FlatAnimatedLafChange.showSnapshot();
                     FlatMacLightLaf.setup();
                     FlatLaf.updateUI();
@@ -127,7 +127,7 @@ public class LightDarkMode extends JPanel {
                     + "background:null");
         }
     }
-
+    
     private JButton buttonLight;
     private JButton buttonDark;
     private JButton buttonLighDark;

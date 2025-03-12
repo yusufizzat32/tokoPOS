@@ -3,17 +3,99 @@ package raven.application.form;
 import com.formdev.flatlaf.FlatClientProperties;
 import net.miginfocom.swing.MigLayout;
 import raven.application.Application;
+import raven.dao.userDAO;
+import raven.model.modelUser;
+import raven.service.serviceUser;
+import raven.application.form.MainForm;
+import raven.config.connectionDB;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Insets;
+import java.awt.LayoutManager;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 
 /**
  *
  * @author Raven
  */
 public class LoginForm extends javax.swing.JPanel {
+    
+    private serviceUser servis = new userDAO();
 
     public LoginForm() {
         initComponents();
         init();
     }
+    
+    private void resetForm() {
+        txtUsername.setText("");
+        txtPassword.setText("");
+    }
+    
+    private boolean validasiInput() {
+        boolean valid = false;
+        if (txtUsername.getText().trim().isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Username tidak boleh kosong");
+        } else if (txtPassword.getText().trim().isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Password tidak boleh kosong");
+        } else {
+            valid = true;
+        }
+        return valid;
+    }
+    
+//    private void prosesLogin() {
+//        // Validasi input sebelum melanjutkan
+//        if (!validasiInput()) {
+//            JOptionPane.showMessageDialog(
+//                null, 
+//                "Harap isi Username dan Password!", 
+//                "Validasi Input", 
+//                JOptionPane.WARNING_MESSAGE
+//            );
+//            return;
+//        }
+//
+//        // Ambil data dari form
+//        String user = txtUsername.getText();
+//        String pass = new String(txtPassword.getPassword());
+//
+//        // Buat model user
+//        modelUser model = new modelUser();
+//        model.setUsername(user);
+//        model.setPassword(pass);
+//
+//        // Proses login menggunakan service
+//        modelUser hasilLogin = servis.prosesLogin(model);
+//
+//        if (hasilLogin != null) {
+//            // Login berhasil
+//            MainForm.login(hasilLogin);
+//            JOptionPane.showMessageDialog(
+//                null, 
+//                "Login berhasil! Selamat datang, " + hasilLogin.getNama()+ ".", 
+//                "Login Sukses", 
+//                JOptionPane.INFORMATION_MESSAGE
+//            );
+//            resetForm();
+//        } else {
+//            // Login gagal
+//            JOptionPane.showMessageDialog(
+//                null, 
+//                "Username atau Password salah. Silakan coba lagi.", 
+//                "Login Gagal", 
+//                JOptionPane.ERROR_MESSAGE
+//            );
+//        }
+//    }
 
     private void init() {
         setLayout(new MigLayout("al center center"));
@@ -21,14 +103,14 @@ public class LoginForm extends javax.swing.JPanel {
         lbTitle.putClientProperty(FlatClientProperties.STYLE, ""
                 + "font:$h1.font");
         
-        txtPass.putClientProperty(FlatClientProperties.STYLE, ""
+        txtPassword.putClientProperty(FlatClientProperties.STYLE, ""
                 + "showRevealButton:true;"
                 + "showCapsLock:true");
         cmdLogin.putClientProperty(FlatClientProperties.STYLE, ""
                 + "borderWidth:0;"
                 + "focusWidth:0");
-        txtUser.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "User Name");
-        txtPass.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "Password");
+        txtUsername.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "User Name");
+        txtPassword.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "Password");
     }
 
     @SuppressWarnings("unchecked")
@@ -38,9 +120,9 @@ public class LoginForm extends javax.swing.JPanel {
         panelLogin1 = new raven.application.form.PanelLogin();
         lbTitle = new javax.swing.JLabel();
         lbUser = new javax.swing.JLabel();
-        txtUser = new javax.swing.JTextField();
+        txtUsername = new javax.swing.JTextField();
         lbPass = new javax.swing.JLabel();
-        txtPass = new javax.swing.JPasswordField();
+        txtPassword = new javax.swing.JPasswordField();
         cmdLogin = new javax.swing.JButton();
 
         lbTitle.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -49,11 +131,11 @@ public class LoginForm extends javax.swing.JPanel {
 
         lbUser.setText("User Name");
         panelLogin1.add(lbUser);
-        panelLogin1.add(txtUser);
+        panelLogin1.add(txtUsername);
 
         lbPass.setText("Password");
         panelLogin1.add(lbPass);
-        panelLogin1.add(txtPass);
+        panelLogin1.add(txtPassword);
 
         cmdLogin.setText("Login");
         cmdLogin.addActionListener(new java.awt.event.ActionListener() {
@@ -67,17 +149,14 @@ public class LoginForm extends javax.swing.JPanel {
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(218, Short.MAX_VALUE)
-                .addComponent(panelLogin1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(197, 197, 197))
+            .addGroup(layout.createSequentialGroup()
+                .addGap(181, 181, 181)
+                .addComponent(panelLogin1, javax.swing.GroupLayout.PREFERRED_SIZE, 371, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(183, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(68, 68, 68)
-                .addComponent(panelLogin1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(96, Short.MAX_VALUE))
+            .addComponent(panelLogin1, javax.swing.GroupLayout.DEFAULT_SIZE, 438, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -91,7 +170,7 @@ public class LoginForm extends javax.swing.JPanel {
     private javax.swing.JLabel lbTitle;
     private javax.swing.JLabel lbUser;
     private raven.application.form.PanelLogin panelLogin1;
-    private javax.swing.JPasswordField txtPass;
-    private javax.swing.JTextField txtUser;
+    private javax.swing.JPasswordField txtPassword;
+    private javax.swing.JTextField txtUsername;
     // End of variables declaration//GEN-END:variables
 }

@@ -1,5 +1,4 @@
 package raven.menu.mode;
-
 import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.FlatLaf;
 import com.formdev.flatlaf.icons.FlatAbstractIcon;
@@ -136,7 +135,7 @@ public class ToolBarAccentColor extends JPanel {
         @Override
         protected void paintIcon(Component c, Graphics2D g) {
             Color accColor = UIManager.getColor(colorKey);
-            if (accColor == null) {
+            if (accColor == null){
                 accColor = Color.lightGray;
             } else if (!c.isEnabled()) {
                 accColor = FlatLaf.isLafDark()
