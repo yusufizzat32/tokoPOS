@@ -16,7 +16,8 @@ public class modelUser {
     private String alamat;
     private String no_telepon;
     private String role;
-
+    
+    
     public int getIdUser() {
         return idUser;
     }

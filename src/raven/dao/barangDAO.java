@@ -1,7 +1,4 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+    
 package raven.dao;
 
 import raven.config.connectionDB;
@@ -90,7 +87,34 @@ public class barangDAO implements serviceBarang{
 
     @Override
     public void updateStok(String id, double stok) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        PreparedStatement st = null;
+        ResultSet rs = null;
+        String selectSql = "SELECT Stok FROM tabel_barang WHERE Kd_Produk = ?";
+        String updateSql = "UPDATE tabel_barang SET Stok = ? WHERE Kd_Produk = ?";
+
+        try {
+
+            st = conn.prepareStatement(selectSql);
+            st.setString(1, id);
+            rs = st.executeQuery();
+
+            if (rs.next()) {
+                double stokLama = rs.getDouble("Stok");
+                double stokBaru = stokLama + stok;
+
+
+                st = conn.prepareStatement(updateSql);
+                st.setDouble(1, stokBaru);
+                st.setString(2, id);
+                st.executeUpdate();
+
+                System.out.println("Stok berhasil diperbarui.");
+            } else {
+                System.out.println("Data produk dengan Kd_produk " + id + " tidak ditemukan.");
+            }
+        } catch (SQLException e) {
+            System.out.println("Gagal memperbarui stok: " + e.getMessage());
+        }
     }
 
     @Override
@@ -229,34 +253,36 @@ public class barangDAO implements serviceBarang{
     }
 
     @Override
-    public List<modelBarang> searchByBarcode(String id) {
-        PreparedStatement st = null;
-        ResultSet rs = null;
-        List<modelBarang> list = new ArrayList<>();
-        String sql = "SELECT * FROM tabel_barang WHERE Barcode = ?";
+public modelBarang cariBarangByBarcode(String id) {
+    PreparedStatement st = null;
+    ResultSet rs = null;
+    String sql = "SELECT * FROM tabel_barang WHERE Barcode = ?";
 
+    try {
+        st = conn.prepareStatement(sql);
+        st.setString(1, id);
+        rs = st.executeQuery();
+
+        if (rs.next()) {
+            modelBarang obat = new modelBarang();
+            obat.setIdProduk(rs.getString("Kd_Produk"));
+            obat.setNamaProduk(rs.getString("Nama_Produk"));
+            obat.setHargaProduk(rs.getInt("Harga_Jual"));
+            obat.setStokProduk(rs.getDouble("Stok"));
+            obat.setBarcode(rs.getString("Barcode"));
+            return obat;
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    } finally {
         try {
-            st = conn.prepareStatement(sql);
-            st.setString(1, id);
-            rs = st.executeQuery();
-
-            if (rs.next()) {
-                modelBarang obat = new modelBarang();
-                obat.setIdProduk(rs.getString("Kd_Produk"));
-                obat.setNamaProduk(rs.getString("Nama_Produk"));
-                obat.setHargaProduk(rs.getInt("Harga_Jual"));
-                obat.setStokProduk(rs.getDouble("Stok"));
-                obat.setBarcode(rs.getString("Barcode"));
-                list.add(obat);
-            }
-
-            rs.close();
-            st.close();
+            if (rs != null) rs.close();
+            if (st != null) st.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
-        return list;
     }
+    return null;
+}
 
 }

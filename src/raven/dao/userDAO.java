@@ -31,7 +31,7 @@ public class userDAO implements serviceUser {
     public void tambahData(modelUser model) {
        PreparedStatement st = null;
         try {
-            String sql = "INSERT INTO tbl_user(nama, username, password, alamat, no_telepon, role) VALUES (?,?,?,?,?,?)";
+            String sql = "INSERT INTO tabel_user(nama, username, password, alamat, no_telepon, role) VALUES (?,?,?,?,?,?)";
 
             st = conn.prepareStatement(sql);
             st.setString(1, model.getNama());
@@ -51,7 +51,7 @@ public class userDAO implements serviceUser {
     public void perbaruiData(modelUser model) {
         PreparedStatement st = null;
         try {
-            String sql = "UPDATE tbl_user SET nama=?, username=?, alamat=?, no_telepon=?, role=? WHERE id_user=?";
+            String sql = "UPDATE tabel_user SET nama=?, username=?, alamat=?, no_telepon=?, role=? WHERE id_user=?";
 
             st = conn.prepareStatement(sql);
             st.setString(1, model.getNama());
@@ -71,7 +71,7 @@ public class userDAO implements serviceUser {
     @Override
     public void hapusData(modelUser model) {
         PreparedStatement st = null;
-        String sql = "DELETE FROM tbl_user WHERE id_user=?";
+        String sql = "DELETE FROM tabel_user WHERE id_user=?";
         try {
             st = conn.prepareStatement(sql);
             st.setInt(1, model.getIdUser());
@@ -86,7 +86,7 @@ public class userDAO implements serviceUser {
         PreparedStatement st = null;
         ResultSet rs = null;
         List list = new ArrayList();
-        String sql = "SELECT * FROM tbl_user";
+        String sql = "SELECT * FROM tabel_user";
 
         try {
             st = conn.prepareStatement(sql);
@@ -113,7 +113,7 @@ public class userDAO implements serviceUser {
         PreparedStatement st = null;
         ResultSet rs = null;
         List list = new ArrayList();
-        String sql = "SELECT * FROM tbl_user WHERE id_user LIKE '%" + id + "%' "
+        String sql = "SELECT * FROM tabel_user WHERE id_user LIKE '%" + id + "%' "
                 + "OR nama LIKE '%" + id + "%' "
                 + "OR username LIKE '%" + id + "%' "
                 + "OR alamat LIKE '%" + id + "%' "
@@ -167,7 +167,7 @@ public class userDAO implements serviceUser {
         PreparedStatement st = null;
         ResultSet rs = null;
         modelUser modelUs = null;
-        String sql = "SELECT * FROM tbl_user WHERE username = ? AND password = ?";
+        String sql = "SELECT * FROM tabel_user WHERE username = ? AND password = ?";
 
         try {
             st = conn.prepareStatement(sql);
@@ -202,7 +202,7 @@ public class userDAO implements serviceUser {
         PreparedStatement st = null;
         ResultSet rs = null;
         String enkripsiPasswordLama = generateSHA256(passwordLama);
-        String sql = "SELECT * FROM tbl_user WHERE username = ? AND password = ?";
+        String sql = "SELECT * FROM tabel_user WHERE username = ? AND password = ?";
         try {
             st = conn.prepareStatement(sql);
             st.setString(1, username);
@@ -222,7 +222,7 @@ public class userDAO implements serviceUser {
         ResultSet rs = null;
         String enkripsiPasswordLama = generateSHA256(passwordLama);
         String enkripsiPasswordBaru = generateSHA256(passwordBaru);
-        String sql = "SELECT * FROM tbl_user WHERE username = ? AND password = ?";
+        String sql = "SELECT * FROM tabel_user WHERE username = ? AND password = ?";
 
         try {
             st = conn.prepareStatement(sql);
@@ -231,7 +231,7 @@ public class userDAO implements serviceUser {
             rs = st.executeQuery();
 
             if (rs.next()) {
-                String sqlUpdate = "UPDATE tbl_user SET password = ? WHERE username = ?";
+                String sqlUpdate = "UPDATE tabel_user SET password = ? WHERE username = ?";
                 stUpdate = conn.prepareStatement(sqlUpdate);
                 stUpdate.setString(1, enkripsiPasswordBaru);
                 stUpdate.setString(2, username);

@@ -21,6 +21,8 @@ import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import raven.application.Application;
+import raven.model.session;
 
 /**
  *
@@ -52,50 +54,59 @@ public class LoginForm extends javax.swing.JPanel {
         return valid;
     }
     
-//    private void prosesLogin() {
-//        // Validasi input sebelum melanjutkan
-//        if (!validasiInput()) {
-//            JOptionPane.showMessageDialog(
-//                null, 
-//                "Harap isi Username dan Password!", 
-//                "Validasi Input", 
-//                JOptionPane.WARNING_MESSAGE
-//            );
-//            return;
-//        }
-//
-//        // Ambil data dari form
-//        String user = txtUsername.getText();
-//        String pass = new String(txtPassword.getPassword());
-//
-//        // Buat model user
-//        modelUser model = new modelUser();
-//        model.setUsername(user);
-//        model.setPassword(pass);
-//
-//        // Proses login menggunakan service
-//        modelUser hasilLogin = servis.prosesLogin(model);
-//
-//        if (hasilLogin != null) {
-//            // Login berhasil
-//            MainForm.login(hasilLogin);
-//            JOptionPane.showMessageDialog(
-//                null, 
-//                "Login berhasil! Selamat datang, " + hasilLogin.getNama()+ ".", 
-//                "Login Sukses", 
-//                JOptionPane.INFORMATION_MESSAGE
-//            );
-//            resetForm();
-//        } else {
-//            // Login gagal
-//            JOptionPane.showMessageDialog(
-//                null, 
-//                "Username atau Password salah. Silakan coba lagi.", 
-//                "Login Gagal", 
-//                JOptionPane.ERROR_MESSAGE
-//            );
-//        }
-//    }
+ private void prosesLogin() {
+        // Validasi input sebelum melanjutkan
+        if (!validasiInput()) {
+            JOptionPane.showMessageDialog(
+                null, 
+                "Harap isi Username dan Password!", 
+                "Validasi Input", 
+                JOptionPane.WARNING_MESSAGE
+            );
+            return;
+        }
+
+        // Ambil data dari form
+        String user = txtUsername.getText();
+        String pass = new String(txtPassword.getPassword());
+
+        // Buat model user
+        modelUser model = new modelUser();
+        model.setUsername(user);
+        model.setPassword(pass);
+
+        // Proses login menggunakan service
+        modelUser hasilLogin = servis.prosesLogin(model);
+        
+       
+        if (hasilLogin != null) {
+            // Login berhasil
+            session sess = session.getInstance();
+            sess.setUserSession(hasilLogin.getIdUser(), hasilLogin.getUsername(), hasilLogin.getRole());
+            Application.login(hasilLogin);
+            
+            JOptionPane.showMessageDialog(
+                null, 
+                "Login berhasil! Selamat datang, " + hasilLogin.getNama()+ ".", 
+                "Login Sukses", 
+                JOptionPane.INFORMATION_MESSAGE
+            );
+            resetForm();
+            
+            
+        } else {
+            // Login gagal
+            JOptionPane.showMessageDialog(
+                null, 
+                "Username atau Password salah. Silakan coba lagi.", 
+                "Login Gagal", 
+                JOptionPane.ERROR_MESSAGE
+            );
+        }
+        
+        
+      
+    }
 
     private void init() {
         setLayout(new MigLayout("al center center"));
@@ -161,7 +172,7 @@ public class LoginForm extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void cmdLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdLoginActionPerformed
-        Application.login();
+        prosesLogin();
     }//GEN-LAST:event_cmdLoginActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

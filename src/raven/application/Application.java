@@ -13,6 +13,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import raven.application.form.LoginForm;
 import raven.application.form.MainForm;
+import raven.model.modelUser;
 import raven.toast.Notifications;
 
 /**
@@ -41,7 +42,7 @@ public class Application extends javax.swing.JFrame {
         app.mainForm.showForm(component);
     }
 
-    public static void login() {
+    public static void login(modelUser modelUs) {
         FlatAnimatedLafChange.showSnapshot();
         app.setContentPane(app.mainForm);
         app.mainForm.applyComponentOrientation(app.getComponentOrientation());

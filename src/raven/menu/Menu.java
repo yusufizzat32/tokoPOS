@@ -17,13 +17,18 @@ import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import raven.menu.mode.ToolBarAccentColor;
+import raven.model.modelUser;
 
 /**
  *
  * @author Raven
  */
 public class Menu extends JPanel {
-
+    private modelUser modeluser;
+    public void setModelUser(modelUser modeluser) {
+        this.modeluser = modeluser;
+        createMenu(); // Refresh menu setelah role pengguna diatur
+    }
     private final String menuItems[][] = {
         {"~MAIN~"},
         {"Dashboard"},

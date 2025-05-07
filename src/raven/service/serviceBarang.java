@@ -22,5 +22,5 @@ public interface serviceBarang {
     List<modelBarang> ambilNamaBarang();
     String ambilNamaBarangId(int id);
 
-    public List<modelBarang> searchByBarcode(String id);
+    modelBarang cariBarangByBarcode(String id); // Perubahan di sini
 }

@@ -63,12 +63,58 @@ public class barangMasukDAO implements serviceBarangMasuk {
 
     @Override
     public void updateData(modelBarangMasuk model) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        PreparedStatement st = null;
+        String sql = "UPDATE tabel_produkmasuk SET Nama_Produk = ?, Kd_Produk=?, Harga_Produk = ?, Jumlah = ?,Jumlah_Masuk = ?, Nilai = ? WHERE Kd_Produkmasuk = ?";
+
+        try {
+            st = conn.prepareStatement(sql);
+            
+            st.setString(1, model.getNamaProduk());
+            st.setString(2, model.getIdProduk());
+            st.setDouble(3, model.getHargaProduk());
+            st.setDouble(4, model.getStokProduk());
+            st.setDouble(5, model.getJumlahMasuk());
+            st.setDouble(6, model.getNilaiProduk());
+            st.setInt(7, model.getIdProdukMasuk());
+
+            st.executeUpdate();
+            System.out.println("Data berhasil diperbarui.");
+        } catch (SQLException e) {
+            System.out.println("Gagal memperbarui data: " + e.getMessage());
+        } finally {
+            if (st != null) {
+                try {
+                    st.close();
+                } catch (SQLException e) {
+                    System.out. println(e);
+                }
+            }
+        }
     }
 
     @Override
     public void hapusData(modelBarangMasuk model) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+       PreparedStatement st = null;
+        String sql = "DELETE FROM tabel_produkmasuk WHERE Kd_Produkmasuk = ?";
+
+        try {
+            st = conn.prepareStatement(sql);
+            st.setInt(1, model.getIdProdukMasuk()); // Kondisi berdasarkan Kd_Obat
+
+            
+            st.executeUpdate();
+            System.out.println("Data berhasil dihapus.");
+        } catch (SQLException e) {
+            System.out.println("Gagal menghapus data: " + e.getMessage());
+        } finally {
+            if (st != null) {
+                try {
+                    st.close();
+                } catch (SQLException e) {
+                    System.out.println(e);
+                }
+            }
+        }
     }
 
     @Override

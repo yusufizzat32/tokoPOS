@@ -4,12 +4,15 @@
  */
 package raven.application.form.other;
 
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import raven.dao.barangDAO;
 import raven.model.modelBarang;
 import raven.service.serviceBarang;
 import raven.tablemodel.tableBarang;
 import java.util.List;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 /**
  *
  * @author yusuf
@@ -28,15 +31,21 @@ public class InputMasterProduk extends javax.swing.JDialog {
     
     public InputMasterProduk(java.awt.Frame parent, boolean modal,int row, modelBarang barang,FormMasterProduk formMasterProduk) {
         super(parent, modal);
-        this.barang = barang;
-        this.row = row;
-        this.formMasterProduk = formMasterProduk;
-        initComponents();
-        setLocationRelativeTo(null);
-        if(barang != null){
-            dataTable();
-        }
-        loadData();
+    this.barang = barang;
+    this.row = row;
+    this.formMasterProduk = formMasterProduk;
+    
+    initComponents();  // This must be called first to initialize components
+    
+    // Now we can safely access UI components
+    txtIdBarang.requestFocusInWindow();
+    setupBarcodeScannerHandling();
+    
+    setLocationRelativeTo(null);
+    if (barang != null) {
+        dataTable();
+    }
+    loadData();
         
     }
         private void loadData(){
@@ -97,29 +106,29 @@ public class InputMasterProduk extends javax.swing.JDialog {
     }
         private void tambahData() {
        
-        if (!validasiInput()) {
-            return;
-        }
-        // Log untuk debug
-        System.out.println("Mulai menyimpan data...");
+            if (!validasiInput()) {
+                return;
+            }
+            // Log untuk debug
+            System.out.println("Mulai menyimpan data...");
         
-        String namaBarang = txtNamaBarang.getText().trim();
-        int harga = Integer.parseInt(txtHargaJual.getText().trim());
-        double stok = ((Number) txtStok.getValue()).doubleValue();
-        String idBarang = txtIdBarang.getText().trim();
+            String namaBarang = txtNamaBarang.getText().trim();
+            int harga = Integer.parseInt(txtHargaJual.getText().trim());
+            double stok = ((Number) txtStok.getValue()).doubleValue();
+            String idBarang = txtIdBarang.getText().trim();
 
-        modelBarang brg = new modelBarang();
-        brg.setIdProduk(idBarang);
-        brg.setNamaProduk(namaBarang);
-        brg.setHargaProduk(harga);
-        brg.setStokProduk(stok);
-        brg.setBarcode(idBarang);
+            modelBarang brg = new modelBarang();
+            brg.setIdProduk(idBarang);
+            brg.setNamaProduk(namaBarang);
+            brg.setHargaProduk(harga);
+            brg.setStokProduk(stok);
+            brg.setBarcode(idBarang);
         
-        servis.tambahData(brg);
-        tblModel.insertData(brg);
-        formMasterProduk.refreshTable();
-        resetForm();
-    }    
+            servis.tambahData(brg);
+            tblModel.insertData(brg);
+            formMasterProduk.refreshTable();
+            resetForm();
+        }    
         private void dataTable() {
         simpan.setText("UPDATE");
         idProduk = barang.getIdProduk();
@@ -345,7 +354,64 @@ public class InputMasterProduk extends javax.swing.JDialog {
             dispose();
         }
     }//GEN-LAST:event_batalActionPerformed
-
+private void handleBarcodeInput(String barcode) {
+    if (barcode.isEmpty()) {
+        return;
+    }
+    
+    modelBarang existingItem = servis.cariBarangByBarcode(barcode);
+    
+    if (existingItem != null) {
+        JOptionPane.showMessageDialog(this, 
+            "Produk dengan barcode ini sudah ada:\n" +
+            "Nama: " + existingItem.getNamaProduk() + "\n" +
+            "Harga: " + existingItem.getHargaProduk(),
+            "Info Produk",
+            JOptionPane.INFORMATION_MESSAGE);
+        
+        txtIdBarang.requestFocusInWindow();
+        txtIdBarang.selectAll();
+    } else {
+        txtNamaBarang.requestFocusInWindow();
+        
+        if (txtNamaBarang.getText().isEmpty()) {
+            txtNamaBarang.setText("Produk " + barcode);
+        }
+    }
+}
+    private void setupBarcodeScannerHandling() {
+    // 1. Fokus otomatis ke field ID Barang saat form dibuka
+    txtIdBarang.requestFocusInWindow();
+    
+    // 2. Seleksi semua teks saat field ID Barang mendapat fokus
+    txtIdBarang.addFocusListener(new java.awt.event.FocusAdapter() {
+        @Override
+        public void focusGained(java.awt.event.FocusEvent evt) {
+            SwingUtilities.invokeLater(() -> {
+                txtIdBarang.selectAll();
+            });
+        }
+    });
+    
+    // 3. Handle ketika barcode di-scan (Enter ditekan)
+    txtIdBarang.addActionListener(e -> {
+        handleBarcodeInput(txtIdBarang.getText().trim());
+    });
+    
+    // 4. Validasi input real-time untuk mencegah karakter tidak valid
+    txtIdBarang.addKeyListener(new KeyAdapter() {
+        @Override
+        public void keyTyped(KeyEvent e) {
+            // Hanya izinkan karakter alfanumerik dan beberapa simbol khusus
+            if (!Character.isLetterOrDigit(e.getKeyChar()) 
+                && e.getKeyChar() != '-' 
+                && e.getKeyChar() != '_'
+                && e.getKeyChar() != KeyEvent.VK_BACK_SPACE) {
+                e.consume();
+            }
+        }
+    });
+}
     /**
      * @param args the command line arguments
      */

@@ -18,20 +18,22 @@ import javax.swing.border.EmptyBorder;
 import raven.application.Application;
 import raven.application.form.other.FormDashboard;
 import raven.application.form.other.FormKasir;
-import raven.application.form.other.FormRead;
+import raven.application.form.other.FormTransaksi;
 import raven.application.form.other.FormMasterProduk;
 import raven.application.form.other.FormProdukMasuk;
 import raven.menu.Menu;
 import raven.menu.MenuAction;
+import raven.model.modelUser;
 
 /**
  *
  * @author Raven
  */
 public class MainForm extends JLayeredPane {
-
+    private modelUser model;
     public MainForm() {
         init();
+        this.model = new modelUser();
     }
 
     private void init() {
@@ -68,6 +70,10 @@ public class MainForm extends JLayeredPane {
         String icon = (getComponentOrientation().isLeftToRight()) ? "menu_left.svg" : "menu_right.svg";
         menuButton.setIcon(new FlatSVGIcon("raven/icon/svg/" + icon, 0.8f));
     }
+    public void getModelUser(modelUser model) {
+        this.model = model;
+        menu.setModelUser(model);
+    }
 
     private void initMenuEvent() {
         menu.addMenuEvent((int index, int subIndex, MenuAction action) -> {
@@ -78,7 +84,7 @@ public class MainForm extends JLayeredPane {
                 if (subIndex == 1) {
                     Application.showForm(new FormKasir());
                 } else if (subIndex == 2) {
-                    Application.showForm(new FormRead());
+                    Application.showForm(new FormTransaksi(model));
                 }else {
                     action.cancel();
                 }   

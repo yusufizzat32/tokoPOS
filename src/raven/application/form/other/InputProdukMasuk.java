@@ -81,8 +81,8 @@ public class InputProdukMasuk extends javax.swing.JDialog {
             String idObat1 = txtIdBarang.getText();
             double jumlah = Double.parseDouble(txtJumlahMasuk.getText());
             double jumlahMasuk = Double.parseDouble(txtJumlahMasuk.getText());
-//            double hargaSatuan = Double.parseDouble(tf_hargaSatuan.getText());
-//            double totalHarga = Double.parseDouble(tf_totalHarga.getText());
+//          double hargaSatuan = Double.parseDouble(tf_hargaSatuan.getText());
+//          double totalHarga = Double.parseDouble(tf_totalHarga.getText());
       
             
             modelBarangMasuk obat = new modelBarangMasuk();
