@@ -48,6 +48,7 @@ public class penjualanDetailDAO implements servicePenjualanDetail{
             st.setDouble(5, model.getQty());
             st.setDouble(6, model.getNilai());
             st.executeUpdate();
+            
 
 
             // Update stok setelah menambahkan detail penjualan
@@ -87,8 +88,6 @@ public class penjualanDetailDAO implements servicePenjualanDetail{
     @Override
     public List<modelPenjualanDetail> tampil_detail_P(String id) {
         List<modelPenjualanDetail> details = new ArrayList<>();
-
-        // SQL untuk mengambil detail penjualan berdasarkan id transaksi
         String sql = "SELECT td.*, m.* "
                 + "FROM tabel_transaksidetail td "
                 + "JOIN tabel_barang m ON td.Kd_Produk = m.Kd_Produk " + "WHERE td.Ref = ?"; 
@@ -98,25 +97,19 @@ public class penjualanDetailDAO implements servicePenjualanDetail{
 
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-
-                    // Set ModelMasterObat
                     modelBarang obat = new modelBarang();
                     obat.setIdProduk(rs.getString("Kd_Produk"));
                     obat.setNamaProduk(rs.getString("Nama_Produk"));
                     obat.setHargaProduk(rs.getInt("Harga_Jual"));
 
-                    // Set ModelPenjualan (asumsi sudah ada, Anda bisa menyesuaikan)
                     modelPenjualan penjualan = new modelPenjualan();
-                    penjualan.setRef(id); // ID transaksi di sini bisa disesuaikan
+                    penjualan.setRef(id); 
 
-                    // Set qty dan nilai
                     modelPenjualanDetail detail = new modelPenjualanDetail();
                     detail.setModelBarang(obat);
                     detail.setModelPenjualan(penjualan);
-                    detail.setQty(rs.getInt("Qty"));
+                    detail.setQty(rs.getInt("Quantity"));
                     detail.setNilai(rs.getInt("Subtotal"));
-
-                    // Tambahkan detail ke list
                     details.add(detail);
                 }
             }
@@ -129,7 +122,7 @@ public class penjualanDetailDAO implements servicePenjualanDetail{
 
     @Override
     public List<modelPenjualanDetail> search(String keyword) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        throw new UnsupportedOperationException("Not supported yet.");
     }
     
     public void updateStok(String idProduk, double qty) {

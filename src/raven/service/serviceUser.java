@@ -16,7 +16,7 @@ public interface serviceUser {
     void perbaruiData (modelUser model);
     void hapusData (modelUser model);
     
-    List<modelUser> tampilData();
+    List<modelUser> showData();
     List<modelUser> pencarianData(String id);
     
     String generateSHA256(String password);

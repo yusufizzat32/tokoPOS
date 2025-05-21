@@ -52,6 +52,7 @@ public class rekapTransaksiDAO implements serviceRekapTransaksi{
         }
     }
     
+    @Override
      public void updateStok(String idProduk, int qty) {
         String sql = "UPDATE tabel_barang SET Stok = Stok - ? WHERE Kd_Produk = ?";
 
@@ -64,6 +65,7 @@ public class rekapTransaksiDAO implements serviceRekapTransaksi{
             System.out.println("Gagal memperbarui stok: " + e.getMessage());
         }
     }
+    @Override
      public boolean cekStok(String idProduk, int qty) {
         String sql = "SELECT Stok FROM tabel_barang WHERE Kd_Produk = ?";
 
@@ -169,35 +171,35 @@ public class rekapTransaksiDAO implements serviceRekapTransaksi{
 
     @Override
     public List<modelRekapTransaksi> tampilData() {
-        List<modelRekapTransaksi> list = new ArrayList<>();
-        String sql = "SELECT * FROM tabel_rekaptransaksi";
-        
-        try (PreparedStatement stmt = conn.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
-            while (rs.next()) {
-                modelRekapTransaksi model = new modelRekapTransaksi();
-                modelPenjualanDetail detail = new modelPenjualanDetail();
-                modelBarang obat = new modelBarang();
-                
-                obat.setIdProduk(rs.getString("Kd_Produk"));
-                obat.setBarcode(rs.getString("Barcode"));
-                obat.setNamaProduk(rs.getString("Nama_Produk"));
-                obat.setHargaProduk(rs.getInt("Harga_Produk"));
-                obat.setStokProduk(rs.getInt("Stok"));
-                
-                detail.setQty(rs.getInt("Quantity"));
-                detail.setNilai(rs.getInt("Subtotal"));
-                
-                
-                model.setModelBarang(obat);
-                model.setModelPendet(detail);
-                
-                list.add(model);
-            }
-        } catch (SQLException e) {
-            System.out.println("Error while fetching data: " + e.getMessage());
+         List<modelRekapTransaksi> list = new ArrayList<>();
+    String sql = "SELECT * FROM tabel_rekaptransaksi";
+    
+    try (PreparedStatement stmt = conn.prepareStatement(sql); 
+         ResultSet rs = stmt.executeQuery()) {
+        while (rs.next()) {
+            modelRekapTransaksi model = new modelRekapTransaksi();
+            modelPenjualanDetail detail = new modelPenjualanDetail();
+            modelBarang barang = new modelBarang();
+            
+            barang.setIdProduk(rs.getString("Kd_Produk"));
+            barang.setBarcode(rs.getString("Barcode")); // PASTIKAN INI ADA
+            barang.setNamaProduk(rs.getString("Nama_Produk"));
+            barang.setHargaProduk(rs.getInt("Harga_Produk"));
+            barang.setStokProduk(rs.getDouble("Stok")); // Gunakan getDouble untuk stok
+            
+            detail.setQty(rs.getInt("Quantity"));
+            detail.setNilai(rs.getInt("Subtotal"));
+            
+            model.setModelBarang(barang);
+            model.setModelPendet(detail);
+            
+            list.add(model);
         }
-        
-        return list;
+    } catch (SQLException e) {
+        System.out.println("Error while fetching data: " + e.getMessage());
+    }
+    
+    return list;
     }
     
 }

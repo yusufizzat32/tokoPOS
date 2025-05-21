@@ -161,4 +161,62 @@ public class penjualanDAO implements servicePenjualan{
         return null;
     }
     
+    public List<modelPenjualan> getPenjualanPerHari() {
+    List<modelPenjualan> listPenjualan = new ArrayList<>();
+    String sql = "SELECT DATE_FORMAT(Tanggal, '%Y-%m-%d') AS Tanggal, SUM(Total) AS TotalHarian " +
+                 "FROM tabel_transaksipenjualan " +
+                 "GROUP BY DATE_FORMAT(Tanggal, '%Y-%m-%d') " +
+                 "ORDER BY Tanggal ASC";
+
+    try (PreparedStatement st = conn.prepareStatement(sql);
+         ResultSet rs = st.executeQuery()) {
+        while (rs.next()) {
+            modelPenjualan model = new modelPenjualan();
+            model.setTanggal(rs.getString("Tanggal"));
+            model.setTotal(rs.getDouble("TotalHarian"));
+            listPenjualan.add(model);
+        }
+    } catch (SQLException e) {
+        System.out.println("Gagal mengambil data penjualan harian: " + e.getMessage());
+    }
+    return listPenjualan;
+}
+    
+    public double getPendapatanHariIni() {
+    String sql = "SELECT SUM(Total) AS TotalHariIni FROM tabel_transaksipenjualan WHERE Tanggal = CURDATE()";
+    try (PreparedStatement st = conn.prepareStatement(sql);
+         ResultSet rs = st.executeQuery()) {
+        if (rs.next()) {
+            return rs.getDouble("TotalHariIni");
+        }
+    } catch (SQLException e) {
+        System.out.println("Gagal mengambil pendapatan hari ini: " + e.getMessage());
+    }
+    return 0.0;
+}
+    public int getTotalJumlahTransaksi() {
+    String sql = "SELECT COUNT(*) AS TotalTransaksi FROM tabel_transaksipenjualan";
+    try (PreparedStatement st = conn.prepareStatement(sql);
+         ResultSet rs = st.executeQuery()) {
+        if (rs.next()) {
+            return rs.getInt("TotalTransaksi");
+        }
+    } catch (SQLException e) {
+        System.out.println("Gagal mengambil total transaksi: " + e.getMessage());
+    }
+    return 0;
+}
+    public double getTotalPendapatan() {
+    String sql = "SELECT SUM(Total) AS TotalPendapatan FROM tabel_transaksipenjualan";
+    try (PreparedStatement st = conn.prepareStatement(sql);
+         ResultSet rs = st.executeQuery()) {
+        if (rs.next()) {
+            return rs.getDouble("TotalPendapatan");
+        }
+    } catch (SQLException e) {
+        System.out.println("Gagal mengambil total pendapatan: " + e.getMessage());
+    }
+    return 0.0;
+}
+    
 }

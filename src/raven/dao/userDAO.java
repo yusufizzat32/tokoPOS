@@ -82,7 +82,7 @@ public class userDAO implements serviceUser {
     }
 
     @Override
-    public List<modelUser> tampilData() {
+    public List<modelUser> showData() {
         PreparedStatement st = null;
         ResultSet rs = null;
         List list = new ArrayList();

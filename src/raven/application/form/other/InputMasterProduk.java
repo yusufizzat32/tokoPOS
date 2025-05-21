@@ -29,29 +29,30 @@ public class InputMasterProduk extends javax.swing.JDialog {
     private int row;
     private FormMasterProduk formMasterProduk;
     
+    
     public InputMasterProduk(java.awt.Frame parent, boolean modal,int row, modelBarang barang,FormMasterProduk formMasterProduk) {
         super(parent, modal);
-    this.barang = barang;
-    this.row = row;
-    this.formMasterProduk = formMasterProduk;
+        this.barang = barang;
+        this.row = row;
+        this.formMasterProduk = formMasterProduk;
     
-    initComponents();  // This must be called first to initialize components
+        initComponents();  // This must be called first to initialize components
     
-    // Now we can safely access UI components
-    txtIdBarang.requestFocusInWindow();
-    setupBarcodeScannerHandling();
+        // Now we can safely access UI components
+        txtIdBarang.requestFocusInWindow();
+        setupBarcodeScannerHandling();
     
-    setLocationRelativeTo(null);
-    if (barang != null) {
+        setLocationRelativeTo(null);
+        if (barang != null) {
         dataTable();
-    }
-    loadData();
+        }
+        loadData();
         
     }
         private void loadData(){
-        List<modelBarang> list = servis.showData();
-        tblModel.setData(list);
-    }
+            List<modelBarang> list = servis.showData();
+            tblModel.setData(list);
+        }
         private boolean validasiInput() {
             if (txtIdBarang.getText().trim().isEmpty()) {
             JOptionPane.showMessageDialog(this, "ID Obat tidak boleh kosong.");
@@ -354,10 +355,10 @@ public class InputMasterProduk extends javax.swing.JDialog {
             dispose();
         }
     }//GEN-LAST:event_batalActionPerformed
-private void handleBarcodeInput(String barcode) {
-    if (barcode.isEmpty()) {
-        return;
-    }
+    private void handleBarcodeInput(String barcode) {
+        if (barcode.isEmpty()) {
+            return;
+        }
     
     modelBarang existingItem = servis.cariBarangByBarcode(barcode);
     
