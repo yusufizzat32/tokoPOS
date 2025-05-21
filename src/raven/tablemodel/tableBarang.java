@@ -92,6 +92,5 @@ public class tableBarang extends AbstractTableModel {
     public String getColumnName(int column){
         return columnNames[column];
     }
-    
-    
+      
 }

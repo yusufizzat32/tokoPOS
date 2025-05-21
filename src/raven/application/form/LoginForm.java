@@ -105,7 +105,6 @@ public class LoginForm extends javax.swing.JPanel {
         }
         
         
-      
     }
 
     private void init() {

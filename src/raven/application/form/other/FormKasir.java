@@ -168,11 +168,23 @@ public class FormKasir extends javax.swing.JPanel {
         jLabel6.setFont(new java.awt.Font("Segoe UI", 0, 10)); // NOI18N
         jLabel6.setText("BARCODE");
 
+        txtNoFaktur.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtNoFakturActionPerformed(evt);
+            }
+        });
+
         jLabel7.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabel7.setText("No. Faktur");
 
         jLabel8.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabel8.setText("Sub Total");
+
+        txtTotal.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtTotalActionPerformed(evt);
+            }
+        });
 
         jLabel10.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabel10.setText("Total");
@@ -197,6 +209,11 @@ public class FormKasir extends javax.swing.JPanel {
         });
 
         btnCetak.setText("cetak");
+        btnCetak.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCetakActionPerformed(evt);
+            }
+        });
 
         jLabel13.setFont(new java.awt.Font("Segoe UI", 0, 10)); // NOI18N
         jLabel13.setText("NAMA");
@@ -237,6 +254,11 @@ public class FormKasir extends javax.swing.JPanel {
         jLabel17.setText("%");
 
         btnReset.setText("reset");
+        btnReset.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnResetActionPerformed(evt);
+            }
+        });
 
         btnCancel.setText("BATAL");
         btnCancel.addActionListener(new java.awt.event.ActionListener() {
@@ -657,7 +679,7 @@ public class FormKasir extends javax.swing.JPanel {
             }
         }
 
-                btnNew.setEnabled(true);
+        btnNew.setEnabled(true);
         btnCari.setEnabled(false);
         btnSimpan.setEnabled(false);
         btnCancel.setEnabled(false);
@@ -699,9 +721,10 @@ public class FormKasir extends javax.swing.JPanel {
         txtTotal2.setText(String.valueOf(grandTotal));
         
         // Reset field pembayaran
-        txtDiskon.setText("0");
+        txtDiskon.setText("");
         txtBayar.setText("");
         txtKembalian.setText("");
+        
         
         txtBayar.requestFocus();
     } catch (NumberFormatException e) {
@@ -709,12 +732,97 @@ public class FormKasir extends javax.swing.JPanel {
     }
 }
     private void btnHitungTotalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHitungTotalActionPerformed
+        tableRekapTransaksi model = (tableRekapTransaksi) tbPengeluaran.getModel();
+    int grandTotal = 0;
+
+    try {
+        for (int i = 0; i < model.getRowCount(); i++) {
+            // Ambil nilai SUBTOTAL dari kolom 5 (indeks 5)
+            Object value = model.getValueAt(i, 5); 
+            if (value != null) {
+                String totalStr = value.toString().replaceAll("[^\\d]", "");
+                if (!totalStr.isEmpty()) {
+                    int totalBarang = Integer.parseInt(totalStr);
+                    grandTotal += totalBarang;
+                }
+            }
+        }
+
+        // Update total
+        txtSubTotal.setText(String.valueOf(grandTotal));
+        txtTotal.setText(String.valueOf(grandTotal));
+        txtTotal2.setText(String.valueOf(grandTotal));
+
+        // Reset field pembayaran jika diskon 0
+        if (txtDiskon.getText().isEmpty() || txtDiskon.getText().equals("0")) {
+            txtTotal.setText(String.valueOf(grandTotal));
+        } else {
+            // Jika ada diskon, hitung ulang dengan diskon
+            int diskon = Integer.parseInt(txtDiskon.getText());
+            int totalDiskon = grandTotal - (grandTotal * diskon / 100);
+            txtTotal.setText(String.valueOf(totalDiskon));
+        }
+
+        txtBayar.requestFocus();
+    } catch (NumberFormatException e) {
+        JOptionPane.showMessageDialog(this, "Format angka tidak valid: " + e.getMessage());
         hitungTotal();
     }//GEN-LAST:event_btnHitungTotalActionPerformed
-
+    }
     private void txtBarcodeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtBarcodeActionPerformed
         
     }//GEN-LAST:event_txtBarcodeActionPerformed
+
+    private void btnCetakActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCetakActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnCetakActionPerformed
+
+    private void txtNoFakturActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNoFakturActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtNoFakturActionPerformed
+
+    private void btnResetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnResetActionPerformed
+
+    // Reset field input
+    txtNoFaktur.setText("");
+    txtSubTotal.setText("0");
+    txtTotal.setText("");
+    txtDiskon.setText("0");
+    txtBayar.setText("");
+    txtKembalian.setText("");
+    
+    // Reset field barang
+    txtBarcode.setText("");
+    txtNama.setText("");
+    txtHarga.setText("");
+    txtStok.setText("");
+    txtQty.setText("");
+    
+    // Reset tabel
+    tblModel.clear();
+    
+    // Generate nomor faktur baru
+    txtNoFaktur.setText(servis.noTransaksi());
+    
+    // Reset status tombol
+    btnSimpan.setEnabled(false);
+    btnHapus.setEnabled(false);
+    btnNew.setEnabled(true);
+    txtQty.setEditable(false);
+    btnReset.addActionListener(new java.awt.event.ActionListener() {
+    public void actionPerformed(java.awt.event.ActionEvent evt) {
+        resetForm();
+    }
+
+        private void resetForm() {
+            throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        }
+    });
+    }//GEN-LAST:event_btnResetActionPerformed
+
+    private void txtTotalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtTotalActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtTotalActionPerformed
     private void handleBarcodeInput(String barcode) {
     if (barcode.isEmpty()) {
         return;

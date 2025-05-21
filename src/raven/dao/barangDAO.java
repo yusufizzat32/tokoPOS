@@ -102,7 +102,6 @@ public class barangDAO implements serviceBarang{
                 double stokLama = rs.getDouble("Stok");
                 double stokBaru = stokLama + stok;
 
-
                 st = conn.prepareStatement(updateSql);
                 st.setDouble(1, stokBaru);
                 st.setString(2, id);
