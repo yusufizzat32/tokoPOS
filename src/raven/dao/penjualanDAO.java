@@ -281,5 +281,52 @@ public List<modelPenjualan> tampilPenjualanByPeriod(int idUser, String period) {
     String nomorUrut = String.format("%04d", count);
     return prefix + tanggal + nomorUrut;
 }
+    public List<modelPenjualan> getPenjualanByPeriod(String period) {
+    List<modelPenjualan> listPenjualan = new ArrayList<>();
+    String sql = "";
+    
+    switch(period) {
+        case "7 Hari Terakhir":
+            sql = "SELECT DATE_FORMAT(Tanggal, '%Y-%m-%d') AS Tanggal, SUM(Total) AS TotalHarian " +
+                  "FROM tabel_transaksipenjualan " +
+                  "WHERE Tanggal >= DATE_SUB(CURDATE(), INTERVAL 7 DAY) " +
+                  "GROUP BY DATE_FORMAT(Tanggal, '%Y-%m-%d') " +
+                  "ORDER BY Tanggal ASC";
+            break;
+        case "1 Bulan Terakhir":
+            sql = "SELECT DATE_FORMAT(Tanggal, '%Y-%m-%d') AS Tanggal, SUM(Total) AS TotalHarian " +
+                  "FROM tabel_transaksipenjualan " +
+                  "WHERE Tanggal >= DATE_SUB(CURDATE(), INTERVAL 1 MONTH) " +
+                  "GROUP BY DATE_FORMAT(Tanggal, '%Y-%m-%d') " +
+                  "ORDER BY Tanggal ASC";
+            break;
+        case "1 Tahun Terakhir":
+            sql = "SELECT DATE_FORMAT(Tanggal, '%Y-%m') AS Tanggal, SUM(Total) AS TotalHarian " +
+                  "FROM tabel_transaksipenjualan " +
+                  "WHERE Tanggal >= DATE_SUB(CURDATE(), INTERVAL 1 YEAR) " +
+                  "GROUP BY DATE_FORMAT(Tanggal, '%Y-%m') " +
+                  "ORDER BY Tanggal ASC";
+            break;
+        default: // Default 7 Hari Terakhir
+            sql = "SELECT DATE_FORMAT(Tanggal, '%Y-%m-%d') AS Tanggal, SUM(Total) AS TotalHarian " +
+                  "FROM tabel_transaksipenjualan " +
+                  "WHERE Tanggal >= DATE_SUB(CURDATE(), INTERVAL 7 DAY) " +
+                  "GROUP BY DATE_FORMAT(Tanggal, '%Y-%m-%d') " +
+                  "ORDER BY Tanggal ASC";
+    }
+    
+    try (PreparedStatement st = conn.prepareStatement(sql);
+         ResultSet rs = st.executeQuery()) {
+        while (rs.next()) {
+            modelPenjualan model = new modelPenjualan();
+            model.setTanggal(rs.getString("Tanggal"));
+            model.setTotal(rs.getDouble("TotalHarian"));
+            listPenjualan.add(model);
+        }
+    } catch (SQLException e) {
+        System.out.println("Gagal mengambil data penjualan: " + e.getMessage());
+    }
+    return listPenjualan;
+}
     
 }
