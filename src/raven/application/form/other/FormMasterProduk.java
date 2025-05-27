@@ -9,6 +9,7 @@ import raven.model.modelBarang;
 import raven.service.serviceBarang;
 import raven.tablemodel.tableBarang;
 import java.util.List;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
 import javax.swing.table.TableColumnModel;
 /**
@@ -22,21 +23,41 @@ public class FormMasterProduk extends javax.swing.JPanel {
     public FormMasterProduk() {
         initComponents();
         loadData();
+        loadKategori();
         table1.setModel(tblModel);
         setLebarKolom();
     }
     private void setLebarKolom() {
-        TableColumnModel kolom = table1.getColumnModel();
-        kolom.getColumn(0).setPreferredWidth(50);
-        kolom.getColumn(0).setMaxWidth(50);
-        kolom.getColumn(0).setMinWidth(50);
-    }
+    TableColumnModel kolom = table1.getColumnModel();
+    kolom.getColumn(0).setPreferredWidth(50);
+    kolom.getColumn(0).setMaxWidth(50);
+    kolom.getColumn(0).setMinWidth(50);
+    // Tambahkan pengaturan untuk kolom kategori jika perlu
+    kolom.getColumn(7).setPreferredWidth(100);
+}
     private void loadData() {
         List<modelBarang> list = servis.showData(); 
         tblModel.setData(list);
     }
+    private void loadKategori() {
+        List<String> listKategori = servis.getKategoriList(); // Anda perlu menambahkan method getKategoriList() di serviceBarang
+        DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>();
+        model.addElement("Semua Kategori"); // Opsi default
+        for (String kategori : listKategori) {
+            model.addElement(kategori);
+        }
+        cbxKategori.setModel(model);
+    }
     private void searchData(){
-        List<modelBarang> list = servis.searchData(txtSearch.getText());
+         String keyword = txtSearch.getText();
+        String kategori = cbxKategori.getSelectedItem().toString();
+        
+        List<modelBarang> list;
+        if (kategori.equals("Semua Kategori")) {
+            list = servis.searchData(keyword); // Cari berdasarkan keyword saja
+        } else {
+            list = servis.searchDataByKategori(keyword, kategori); // Cari berdasarkan keyword dan kategori
+        }
         tblModel.setData(list);
     }
     private void tambahData(){
@@ -84,6 +105,7 @@ public class FormMasterProduk extends javax.swing.JPanel {
         jScrollPane2 = new javax.swing.JScrollPane();
         table1 = new com.raven.swing.Table();
         jLabel2 = new javax.swing.JLabel();
+        cbxKategori = new javax.swing.JComboBox<>();
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         jLabel1.setText("MASTER PRODUK");
@@ -109,7 +131,6 @@ public class FormMasterProduk extends javax.swing.JPanel {
             }
         });
 
-        txtSearch.setText("Cari Barang");
         txtSearch.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtSearchActionPerformed(evt);
@@ -139,6 +160,13 @@ public class FormMasterProduk extends javax.swing.JPanel {
 
         jLabel2.setText("Search");
 
+        cbxKategori.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cbxKategori.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cbxKategoriActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -155,7 +183,9 @@ public class FormMasterProduk extends javax.swing.JPanel {
                                 .addComponent(edit, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(hapus, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 389, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 206, Short.MAX_VALUE)
+                                .addComponent(cbxKategori, javax.swing.GroupLayout.PREFERRED_SIZE, 177, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jLabel2))
                             .addComponent(jLabel1))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -173,7 +203,8 @@ public class FormMasterProduk extends javax.swing.JPanel {
                     .addComponent(tambah)
                     .addComponent(edit)
                     .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel2))
+                    .addComponent(jLabel2)
+                    .addComponent(cbxKategori, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -201,11 +232,16 @@ public class FormMasterProduk extends javax.swing.JPanel {
     }//GEN-LAST:event_txtSearchKeyPressed
 
     private void txtSearchKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSearchKeyReleased
-
+        searchData();
     }//GEN-LAST:event_txtSearchKeyReleased
+
+    private void cbxKategoriActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbxKategoriActionPerformed
+    searchData();        // TODO add your handling code here:
+    }//GEN-LAST:event_cbxKategoriActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JComboBox<String> cbxKategori;
     private javax.swing.JToggleButton edit;
     private javax.swing.JToggleButton hapus;
     private javax.swing.JLabel jLabel1;

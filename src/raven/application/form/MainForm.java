@@ -21,7 +21,6 @@ import raven.application.form.other.FormKasir;
 import raven.application.form.other.FormTransaksi;
 import raven.application.form.other.FormMasterProduk;
 import raven.application.form.other.FormProdukMasuk;
-import raven.application.form.other.FormUser;
 import raven.menu.Menu;
 import raven.menu.MenuAction;
 import raven.model.modelUser;
@@ -48,6 +47,7 @@ public class MainForm extends JLayeredPane {
                 + "arc:999;"
                 + "focusWidth:0;"
                 + "borderWidth:0");
+       
         menuButton.addActionListener((ActionEvent e) -> {
             setMenuFull(!menu.isMenuFull());
         });
@@ -99,14 +99,14 @@ public class MainForm extends JLayeredPane {
                 }   
             } else if (index == 3) {
                 if (subIndex == 1) {
-                    Application.showForm(new FormUser());
+                    
                 
                 }else {
                     action.cancel();
                 }   
             } 
             else if (index == 4) {
-//                Application.logout();
+//                Application.logout(); 
             } else {
                 action.cancel();
             }

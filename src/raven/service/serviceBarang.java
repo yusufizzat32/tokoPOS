@@ -20,6 +20,8 @@ public interface serviceBarang {
     List<modelBarang> showData();
     List<modelBarang> searchData(String keyword);
     List<modelBarang> ambilNamaBarang();
+    List<String> getKategoriList();
+    List<modelBarang> searchDataByKategori(String keyword, String kategori);
     String ambilNamaBarangId(int id);
 
     modelBarang cariBarangByBarcode(String id); // Perubahan di sini

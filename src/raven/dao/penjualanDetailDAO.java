@@ -29,35 +29,33 @@ public class penjualanDetailDAO implements servicePenjualanDetail{
         conn = connectionDB.getConnection();
     }
 
-    @Override
-    public void tambah_detail_P(modelPenjualanDetail model) {
-        if (!cekStok(model.getModelBaraang().getIdProduk(), model.getQty())) {
-            System.out.println(
-                    "Stok tidak mencukupi untuk obat ID: " + model.getModelBaraang().getIdProduk());
-            return; // Hentikan proses jika stok tidak cukup
-        }
-
-        String sql =
-                "INSERT INTO tabel_transaksidetail (Ref, Kd_Produk, Nama_Produk,Harga_Satuan, Quantity, Subtotal) VALUES (?, ?, ?, ?, ?, ?)";
-
-        try (PreparedStatement st = conn.prepareStatement(sql)) {
-            st.setString(1, model.getModelPenjualan().getRef());
-            st.setString(2, model.getModelBaraang().getIdProduk());
-            st.setString(3, model.getModelBaraang().getNamaProduk());
-            st.setDouble(4, model.getModelBaraang().getHargaProduk());
-            st.setDouble(5, model.getQty());
-            st.setDouble(6, model.getNilai());
-            st.executeUpdate();
-            
-
-
-            // Update stok setelah menambahkan detail penjualan
-//            updateStok(model.getModelBaraang().getIdProduk(), model.getQty());
-        } catch (SQLException e) {
-            System.out.println("Gagal menambahkan detail penjualan: " + e.getMessage());
-        }
+@Override
+public void tambah_detail_P(modelPenjualanDetail model) {
+    if (!cekStok(model.getModelBaraang().getIdProduk(), model.getQty())) {
+        System.out.println("Stok tidak mencukupi untuk produk ID: " + 
+            model.getModelBaraang().getIdProduk());
+        return;
     }
 
+    String sql = "INSERT INTO tabel_transaksidetail (Ref, Kd_Produk, Nama_Produk, Harga_Satuan, Quantity, Subtotal) " 
+               + "VALUES (?, ?, ?, ?, ?, ?)";
+
+    try (PreparedStatement st = conn.prepareStatement(sql)) {
+        st.setString(1, model.getModelPenjualan().getRef());
+        st.setString(2, model.getModelBaraang().getIdProduk());
+        st.setString(3, model.getModelBaraang().getNamaProduk());
+        st.setInt(4, model.getModelBaraang().getHargaProduk());
+        st.setInt(5, model.getQty());
+        st.setInt(6, model.getNilai());
+        int affectedRows = st.executeUpdate();
+        System.out.println("Inserted " + affectedRows + " row(s) for ref: " + 
+            model.getModelPenjualan().getRef());
+    } catch (SQLException e) {
+        System.out.println("Gagal menambahkan detail penjualan: " + e.getMessage());
+        e.printStackTrace();
+        throw new RuntimeException("Failed to save transaction detail", e);
+    }
+}
     @Override
     public void sumTotal(modelPenjualanDetail model) {
         PreparedStatement st = null;
@@ -86,39 +84,44 @@ public class penjualanDetailDAO implements servicePenjualanDetail{
     }
 
     @Override
-    public List<modelPenjualanDetail> tampil_detail_P(String id) {
-        List<modelPenjualanDetail> details = new ArrayList<>();
-        String sql = "SELECT td.*, m.* "
-                + "FROM tabel_transaksidetail td "
-                + "JOIN tabel_barang m ON td.Kd_Produk = m.Kd_Produk " + "WHERE td.Ref = ?"; 
-
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, id);
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    modelBarang obat = new modelBarang();
-                    obat.setIdProduk(rs.getString("Kd_Produk"));
-                    obat.setNamaProduk(rs.getString("Nama_Produk"));
-                    obat.setHargaProduk(rs.getInt("Harga_Jual"));
-
-                    modelPenjualan penjualan = new modelPenjualan();
-                    penjualan.setRef(id); 
-
-                    modelPenjualanDetail detail = new modelPenjualanDetail();
-                    detail.setModelBarang(obat);
-                    detail.setModelPenjualan(penjualan);
-                    detail.setQty(rs.getInt("Quantity"));
-                    detail.setNilai(rs.getInt("Subtotal"));
-                    details.add(detail);
-                }
+public List<modelPenjualanDetail> tampil_detail_P(String id) {
+    List<modelPenjualanDetail> details = new ArrayList<>();
+    // Hanya query dari tabel_transaksidetail saja
+    String sql = "SELECT * FROM tabel_transaksidetail WHERE Ref = ?";
+    
+    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setString(1, id);
+        
+        System.out.println("Executing query: " + stmt); // Debug
+        
+        try (ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                modelBarang obat = new modelBarang();
+                obat.setIdProduk(rs.getString("Kd_Produk"));
+                obat.setNamaProduk(rs.getString("Nama_Produk"));
+                obat.setHargaProduk(rs.getInt("Harga_Satuan")); // Ganti ke Harga_Satuan
+                
+                modelPenjualan penjualan = new modelPenjualan();
+                penjualan.setRef(id);
+                
+                modelPenjualanDetail detail = new modelPenjualanDetail();
+                detail.setModelBarang(obat);
+                detail.setModelPenjualan(penjualan);
+                detail.setQty(rs.getInt("Quantity"));
+                detail.setNilai(rs.getInt("Subtotal"));
+                details.add(detail);
+                
+                System.out.println("Found detail: " + obat.getIdProduk() + " - " + obat.getNamaProduk()); // Debug
             }
-        } catch (SQLException e) {
-            System.out.println("Gagal mengambil data detail penjualan: " + e.getMessage());
         }
-
-        return details;
+    } catch (SQLException e) {
+        System.out.println("Gagal mengambil data detail penjualan: " + e.getMessage());
+        e.printStackTrace();
     }
+    
+    System.out.println("Total details found: " + details.size()); // Debug
+    return details;
+}
 
     @Override
     public List<modelPenjualanDetail> search(String keyword) {
@@ -138,22 +141,23 @@ public class penjualanDetailDAO implements servicePenjualanDetail{
         }
     }
     public boolean cekStok(String idProduk, double qty) {
-        String sql = "SELECT Stok FROM tabel_barang WHERE Kd_Produk = ?";
-
-        try (PreparedStatement st = conn.prepareStatement(sql)) {
-            st.setString(1, idProduk);
-
-            try (ResultSet rs = st.executeQuery()) {
-                if (rs.next()) {
-                    double stok = rs.getDouble("Stok");
-                    return stok >= qty; // True jika stok mencukupi
-                }
+    String sql = "SELECT Stok FROM tabel_barang WHERE Kd_Produk = ?";
+    
+    try (PreparedStatement st = conn.prepareStatement(sql)) {
+        st.setString(1, idProduk);
+        
+        try (ResultSet rs = st.executeQuery()) {
+            if (rs.next()) {
+                double stok = rs.getDouble("Stok");
+                System.out.println("Debug - Stok: " + stok + ", Qty: " + qty); // Debug line
+                return stok >= qty;
             }
-        } catch (SQLException e) {
-            System.out.println("Gagal mengecek stok: " + e.getMessage());
         }
-        return false; // False jika stok tidak mencukupi atau ada kesalahan
+    } catch (SQLException e) {
+        System.out.println("Gagal mengecek stok: " + e.getMessage());
     }
+    return false;
+}
     
     public void updateQty(String idPenjualanrinci, String idObat, double qtyBaru) {
         String getQtySql = "SELECT Qty FROM tabel_transaksidetail WHERE Kd_Trx = ? AND Kd_Produk = ?";

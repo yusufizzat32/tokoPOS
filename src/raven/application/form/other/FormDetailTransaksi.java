@@ -47,14 +47,15 @@ public class FormDetailTransaksi extends javax.swing.JPanel {
     private Timer timer;
     session sess = session.getInstance();
     
+    
     private modelPenjualan mp = new modelPenjualan();
     public FormDetailTransaksi(String refTransaksi) {
         initComponents();
         this.idKaryawan = sess.getUserId();
         tblData.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {},
-            new String [] {"Kode Produk", "Nama Produk", "Harga", "Qty", "Subtotal"}
-        ));
+    new Object [][] {},
+    new String [] {"Kode Produk", "Nama Produk", "Harga", "Qty", "Subtotal"}
+));
         
         loadDetailData(refTransaksi);
         setLebarKolom();
@@ -69,22 +70,29 @@ public class FormDetailTransaksi extends javax.swing.JPanel {
         
     }
     private void loadDetailData(String refTransaksi) {
-    List<modelPenjualanDetail> details = servisDetail.tampil_detail_P(refTransaksi);
-    
-    DefaultTableModel model = (DefaultTableModel) tblData.getModel();
-    model.setRowCount(0);
-    
-
-    for (modelPenjualanDetail detail : details) {
-        model.addRow(new Object[]{
-            detail.getModelBaraang().getIdProduk(),
-            detail.getModelBaraang().getNamaProduk(),
-            detail.getModelBaraang().getHargaProduk(),
-            detail.getQty(),
-            detail.getNilai()
-        });
+     System.out.println("Loading details for ref: " + refTransaksi);
+    try {
+        List<modelPenjualanDetail> details = servisDetail.tampil_detail_P(refTransaksi);
+        System.out.println("Found " + details.size() + " details");
+        
+        DefaultTableModel model = (DefaultTableModel) tblData.getModel();
+        model.setRowCount(0);
+        
+        for (modelPenjualanDetail detail : details) {
+            System.out.println("Adding row: " + detail.getModelBaraang().getIdProduk());
+            model.addRow(new Object[]{
+                detail.getModelBaraang().getIdProduk(),
+                detail.getModelBaraang().getNamaProduk(),
+                detail.getModelBaraang().getHargaProduk(),
+                detail.getQty(),
+                detail.getNilai()
+            });
+        }
+    } catch (Exception e) {
+        System.err.println("Error loading details: " + e.getMessage());
+        e.printStackTrace();
     }
-    }
+}
 
     private void loadData() {
         List<modelPenjualan> list = servis.tampilPenjualan(idKaryawan);
@@ -101,9 +109,9 @@ public class FormDetailTransaksi extends javax.swing.JPanel {
         edit = new javax.swing.JToggleButton();
         hapus = new javax.swing.JToggleButton();
         jLabel1 = new javax.swing.JLabel();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        tblData = new javax.swing.JTable();
         jLabel2 = new javax.swing.JLabel();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        tblData = new com.raven.swing.Table();
 
         table1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -142,6 +150,9 @@ public class FormDetailTransaksi extends javax.swing.JPanel {
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         jLabel1.setText("MASTER PRODUK");
 
+        jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        jLabel2.setText("Detail Transaksi");
+
         tblData.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -153,10 +164,7 @@ public class FormDetailTransaksi extends javax.swing.JPanel {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        jScrollPane2.setViewportView(tblData);
-
-        jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
-        jLabel2.setText("Detail Transaksi");
+        jScrollPane3.setViewportView(tblData);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -166,7 +174,7 @@ public class FormDetailTransaksi extends javax.swing.JPanel {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 831, Short.MAX_VALUE)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 831, Short.MAX_VALUE))
+                    .addComponent(jScrollPane3))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -174,9 +182,9 @@ public class FormDetailTransaksi extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel2)
-                .addGap(40, 40, 40)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 245, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(137, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -198,9 +206,9 @@ public class FormDetailTransaksi extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JTable table1;
     private javax.swing.JToggleButton tambah;
-    private javax.swing.JTable tblData;
+    private com.raven.swing.Table tblData;
     // End of variables declaration//GEN-END:variables
 }
