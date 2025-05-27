@@ -27,6 +27,12 @@ public final class FormDashboard extends javax.swing.JPanel {
     public FormDashboard() {
         initComponents();
         penjualanDao = new penjualanDAO();
+        // Inisialisasi combobox
+        String[] rentangWaktu = {"7 Hari Terakhir", "1 Bulan Terakhir", "1 Tahun Terakhir"};
+        cbxRentangWaktu.setModel(new javax.swing.DefaultComboBoxModel<>(rentangWaktu));
+    
+        // Tambahkan action listener
+        cbxRentangWaktu.addActionListener(e -> updateChart());
         showPenjualanPerHariChart();
         updatePendapatanHariIni();
         updateTotalJumlahTransaksi();
@@ -35,7 +41,44 @@ public final class FormDashboard extends javax.swing.JPanel {
 
     
     
+    private void updateChart() {
+        String selectedPeriod = (String) cbxRentangWaktu.getSelectedItem();
+        showPenjualanChart(selectedPeriod);
+    }
+    public void showPenjualanChart(String period) {
+    List<modelPenjualan> dataPenjualan = penjualanDao.getPenjualanByPeriod(period);
 
+    DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+    for (modelPenjualan penjualan : dataPenjualan) {
+        dataset.addValue(penjualan.getTotal(), "Penjualan", penjualan.getTanggal());
+    }
+
+    String xAxisLabel = "Tanggal";
+    if ("1 Tahun Terakhir".equals(period)) {
+        xAxisLabel = "Bulan-Tahun";
+    }
+
+    JFreeChart chart = ChartFactory.createLineChart(
+        "Penjualan " + period, 
+        xAxisLabel,           
+        "Total Penjualan",     
+        dataset,              
+        PlotOrientation.VERTICAL,
+        true,                
+        true,                 
+        false                
+    );  
+
+    CategoryPlot plot = chart.getCategoryPlot();
+    plot.setBackgroundPaint(Color.WHITE);
+    LineAndShapeRenderer renderer = (LineAndShapeRenderer) plot.getRenderer();
+    renderer.setSeriesPaint(0, new Color(204, 0, 51));
+
+    ChartPanel chartPanel = new ChartPanel(chart);
+    panelLineChart.removeAll();
+    panelLineChart.add(chartPanel, BorderLayout.CENTER);
+    panelLineChart.validate();
+}
     /*=============================================================================*/
     private void updatePendapatanHariIni() {
         double pendapatan = penjualanDao.getPendapatanHariIni();
@@ -102,11 +145,12 @@ public final class FormDashboard extends javax.swing.JPanel {
         cetakLaporan = new javax.swing.JButton();
         cetakLaporanStokMasuk = new javax.swing.JButton();
         jButton1 = new javax.swing.JButton();
+        cbxRentangWaktu = new javax.swing.JComboBox<>();
+        jLabel5 = new javax.swing.JLabel();
 
-        setMaximumSize(new java.awt.Dimension(1920, 1080));
-        setMinimumSize(new java.awt.Dimension(1920, 1080));
+        setMaximumSize(null);
+        setMinimumSize(null);
         setName(""); // NOI18N
-        setPreferredSize(new java.awt.Dimension(1920, 1080));
 
         panelLineChart.setBackground(new java.awt.Color(204, 204, 204));
         panelLineChart.setLayout(new java.awt.BorderLayout());
@@ -131,7 +175,9 @@ public final class FormDashboard extends javax.swing.JPanel {
                 .addContainerGap()
                 .addGroup(panelTotalTransaksiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(labelJumlahTransaksi, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(panelTotalTransaksiLayout.createSequentialGroup()
+                        .addComponent(labelJumlahTransaksi, javax.swing.GroupLayout.PREFERRED_SIZE, 483, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         panelTotalTransaksiLayout.setVerticalGroup(
@@ -196,7 +242,7 @@ public final class FormDashboard extends javax.swing.JPanel {
             .addGroup(panelLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, 698, Short.MAX_VALUE)
+                    .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(panelLayout.createSequentialGroup()
                         .addComponent(labelTotalPendapatan, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addContainerGap())))
@@ -226,11 +272,19 @@ public final class FormDashboard extends javax.swing.JPanel {
         jButton1.setFont(new java.awt.Font("Helvetica", 1, 24)); // NOI18N
         jButton1.setText("CETAK MASTER PRODUK");
 
+        cbxRentangWaktu.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cbxRentangWaktu.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cbxRentangWaktuActionPerformed(evt);
+            }
+        });
+
+        jLabel5.setText("Rentang Waktu");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(panelLineChart, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -238,16 +292,25 @@ public final class FormDashboard extends javax.swing.JPanel {
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(panelTotalTransaksi, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(cetakLaporan, javax.swing.GroupLayout.DEFAULT_SIZE, 592, Short.MAX_VALUE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(cetakLaporan, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(cetakLaporanStokMasuk, javax.swing.GroupLayout.DEFAULT_SIZE, 600, Short.MAX_VALUE)
-                            .addComponent(panelTotalTransaksi1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(panelTotalTransaksi1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(cetakLaporanStokMasuk, javax.swing.GroupLayout.DEFAULT_SIZE, 553, Short.MAX_VALUE))
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(panel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                            .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, 493, Short.MAX_VALUE))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
+            .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel5)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(cbxRentangWaktu, javax.swing.GroupLayout.PREFERRED_SIZE, 375, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(panelLineChart, javax.swing.GroupLayout.PREFERRED_SIZE, 1583, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(0, 0, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -259,18 +322,27 @@ public final class FormDashboard extends javax.swing.JPanel {
                     .addComponent(panelTotalTransaksi1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(panelTotalTransaksi, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(panel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(cetakLaporan, javax.swing.GroupLayout.DEFAULT_SIZE, 127, Short.MAX_VALUE)
+                    .addComponent(cetakLaporan, javax.swing.GroupLayout.DEFAULT_SIZE, 139, Short.MAX_VALUE)
                     .addComponent(cetakLaporanStokMasuk, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(panelLineChart, javax.swing.GroupLayout.DEFAULT_SIZE, 587, Short.MAX_VALUE)
+                .addGap(24, 24, 24)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(cbxRentangWaktu, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(panelLineChart, javax.swing.GroupLayout.PREFERRED_SIZE, 535, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(13, 13, 13))
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    private void cbxRentangWaktuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbxRentangWaktuActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cbxRentangWaktuActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JComboBox<String> cbxRentangWaktu;
     private javax.swing.JButton cetakLaporan;
     private javax.swing.JButton cetakLaporanStokMasuk;
     private javax.swing.JButton jButton1;
@@ -278,6 +350,7 @@ public final class FormDashboard extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel labelJumlahTransaksi;
     private javax.swing.JLabel labelPendapatanHariIni;
     private javax.swing.JLabel labelTotalPendapatan;

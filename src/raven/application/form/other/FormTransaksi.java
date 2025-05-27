@@ -59,7 +59,7 @@ public class FormTransaksi extends javax.swing.JPanel {
         setLebarKolom();    
         filterComboBox.addItem("Semua");
         filterComboBox.addItem("Hari Ini");
-        filterComboBox.addItem("Minggu");
+        filterComboBox.addItem("Minggu Ini");
         filterComboBox.addItem("Bulan Ini");
     }
     
