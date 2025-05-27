@@ -515,6 +515,7 @@ private int parseNumberField(JTextField field, String fieldName) throws NumberFo
         modelPenjualan mp = new modelPenjualan();
         session sess = session.getInstance();
         int idUser = sess.getUserId();
+    
         mp.setCreateAt(new Timestamp(System.currentTimeMillis()));
         mp.setRef(ref);
         mp.setBayar(bayar);

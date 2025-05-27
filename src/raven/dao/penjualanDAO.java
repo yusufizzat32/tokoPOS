@@ -264,5 +264,22 @@ public List<modelPenjualan> tampilPenjualanByPeriod(int idUser, String period) {
     }
     return 0.0;
 }
+    public static String generateKodeTransaksi(Connection conn) throws SQLException {
+    String prefix = "TRX";
+    String tanggal = new java.text.SimpleDateFormat("yyyyMMdd").format(new java.util.Date());
+    String sql = "SELECT COUNT(*) FROM penjualan WHERE kd_trx LIKE ?";
+    
+    PreparedStatement ps = conn.prepareStatement(sql);
+    ps.setString(1, prefix + tanggal + "%");
+    ResultSet rs = ps.executeQuery();
+    
+    int count = 0;
+    if (rs.next()) {
+        count = rs.getInt(1) + 1;
+    }
+
+    String nomorUrut = String.format("%04d", count);
+    return prefix + tanggal + nomorUrut;
+}
     
 }

@@ -31,23 +31,37 @@ public class penjualanDetailDAO implements servicePenjualanDetail{
 
 @Override
 public void tambah_detail_P(modelPenjualanDetail model) {
+    // First check stock availability
     if (!cekStok(model.getModelBaraang().getIdProduk(), model.getQty())) {
         System.out.println("Stok tidak mencukupi untuk produk ID: " + 
             model.getModelBaraang().getIdProduk());
         return;
     }
 
-    String sql = "INSERT INTO tabel_transaksidetail (Ref, Kd_Produk, Nama_Produk, Harga_Satuan, Quantity, Subtotal) " 
-               + "VALUES (?, ?, ?, ?, ?, ?)";
+    String sql = "INSERT INTO tabel_transaksidetail (Kd_Trx, Ref, Kd_Produk, Nama_Produk, Harga_Satuan, Quantity, Subtotal) " 
+               + "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
     try (PreparedStatement st = conn.prepareStatement(sql)) {
-        st.setString(1, model.getModelPenjualan().getRef());
-        st.setString(2, model.getModelBaraang().getIdProduk());
-        st.setString(3, model.getModelBaraang().getNamaProduk());
-        st.setInt(4, model.getModelBaraang().getHargaProduk());
-        st.setInt(5, model.getQty());
-        st.setInt(6, model.getNilai());
+        // Generate transaction code
+        String kdTrx = generateKodeTransaksi(conn);
+        
+        if (kdTrx == null || kdTrx.length() < 4) {
+            throw new SQLException("Gagal generate kode transaksi yang valid");
+        }
+        
+        st.setString(1, kdTrx);
+        st.setString(2, model.getModelPenjualan().getRef());
+        st.setString(3, model.getModelBaraang().getIdProduk());
+        st.setString(4, model.getModelBaraang().getNamaProduk());
+        st.setInt(5, model.getModelBaraang().getHargaProduk());
+        st.setInt(6, model.getQty());
+        st.setInt(7, model.getNilai());
+        
         int affectedRows = st.executeUpdate();
+        if (affectedRows == 0) {
+            throw new SQLException("Gagal menambahkan detail transaksi, tidak ada baris yang terpengaruh.");
+        }
+        
         System.out.println("Inserted " + affectedRows + " row(s) for ref: " + 
             model.getModelPenjualan().getRef());
     } catch (SQLException e) {
@@ -83,35 +97,35 @@ public void tambah_detail_P(modelPenjualanDetail model) {
         }
     }
 
-    @Override
+@Override
 public List<modelPenjualanDetail> tampil_detail_P(String id) {
     List<modelPenjualanDetail> details = new ArrayList<>();
-    // Hanya query dari tabel_transaksidetail saja
     String sql = "SELECT * FROM tabel_transaksidetail WHERE Ref = ?";
     
     try (PreparedStatement stmt = conn.prepareStatement(sql)) {
         stmt.setString(1, id);
         
-        System.out.println("Executing query: " + stmt); // Debug
+        System.out.println("Executing query: " + stmt);
         
         try (ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
                 modelBarang obat = new modelBarang();
                 obat.setIdProduk(rs.getString("Kd_Produk"));
                 obat.setNamaProduk(rs.getString("Nama_Produk"));
-                obat.setHargaProduk(rs.getInt("Harga_Satuan")); // Ganti ke Harga_Satuan
+                obat.setHargaProduk(rs.getInt("Harga_Satuan"));
                 
                 modelPenjualan penjualan = new modelPenjualan();
                 penjualan.setRef(id);
                 
                 modelPenjualanDetail detail = new modelPenjualanDetail();
+                detail.setKdTrx(rs.getString("Kd_Trx")); // Set Kd_Trx
                 detail.setModelBarang(obat);
                 detail.setModelPenjualan(penjualan);
                 detail.setQty(rs.getInt("Quantity"));
                 detail.setNilai(rs.getInt("Subtotal"));
                 details.add(detail);
                 
-                System.out.println("Found detail: " + obat.getIdProduk() + " - " + obat.getNamaProduk()); // Debug
+                System.out.println("Found detail: " + obat.getIdProduk() + " - " + obat.getNamaProduk());
             }
         }
     } catch (SQLException e) {
@@ -119,10 +133,9 @@ public List<modelPenjualanDetail> tampil_detail_P(String id) {
         e.printStackTrace();
     }
     
-    System.out.println("Total details found: " + details.size()); // Debug
+    System.out.println("Total details found: " + details.size());
     return details;
 }
-
     @Override
     public List<modelPenjualanDetail> search(String keyword) {
         throw new UnsupportedOperationException("Not supported yet.");
@@ -217,6 +230,37 @@ public List<modelPenjualanDetail> tampil_detail_P(String id) {
             System.out.println("Gagal memperbarui qty: " + e.getMessage());
         }
     }
+    public static String generateKodeTransaksi(Connection conn) {
+    String kode = "TRX";
+    String sql = "SELECT MAX(Kd_Trx) FROM tabel_transaksidetail";
+    
+    try (PreparedStatement st = conn.prepareStatement(sql);
+         ResultSet rs = st.executeQuery()) {
+        
+        if (rs.next()) {
+            String lastCode = rs.getString(1);
+            if (lastCode != null && lastCode.startsWith("TRX")) {
+                try {
+                    int lastNumber = Integer.parseInt(lastCode.substring(3));
+                    kode += String.format("%04d", lastNumber + 1);
+                } catch (NumberFormatException | StringIndexOutOfBoundsException e) {
+                    // If parsing fails, fallback to timestamp
+                    kode += System.currentTimeMillis() % 10000; // Use last 4 digits of timestamp
+                }
+            } else {
+                kode += "0001";
+            }
+        } else {
+            kode += "0001";
+        }
+    } catch (SQLException e) {
+        System.out.println("Gagal generate kode transaksi: " + e.getMessage());
+        // Fallback to timestamp if error occurs
+        kode += System.currentTimeMillis() % 10000; // Use last 4 digits of timestamp
+    }
+    
+    return kode;
+}
     
     
 }

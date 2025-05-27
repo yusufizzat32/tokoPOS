@@ -54,23 +54,23 @@ public class FormDetailTransaksi extends javax.swing.JPanel {
         this.idKaryawan = sess.getUserId();
         tblData.setModel(new javax.swing.table.DefaultTableModel(
     new Object [][] {},
-    new String [] {"Kode Produk", "Nama Produk", "Harga", "Qty", "Subtotal"}
+    new String [] {"Kode Transaksi", "Kode Produk", "Nama Produk", "Harga", "Qty", "Subtotal"}
 ));
         
         loadDetailData(refTransaksi);
         setLebarKolom();
     }
-    private void setLebarKolom() {
+   private void setLebarKolom() {
     TableColumnModel kolom = tblData.getColumnModel();
-        kolom.getColumn(0).setPreferredWidth(100);  
-        kolom.getColumn(1).setPreferredWidth(200);  
-        kolom.getColumn(2).setPreferredWidth(80);   
-        kolom.getColumn(3).setPreferredWidth(50);   
-        kolom.getColumn(4).setPreferredWidth(100);
-        
-    }
+    kolom.getColumn(0).setPreferredWidth(100);  // Kode Transaksi
+    kolom.getColumn(1).setPreferredWidth(100);  // Kode Produk
+    kolom.getColumn(2).setPreferredWidth(200);  // Nama Produk  
+    kolom.getColumn(3).setPreferredWidth(80);   // Harga   
+    kolom.getColumn(4).setPreferredWidth(50);   // Qty   
+    kolom.getColumn(5).setPreferredWidth(100);  // Subtotal
+}
     private void loadDetailData(String refTransaksi) {
-     System.out.println("Loading details for ref: " + refTransaksi);
+    System.out.println("Loading details for ref: " + refTransaksi);
     try {
         List<modelPenjualanDetail> details = servisDetail.tampil_detail_P(refTransaksi);
         System.out.println("Found " + details.size() + " details");
@@ -81,6 +81,7 @@ public class FormDetailTransaksi extends javax.swing.JPanel {
         for (modelPenjualanDetail detail : details) {
             System.out.println("Adding row: " + detail.getModelBaraang().getIdProduk());
             model.addRow(new Object[]{
+                detail.getKdTrx(), // Tambahkan Kd_Trx
                 detail.getModelBaraang().getIdProduk(),
                 detail.getModelBaraang().getNamaProduk(),
                 detail.getModelBaraang().getHargaProduk(),
