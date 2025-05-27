@@ -13,6 +13,17 @@ public class modelPenjualanDetail {
     private modelPenjualan modelPenjualan1;
     private int qty;
     private int nilai;
+    private String kdTrx;  // Add this field
+    // ... existing fields ...
+    
+    // Add getter and setter
+    public String getKdTrx() {
+        return kdTrx;
+    }
+    
+    public void setKdTrx(String kdTrx) {
+        this.kdTrx = kdTrx;
+    }
     
     public modelPenjualanDetail() {
         this.modelBarang1 = new modelBarang(); // Pastikan ini ada
