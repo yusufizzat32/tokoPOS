@@ -10,8 +10,8 @@ import raven.model.modelReturBarang;
 
 /**
  *
- * @author yusuf
-*/
+ * @author revi
+ */
 public interface serviceRetur {
     void insertRetur(modelReturBarang retur);
     void updateRetur(modelReturBarang retur);

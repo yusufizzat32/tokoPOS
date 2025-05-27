@@ -1,4 +1,8 @@
 package raven.model;
+/**
+ *
+ * @author revi
+ */
 public class modelReturBarang {
     private int idRetur;
     private String ref;

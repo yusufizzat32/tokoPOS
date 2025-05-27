@@ -15,7 +15,7 @@ import javax.swing.table.DefaultTableModel;
 import raven.dao.penjualanDAO;
 /**
  *
- * @author yusuf
+ * @author revi
  */
 public class cariBrgRetur extends javax.swing.JDialog {
 

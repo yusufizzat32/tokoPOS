@@ -11,8 +11,8 @@ import raven.model.modelReturBarang;
 
 /**
  *
- * @author yusuf
-*/
+ * @author revi
+ */
 public interface serviceReturDetail {
     void insertReturDetail(modelDetailRetur detail);
     void updateReturDetail(modelDetailRetur detail);

@@ -20,7 +20,7 @@ import raven.service.serviceRetur;
 import raven.service.serviceReturDetail;
 /**
  *
- * @author yusuf
+ * @author revi
  */
  public class returdetailDAO implements serviceReturDetail{
     private Connection conn;

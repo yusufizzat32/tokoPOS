@@ -11,7 +11,7 @@ import javax.swing.table.AbstractTableModel;
 import raven.model.modelRekapTransaksi;
 /**
  *
- * @author yusuf
+ * @author revi
  */
 public class tableDetailRetur extends AbstractTableModel {
     private final List<modelRekapTransaksi> list = new ArrayList<>();

@@ -17,7 +17,7 @@ import raven.model.modelReturBarang;
 import raven.service.serviceRetur;
 /**
  *
- * @author yusuf
+ * @author revi
  */
  public class returDAO implements serviceRetur{
     private Connection conn;

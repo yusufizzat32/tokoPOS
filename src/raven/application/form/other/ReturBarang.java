@@ -22,7 +22,10 @@ import raven.dao.returDAO;
 import raven.model.modelReturBarang;
 
 
-
+/**
+ *
+ * @author revi
+ */
 public class ReturBarang extends javax.swing.JDialog {
     private final Connection conn;
     private penjualanDetailDAO penjualanDetailService = new penjualanDetailDAO();
