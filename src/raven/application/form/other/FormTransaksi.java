@@ -56,19 +56,29 @@ public class FormTransaksi extends javax.swing.JPanel {
         
         tblData.setModel(tblModelPen);
         loadData();
-        setLebarKolom();
+        setLebarKolom();    
+        filterComboBox.addItem("Semua");
+        filterComboBox.addItem("Hari Ini");
+        filterComboBox.addItem("Minggu");
+        filterComboBox.addItem("Bulan Ini");
     }
     
     private void loadData() {
         List<modelPenjualan> list = servis.tampilPenjualan(idKaryawan);
         tblModelPen.setData(list);
     }
+     private void loadDataByPeriod(String period) {
+        List<modelPenjualan> list = servis.tampilPenjualanByPeriod(idKaryawan, period);
+        tblModelPen.setData(list);
+    }
+    
     private void setLebarKolom() {
         TableColumnModel kolom = table1.getColumnModel();
         kolom.getColumn(0).setPreferredWidth(50);
         kolom.getColumn(0).setMaxWidth(50);
         kolom.getColumn(0).setMinWidth(50);
     }
+    
     
     
    
@@ -84,12 +94,13 @@ public class FormTransaksi extends javax.swing.JPanel {
         jLabel1 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         detail = new javax.swing.JToggleButton();
-        hapus1 = new javax.swing.JToggleButton();
         jLabel2 = new javax.swing.JLabel();
         jScrollPane3 = new javax.swing.JScrollPane();
         tblData = new com.raven.swing.Table();
         jTextField1 = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
+        filterComboBox = new javax.swing.JComboBox<>();
+        jButton1 = new javax.swing.JButton();
 
         table1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -137,13 +148,6 @@ public class FormTransaksi extends javax.swing.JPanel {
             }
         });
 
-        hapus1.setText("HAPUS");
-        hapus1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                hapus1ActionPerformed(evt);
-            }
-        });
-
         jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         jLabel2.setText("RIWAYAT TRANSAKSI");
 
@@ -160,9 +164,15 @@ public class FormTransaksi extends javax.swing.JPanel {
         ));
         jScrollPane3.setViewportView(tblData);
 
-        jTextField1.setText("Cari Barang");
-
         jLabel4.setText("Search");
+
+        filterComboBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                filterComboBoxActionPerformed(evt);
+            }
+        });
+
+        jButton1.setText("print");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -175,8 +185,10 @@ public class FormTransaksi extends javax.swing.JPanel {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(detail, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(hapus1, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(filterComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 169, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jButton1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLabel4)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 228, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -191,9 +203,10 @@ public class FormTransaksi extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(detail, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(hapus1)
                     .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel4))
+                    .addComponent(jLabel4)
+                    .addComponent(filterComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton1))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -230,15 +243,17 @@ public class FormTransaksi extends javax.swing.JPanel {
 
     }//GEN-LAST:event_detailActionPerformed
 
-    private void hapus1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hapus1ActionPerformed
-
-    }//GEN-LAST:event_hapus1ActionPerformed
+    private void filterComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filterComboBoxActionPerformed
+         String selectedPeriod = (String) filterComboBox.getSelectedItem();
+        loadDataByPeriod(selectedPeriod);
+    }//GEN-LAST:event_filterComboBoxActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToggleButton detail;
     private javax.swing.JToggleButton edit;
+    private javax.swing.JComboBox<String> filterComboBox;
     private javax.swing.JToggleButton hapus;
-    private javax.swing.JToggleButton hapus1;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

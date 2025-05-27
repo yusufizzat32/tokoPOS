@@ -14,7 +14,7 @@ public interface serviceBarangMasuk {
     void tambahData (modelBarangMasuk model);
     void updateData (modelBarangMasuk model);
     void hapusData (modelBarangMasuk model);
-    
+    List<modelBarangMasuk> showDataByPeriod(String period);
     List<modelBarangMasuk> showData();
     List<modelBarangMasuk> searchData(String id);
 }

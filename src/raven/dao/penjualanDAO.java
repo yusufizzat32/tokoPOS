@@ -79,7 +79,53 @@ public class penjualanDAO implements servicePenjualan{
 
         return listPenjualan;
     }
+    
+    // Tambahkan di penjualanDAO.java
+@Override
+public List<modelPenjualan> tampilPenjualanByPeriod(int idUser, String period) {
+    List<modelPenjualan> listPenjualan = new ArrayList<>();
+    String sql = "";
+    
+    switch(period) {
+        case "Hari Ini":
+            sql = "SELECT Ref, Kasir, DATE_FORMAT(Tanggal,'%d-%m-%Y') AS Tanggal, Total, Bayar, Kembalian, Diskon " +
+                  "FROM tabel_transaksipenjualan WHERE id_user = ? AND Tanggal = CURDATE() ORDER BY create_at DESC";
+            break;
+        case "Minggu Ini":
+            sql = "SELECT Ref, Kasir, DATE_FORMAT(Tanggal,'%d-%m-%Y') AS Tanggal, Total, Bayar, Kembalian, Diskon " +
+                  "FROM tabel_transaksipenjualan WHERE id_user = ? AND YEARWEEK(Tanggal, 1) = YEARWEEK(CURDATE(), 1) ORDER BY create_at DESC";
+            break;
+        case "Bulan Ini":
+            sql = "SELECT Ref, Kasir, DATE_FORMAT(Tanggal,'%d-%m-%Y') AS Tanggal, Total, Bayar, Kembalian, Diskon " +
+                  "FROM tabel_transaksipenjualan WHERE id_user = ? AND MONTH(Tanggal) = MONTH(CURDATE()) AND YEAR(Tanggal) = YEAR(CURDATE()) ORDER BY create_at DESC";
+            break;
+        default: // Semua
+            sql = "SELECT Ref, Kasir, DATE_FORMAT(Tanggal,'%d-%m-%Y') AS Tanggal, Total, Bayar, Kembalian, Diskon " +
+                  "FROM tabel_transaksipenjualan WHERE id_user = ? ORDER BY create_at DESC";
+    }
+    
+    try (PreparedStatement st = conn.prepareStatement(sql)) {
+        st.setInt(1, idUser);
+        ResultSet rs = st.executeQuery();
+        while (rs.next()) {
+            modelPenjualan model = new modelPenjualan();
+            model.setRef(rs.getString("Ref"));
+            model.setKasir(rs.getString("Kasir"));
+            model.setTanggal(rs.getString("Tanggal"));
+            model.setTotal(rs.getDouble("Total"));
+            model.setBayar(rs.getDouble("Bayar"));
+            model.setKembalian(rs.getDouble("Kembalian"));
+            model.setDiskon(rs.getDouble("Diskon"));
 
+            listPenjualan.add(model);
+        }
+    } catch (SQLException e) {
+        System.out.println("Gagal mengambil data: " + e.getMessage());
+    }
+
+    return listPenjualan;
+}
+    
     @Override
     public List<modelPenjualan> cariData(String keyword) {
         List<modelPenjualan> listObat = new ArrayList<>();

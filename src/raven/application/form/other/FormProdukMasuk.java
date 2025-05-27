@@ -25,6 +25,10 @@ public class FormProdukMasuk extends javax.swing.JPanel {
         loadData();
         table1.setModel(tblModel);
         setLebarKolom();
+        filterComboBox.addItem("Semua");
+        filterComboBox.addItem("Hari Ini");
+        filterComboBox.addItem("Minggu Ini");
+        filterComboBox.addItem("Bulan Ini");
     }
     private void setLebarKolom() {
         TableColumnModel kolom = table1.getColumnModel();
@@ -34,6 +38,10 @@ public class FormProdukMasuk extends javax.swing.JPanel {
     }
     private void loadData() {
         List<modelBarangMasuk> list = servis.showData();
+        tblModel.setData(list);
+    }
+     private void loadDataByPeriod(String period) {
+        List<modelBarangMasuk> list = servis.showDataByPeriod(period);
         tblModel.setData(list);
     }
     private void tambahData(){
@@ -66,7 +74,10 @@ public class FormProdukMasuk extends javax.swing.JPanel {
                 JOptionPane.showMessageDialog(null, "Silahkan pilih data yang ingin di hapus!");
         }
     }
-
+ private void searchData(){
+        List<modelBarangMasuk> list = servis.searchData(txtSearch.getText());
+        tblModel.setData(list);
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -82,8 +93,9 @@ public class FormProdukMasuk extends javax.swing.JPanel {
         edit = new javax.swing.JToggleButton();
         jScrollPane2 = new javax.swing.JScrollPane();
         table1 = new com.raven.swing.Table();
-        jTextField1 = new javax.swing.JTextField();
+        txtSearch = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
+        filterComboBox = new javax.swing.JComboBox<>();
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         jLabel1.setText("PRODUK MASUK");
@@ -122,7 +134,11 @@ public class FormProdukMasuk extends javax.swing.JPanel {
         ));
         jScrollPane2.setViewportView(table1);
 
-        jTextField1.setText("Cari Barang");
+        txtSearch.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txtSearchKeyReleased(evt);
+            }
+        });
 
         jLabel2.setText("Search");
 
@@ -143,10 +159,12 @@ public class FormProdukMasuk extends javax.swing.JPanel {
                                 .addComponent(edit, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(hapus, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(filterComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(jLabel2)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 228, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 228, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -159,8 +177,9 @@ public class FormProdukMasuk extends javax.swing.JPanel {
                     .addComponent(hapus)
                     .addComponent(tambah)
                     .addComponent(edit)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel2))
+                    .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel2)
+                    .addComponent(filterComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -179,15 +198,20 @@ public class FormProdukMasuk extends javax.swing.JPanel {
         hapusData();
     }//GEN-LAST:event_hapusActionPerformed
 
+    private void txtSearchKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSearchKeyReleased
+        searchData();
+    }//GEN-LAST:event_txtSearchKeyReleased
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToggleButton edit;
+    private javax.swing.JComboBox<String> filterComboBox;
     private javax.swing.JToggleButton hapus;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTextField jTextField1;
     private com.raven.swing.Table table1;
     private javax.swing.JToggleButton tambah;
+    private javax.swing.JTextField txtSearch;
     // End of variables declaration//GEN-END:variables
 }

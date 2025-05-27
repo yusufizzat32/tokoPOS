@@ -49,7 +49,7 @@ public class tableBarangMasuk extends AbstractTableModel{
         JOptionPane.showMessageDialog(null, "Data Berhasil Dihapus");
     }
 
-    private final String[] columnNames = {"NO", "KODE BARANG", "NAMA BARANG", "JUMLAH MASUK", "TANGGAL MASUK"};
+    private final String[] columnNames = {"NO", "KODE BARANG", "NAMA BARANG", "JUMLAH MASUK", "TANGGAL MASUK","TANGGAL KADALUARSA"};
 
     @Override
     public int getRowCount() {
@@ -77,8 +77,11 @@ public class tableBarangMasuk extends AbstractTableModel{
                 return jumlah;
             case 4:
                 return obat.getTanggal();
+                
+            case 5:
+                  return obat.getTanggalKadaluarsaFormatted();
             default:
-                return null;
+                return null;    
         }
     }
     @Override

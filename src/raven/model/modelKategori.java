@@ -8,31 +8,13 @@ package raven.model;
  *
  * @author yusuf
  */
-public class modelBarang {
+public class modelKategori {
     private String barcode;
     private String idProduk;
     private String namaProduk;
     private double stokProduk;
     private int hargaProduk;
     private int hargaBeli;
-    private int idKategori;
-    private String namaKategori;
-    
-    public int getIdKategori() {
-    return idKategori;
-}
-
-public void setIdKategori(int idKategori) {
-    this.idKategori = idKategori;
-}
-
-public String getNamaKategori() {
-    return namaKategori;
-}
-
-public void setNamaKategori(String namaKategori) {
-    this.namaKategori = namaKategori;
-}
     
     public String getBarcode() {
         return barcode;
@@ -88,19 +70,4 @@ public void setNamaKategori(String namaKategori) {
     public void setNamaProduk(String namaProduk) {
         this.namaProduk = namaProduk;
     }
-
-//    public String getSatuanObat() {
-//        return satuanObat;
-//    }
-//
-//    public void setSatuanObat(String satuanObat) {
-//        this.satuanObat = satuanObat;
-//    }
-    
-//    public void setJumlahMasuk(double jumlahMasuk){
-//        this.jumlahMasuk = jumlahMasuk;
-//    }
-//    public double getJumlahMasuk(){
-//        return jumlahMasuk;
-//    }
 }

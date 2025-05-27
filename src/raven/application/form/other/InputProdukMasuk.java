@@ -4,6 +4,7 @@
  */
 package raven.application.form.other;
 
+import java.util.Date;
 import java.util.HashMap;
 import raven.dao.barangMasukDAO;
 import raven.dao.barangDAO;
@@ -56,69 +57,59 @@ public class InputProdukMasuk extends javax.swing.JDialog {
         tblModel.setData(list);
     }
         private boolean validasiInput() {
-        boolean valid = false;
-        if (cbxNamaBarang.getSelectedItem().equals("pilih barang")) {
-            JOptionPane.showMessageDialog(null, "Nama barang tidak boleh kosong");
-        } else if (txtJumlahMasuk.getText().trim().isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Jumlah Masuk tidak boleh kosong");
-        } else {
-            valid = true;
-        }
-        return valid;
-        }
-         private boolean isNumeric(String str) {
-        try {
-            Long.valueOf(str);
-            return true;
-        } catch (NumberFormatException e) {
-            return false;
-        }
+    boolean valid = false;
+    if (cbxNamaBarang.getSelectedItem().equals("pilih barang")) {
+        JOptionPane.showMessageDialog(null, "Nama barang tidak boleh kosong");
+    } else if (txtJumlahMasuk.getText().trim().isEmpty()) {
+        JOptionPane.showMessageDialog(null, "Jumlah Masuk tidak boleh kosong");
+    } else if (tglKadaluarsa.getDate() == null) {
+        JOptionPane.showMessageDialog(null, "Tanggal kadaluarsa tidak boleh kosong");
+    } else {
+        valid = true;
     }
+    return valid;
+}
         private void tambahData() {
-       
-        if(validasiInput()==true){  
-            String namaObat = cbxNamaBarang.getSelectedItem().toString();
-            String idObat1 = txtIdBarang.getText();
-            double jumlah = Double.parseDouble(txtJumlahMasuk.getText());
-            double jumlahMasuk = Double.parseDouble(txtJumlahMasuk.getText());
-//          double hargaSatuan = Double.parseDouble(tf_hargaSatuan.getText());
-//          double totalHarga = Double.parseDouble(tf_totalHarga.getText());
-      
-            
-            modelBarangMasuk obat = new modelBarangMasuk();
-            obat.setNamaProduk(namaObat);
-            obat.setIdProduk(idObat1);
-            obat.setStokProduk(jumlah);
-            obat.setJumlahMasuk(jumlahMasuk);
-            obat.setHargaProduk(hargaSatuan);
-            obat.setNilaiProduk(totalHarga);
+    if (validasiInput() == true) {
+        String namaObat = cbxNamaBarang.getSelectedItem().toString();
+        String idObat1 = txtIdBarang.getText();
+        double jumlah = Double.parseDouble(txtJumlahMasuk.getText());
+        double jumlahMasuk = Double.parseDouble(txtJumlahMasuk.getText());
+        Date tanggalKadaluarsa = tglKadaluarsa.getDate(); // Ambil tanggal dari JDateChooser
 
-            
-            servis.tambahData(obat); 
-            tblModel.insertData(obat);
-            resetForm();
-            dispose();
-            
-            
-        }
-        }    
+        modelBarangMasuk obat = new modelBarangMasuk();
+        obat.setNamaProduk(namaObat);
+        obat.setIdProduk(idObat1);
+        obat.setStokProduk(jumlah);
+        obat.setJumlahMasuk(jumlahMasuk);
+        obat.setHargaProduk(hargaSatuan);
+        obat.setNilaiProduk(totalHarga);
+        obat.setTanggalKadaluarsa(tanggalKadaluarsa); // Set tanggal kadaluarsa
+
+        servis.tambahData(obat);
+        tblModel.insertData(obat);
+        resetForm();
+        dispose();
+    }
+}  
         private void dataTable() {
-        simpan.setText("UPDATE");
-        idProduk = barang.getIdProduk();
-        cbxNamaBarang.setSelectedItem(barang.getNamaProduk());
-        txtIdBarang.setText(barang.getIdProduk());
-        txtJumlahMasuk.setText(String.valueOf(barang.getJumlahMasuk()));
-//        cbxSatuan.setSelectedItem(obat.getSatuanObat());
+           simpan.setText("UPDATE");
+            idProduk = barang.getIdProduk();
+            cbxNamaBarang.setSelectedItem(barang.getNamaProduk());
+            txtIdBarang.setText(barang.getIdProduk());
+            txtJumlahMasuk.setText(String.valueOf(barang.getJumlahMasuk()));
+            tglKadaluarsa.setDate(barang.getTanggalKadaluarsa()); // Set tanggal kadaluarsa ke JDateChooser
     }
         
         private void resetForm() {
         cbxNamaBarang.setSelectedIndex(0);
         txtIdBarang.setText("");
         txtJumlahMasuk.setText("");
+        tglKadaluarsa.setDate(null); // Reset tanggal kadaluarsa
     }
         private void ambilNamaObat(){
         DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>();
-        model.addElement("Pilih Obat"); // Tambahkan item default
+        model.addElement("pilih barang"); // Tambahkan item default
         List<modelBarang> list = servis_Barang.ambilNamaBarang(); // Ambil data nama obat dari database/service
 
         for (modelBarang barang : list) {
@@ -189,6 +180,8 @@ public class InputProdukMasuk extends javax.swing.JDialog {
         jLabel8 = new javax.swing.JLabel();
         txtJumlahMasuk = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
+        tglKadaluarsa = new com.toedter.calendar.JDateChooser();
+        jLabel6 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -249,6 +242,8 @@ public class InputProdukMasuk extends javax.swing.JDialog {
 
         jLabel5.setText("JUMLAH");
 
+        jLabel6.setText("TGL KADALUARSA");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -267,12 +262,16 @@ public class InputProdukMasuk extends javax.swing.JDialog {
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel4)
                             .addComponent(jLabel8)
-                            .addComponent(jLabel5))
+                            .addComponent(jLabel5)
+                            .addComponent(jLabel6))
                         .addGap(18, 18, 18)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(cbxNamaBarang, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(txtIdBarang)
-                            .addComponent(txtJumlahMasuk))))
+                            .addComponent(txtJumlahMasuk)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(tglKadaluarsa, javax.swing.GroupLayout.PREFERRED_SIZE, 154, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, Short.MAX_VALUE)))))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -291,7 +290,11 @@ public class InputProdukMasuk extends javax.swing.JDialog {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txtJumlahMasuk, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel5))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 165, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(tglKadaluarsa, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 131, Short.MAX_VALUE)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -400,11 +403,13 @@ public class InputProdukMasuk extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JSeparator jSeparator1;
     private com.raven.swing.ButtonGradient simpan;
+    private com.toedter.calendar.JDateChooser tglKadaluarsa;
     private javax.swing.JTextField txtIdBarang;
     private javax.swing.JTextField txtJumlahMasuk;
     // End of variables declaration//GEN-END:variables
