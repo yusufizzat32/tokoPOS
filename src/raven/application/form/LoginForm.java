@@ -13,6 +13,8 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.LayoutManager;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -23,6 +25,11 @@ import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import raven.application.Application;
 import raven.model.session;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JTextField;
+import raven.application.form.other.FormDashboard;
+
 
 /**
  *
@@ -31,9 +38,13 @@ import raven.model.session;
 public class LoginForm extends javax.swing.JPanel {
     
     private serviceUser servis = new userDAO();
-
+      private JTextField txtRFID = new JTextField();
+      
     public LoginForm() {
         initComponents();
+         setupRFIDListener();
+        txtRFID = new javax.swing.JTextField(); 
+        RegisterForm regDialog = new RegisterForm(new JFrame(), true);
         init();
     }
     
@@ -69,7 +80,7 @@ public class LoginForm extends javax.swing.JPanel {
         // Ambil data dari form
         String user = txtUsername.getText();
         String pass = new String(txtPassword.getPassword());
-
+        
         // Buat model user
         modelUser model = new modelUser();
         model.setUsername(user);
@@ -108,7 +119,8 @@ public class LoginForm extends javax.swing.JPanel {
       
     }
 
-    private void init() {
+                                      
+private void init() {
         setLayout(new MigLayout("al center center"));
 
         lbTitle.putClientProperty(FlatClientProperties.STYLE, ""
@@ -135,6 +147,9 @@ public class LoginForm extends javax.swing.JPanel {
         lbPass = new javax.swing.JLabel();
         txtPassword = new javax.swing.JPasswordField();
         cmdLogin = new javax.swing.JButton();
+        register = new javax.swing.JButton();
+        lbPass1 = new javax.swing.JLabel();
+        RFID = new javax.swing.JTextField();
 
         lbTitle.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lbTitle.setText("Login");
@@ -146,6 +161,12 @@ public class LoginForm extends javax.swing.JPanel {
 
         lbPass.setText("Password");
         panelLogin1.add(lbPass);
+
+        txtPassword.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtPasswordActionPerformed(evt);
+            }
+        });
         panelLogin1.add(txtPassword);
 
         cmdLogin.setText("Login");
@@ -155,6 +176,18 @@ public class LoginForm extends javax.swing.JPanel {
             }
         });
         panelLogin1.add(cmdLogin);
+
+        register.setText("Belum Punya Akun?");
+        register.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                registerActionPerformed(evt);
+            }
+        });
+        panelLogin1.add(register);
+
+        lbPass1.setText("KODE RFID");
+        panelLogin1.add(lbPass1);
+        panelLogin1.add(RFID);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -175,13 +208,81 @@ public class LoginForm extends javax.swing.JPanel {
         prosesLogin();
     }//GEN-LAST:event_cmdLoginActionPerformed
 
+    private void registerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_registerActionPerformed
+      RegisterForm regDialog = new RegisterForm(new JFrame(), true);
+    regDialog.setLocationRelativeTo(null);
+    regDialog.setVisible(true);
+    }//GEN-LAST:event_registerActionPerformed
+
+    private void txtPasswordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPasswordActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtPasswordActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTextField RFID;
     private javax.swing.JButton cmdLogin;
     private javax.swing.JLabel lbPass;
+    private javax.swing.JLabel lbPass1;
     private javax.swing.JLabel lbTitle;
     private javax.swing.JLabel lbUser;
     private raven.application.form.PanelLogin panelLogin1;
+    private javax.swing.JButton register;
     private javax.swing.JPasswordField txtPassword;
     private javax.swing.JTextField txtUsername;
     // End of variables declaration//GEN-END:variables
+
+   
+    private void setupRFIDListener() {
+          txtRFID.addKeyListener(new KeyAdapter() {
+            
+            @Override
+            public void keyReleased(KeyEvent e) {
+                String uid = txtRFID.getText().trim();
+                
+                // Jika panjang UID mencukupi (contoh: 10 karakter)
+                if (uid.length() >= 10) {
+                    // Cek apakah UID terdaftar di database
+                    if (autentikasiRFID(uid)) {
+                        JOptionPane.showMessageDialog(LoginForm.this, "Login berhasil via RFID!");
+                        dispose(); // Tutup LoginForm
+                        new FormDashboard().setVisible(true); // Buka dashboard
+                    } else {
+                        JOptionPane.showMessageDialog(LoginForm.this, "Kartu RFID tidak terdaftar!");
+                    }
+                    txtRFID.setText(""); // Reset field
+                }
+            }
+          });
+    }
+              private boolean autentikasiRFID(String uid) {
+            
+    boolean isValid = false;
+    Connection conn = null;
+    PreparedStatement ps = null;
+    ResultSet rs = null;
+
+    try {
+        // Ganti dengan koneksi database milikmu
+        conn = ps.getConnection(); 
+        String sql = "SELECT * FROM user WHERE rfid_uid = ?";
+        ps = conn.prepareStatement(sql);
+        ps.setString(1, uid);
+        rs = ps.executeQuery();
+
+        if (rs.next()) {
+            isValid = true; // UID ditemukan
+        }
+    } catch (SQLException ex) {
+        ex.printStackTrace();
+        JOptionPane.showMessageDialog(LoginForm.this, "Terjadi kesalahan saat mengakses database.");
+    } finally {
+        // Tutup koneksi
+        try { if (rs != null) rs.close(); } catch (SQLException e) { e.printStackTrace(); }
+        try { if (ps != null) ps.close(); } catch (SQLException e) { e.printStackTrace(); }
+        try { if (conn != null) conn.close(); } catch (SQLException e) { e.printStackTrace(); }
+    }
+    return isValid;
+}
+   private void dispose() {
+    }
 }

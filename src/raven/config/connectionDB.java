@@ -7,7 +7,7 @@ import java.sql.SQLException;
 public class connectionDB {
 
     static Connection con;
-    private static final String URL = "jdbc:mysql://localhost:3306/toko_pos2";
+    private static final String URL = "jdbc:mysql://localhost:3306/db_tokopos";
     private static final String USER = "root";
     private static final String PASSWORD = "";
 
