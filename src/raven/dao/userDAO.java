@@ -68,31 +68,40 @@ public void perbaruiData(modelUser model) {
     PreparedStatement st = null;
     try {
         // Query yang diperbaiki dengan urutan parameter yang benar
-        String sql = "UPDATE tabel_user SET nama=?, username=?, alamat=?, no_telepon=?, role=?, password=?, rfid=? WHERE id_user=?";
+        String sql = "UPDATE tabel_user SET nama=?, username=?, password=?, alamat=?, no_telepon=?, role=?, rfid=? WHERE id_user=?";
             
         st = conn.prepareStatement(sql);
         st.setString(1, model.getNama());
         st.setString(2, model.getUsername());
-        st.setString(3, model.getAlamat());
-        st.setString(4, model.getno_telepon());
-        st.setString(5, model.getRole());
-        st.setString(6, model.getRFID());
         
-        // Cek apakah password diubah atau tidak
+        // Handle password update
         if (model.getPassword() != null && !model.getPassword().isEmpty()) {
-            st.setString(6, generateSHA256(model.getPassword()));
+            st.setString(3, generateSHA256(model.getPassword()));
         } else {
-            // Jika password tidak diubah, dapatkan password lama dari database
+            // If password not changed, get current password
             String currentPassword = getCurrentPassword(model.getIdUser());
-            st.setString(6, currentPassword);
+            st.setString(3, currentPassword);
         }
         
-        st.setInt(7, model.getIdUser());
+        st.setString(4, model.getAlamat());
+        st.setString(5, model.getno_telepon());
+        
+        // Ensure role matches exactly one of the enum values
+        String role = model.getRole().trim();
+        if (!role.equals("Admin") && !role.equals("Kasir") && !role.equals("Manajemen Stok")) {
+            throw new IllegalArgumentException("Role must be one of: Admin, Kasir, Manajemen Stok");
+        }
+        st.setString(6, role);
+        
+        st.setString(7, model.getRFID());
+        st.setInt(8, model.getIdUser());
 
         st.executeUpdate();
     } catch (SQLException e) {
         e.printStackTrace();
         JOptionPane.showMessageDialog(null, "Gagal memperbarui data: " + e.getMessage());
+    } catch (IllegalArgumentException e) {
+        JOptionPane.showMessageDialog(null, e.getMessage());
     } finally {
         if (st != null) {
             try {
@@ -111,7 +120,7 @@ private String getCurrentPassword(int userId) throws SQLException {
         st.setInt(1, userId);
         ResultSet rs = st.executeQuery();
         if (rs.next()) {
-            return rs.getString("password");
+            return rs.getString("Password");
         }
     }
     return "";
@@ -119,30 +128,32 @@ private String getCurrentPassword(int userId) throws SQLException {
 
     public boolean gantiPassword(String username, String passwordBaru) {
     try {
-       
-        String sql = "SELECT password FROM tabel_user WHERE Username = ?"; 
+          String hashedPassword = generateSHA256(passwordBaru);
+         if (hashedPassword == null) {
+            System.err.println("Gagal generate hash password");
+            return false;
+        }
+        String sql = "SELECT password, Username FROM tabel_user WHERE Username = ?"; 
         PreparedStatement ps = conn.prepareStatement(sql);
         ps.setString(1, username);
         ResultSet rs = ps.executeQuery();
 
-        if (rs.next()) {
-            String username1 = rs.getString("Username");
-
-            if (username1.equals(username)) {
+       if (rs.next()) {
                 // Password lama cocok, lanjut update
                 String updateSql = "UPDATE tabel_user SET password = ? WHERE Username = ?";
                 PreparedStatement psUpdate = conn.prepareStatement(updateSql);
-                psUpdate.setString(1, passwordBaru);
+                psUpdate.setString(1, hashedPassword);
                 psUpdate.setString(2, username);
                 int updated = psUpdate.executeUpdate();
 
                 return updated > 0;
-            }
-        }
+            
+       }
     } catch (Exception e) {
         e.printStackTrace();
     }
     return false;
+    
 }
 
 
@@ -351,14 +362,14 @@ public void hapusData(int idUser) {
         PreparedStatement st = null;
         PreparedStatement stUpdate = null;
         ResultSet rs = null;
-        String enkripsiPasswordLama = generateSHA256(passwordLama);
+  
         String enkripsiPasswordBaru = generateSHA256(passwordBaru);
         String sql = "SELECT * FROM tabel_user WHERE username = ? AND password = ?";
 
         try {
             st = conn.prepareStatement(sql);
             st.setString(1, username);
-            st.setString(2, enkripsiPasswordLama);
+            st.setString(2, enkripsiPasswordBaru);
             rs = st.executeQuery();
 
             if (rs.next()) {
@@ -506,7 +517,67 @@ public void insertData(modelUser u) {
        }
        return user;
     }
+    
+   @Override
+public modelUser loginByRFID(String rfid) {
+    modelUser user = null;
+    String sql = "SELECT * FROM tabel_user WHERE rfid = ?";
+    try {
+        PreparedStatement ps = conn.prepareStatement(sql);
+        ps.setString(1, rfid);
+        ResultSet rs = ps.executeQuery();
 
+        if (rs.next()) {
+            user = new modelUser();
+            user.setIdUser(rs.getInt("id_user"));
+            user.setNama(rs.getString("nama"));
+            user.setUsername(rs.getString("username"));
+            user.setPassword(rs.getString("password"));
+            user.setRole(rs.getString("role"));
+            user.setRFID(rs.getString("rfid"));
+        }
+
+        rs.close();
+        ps.close();
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+
+    return user;
+}
+@Override
+public modelUser prosesLoginByRFID(String rfid) {
+    PreparedStatement st = null;
+    ResultSet rs = null;
+    modelUser modelUs = null;
+    String sql = "SELECT * FROM tabel_user WHERE rfid = ?";
+
+    try {
+        st = conn.prepareStatement(sql);
+        st.setString(1, rfid);
+        rs = st.executeQuery();
+
+        if (rs.next()) {
+            modelUs = new modelUser();
+            modelUs.setIdUser(rs.getInt("id_user"));
+            modelUs.setNama(rs.getString("nama"));
+            modelUs.setUsername(rs.getString("username"));
+            modelUs.setRole(rs.getString("role"));
+            modelUs.setRFID(rs.getString("rfid"));
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    } finally {
+        if (st != null) {
+            try {
+                st.close();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+    return modelUs;
+}
     @Override
     public boolean isRFIDRegistered(String rfid) {
       String sql = "SELECT COUNT (*) FROM user WHERE rfid=?"; 

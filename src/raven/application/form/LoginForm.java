@@ -42,9 +42,11 @@ public class LoginForm extends javax.swing.JPanel {
       
     public LoginForm() {
         initComponents();
-         setupRFIDListener();
+        
+        setupRFIDListener();
         txtRFID = new javax.swing.JTextField(); 
         RegisterForm regDialog = new RegisterForm(new JFrame(), true);
+        
         init();
     }
     
@@ -233,26 +235,45 @@ private void init() {
 
    
     private void setupRFIDListener() {
-          txtRFID.addKeyListener(new KeyAdapter() {
-            
+        RFID.addKeyListener(new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent e) {
-                String uid = txtRFID.getText().trim();
-                
-                // Jika panjang UID mencukupi (contoh: 10 karakter)
-                if (uid.length() >= 10) {
-                    // Cek apakah UID terdaftar di database
-                    if (autentikasiRFID(uid)) {
-                        JOptionPane.showMessageDialog(LoginForm.this, "Login berhasil via RFID!");
-                        dispose(); // Tutup LoginForm
-                        new FormDashboard().setVisible(true); // Buka dashboard
+                String rfid = RFID.getText().trim();
+                if (!rfid.isEmpty()) {
+                    modelUser user = servis.loginByRFID(rfid);
+                    if (user != null) {
+                        // Set username dan password
+                        txtUsername.setText(user.getUsername());
+                        txtPassword.setText(""); // Kosongkan password karena sudah di-hash di database
+                        
+                        // Buat model untuk login
+                        modelUser model = new modelUser();
+                        model.setUsername(user.getUsername());
+                        model.setPassword(""); // Password tidak diperlukan karena sudah divalidasi oleh RFID
+                        
+                        // Proses login otomatis
+                        modelUser hasilLogin = servis.prosesLoginByRFID(rfid);
+                        if (hasilLogin != null) {
+                            // Login berhasil
+                            session sess = session.getInstance();
+                            sess.setUserSession(hasilLogin.getIdUser(), hasilLogin.getUsername(), hasilLogin.getRole());
+                            Application.login(hasilLogin);
+                            
+                            JOptionPane.showMessageDialog(
+                                null, 
+                                "Login berhasil via RFID! Selamat datang, " + hasilLogin.getNama() + ".", 
+                                "Login Sukses", 
+                                JOptionPane.INFORMATION_MESSAGE
+                            );
+                            resetForm();
+                        }
                     } else {
-                        JOptionPane.showMessageDialog(LoginForm.this, "Kartu RFID tidak terdaftar!");
+                        JOptionPane.showMessageDialog(null, "RFID tidak terdaftar!");
+                        RFID.setText(""); // Reset field RFID
                     }
-                    txtRFID.setText(""); // Reset field
                 }
             }
-          });
+        });
     }
               private boolean autentikasiRFID(String uid) {
             

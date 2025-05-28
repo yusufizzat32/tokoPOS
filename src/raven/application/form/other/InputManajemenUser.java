@@ -8,6 +8,10 @@ import java.awt.Frame;
 import raven.model.modelUser;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import raven.dao.userDAO;
 import raven.model.modelUser;
 import raven.service.serviceUser;
@@ -50,10 +54,10 @@ public class InputManajemenUser extends javax.swing.JDialog {
   
          setLocationRelativeTo(null);
           
-    txtRole.removeAllItems();           
-    txtRole.addItem("Admin");
-    txtRole.addItem("Kasir");
-    txtRole.addItem("Manajemen Stok");
+txtRole.removeAllItems();           
+txtRole.addItem("Admin");
+txtRole.addItem("Kasir");
+txtRole.addItem("Manajemen Stok");  // Must match exactly with database enum
         if (mode == 1 && user != null) {
         // Mode edit
         simpan.setText("UPDATE"); // Tambahkan ini
@@ -67,7 +71,6 @@ public class InputManajemenUser extends javax.swing.JDialog {
         txtAlamat.setText(user.getAlamat());
         txtRFID.setText(user.getRFID());
     } else if (mode == 0) {
-        // Mode insert
         userDAO dao = new userDAO();
         txtIDUser.setEnabled(false);
     }
@@ -510,10 +513,68 @@ private void perbaruiData() {
         txtRFID.setText("");
     }
 
-    private void tambahData() {
+     private void tambahData() {
     simpanData();       
     }
+  public void dispose() {
+    }
+  
+ private void setupRFIDListener() {
+          txtRFID.addKeyListener(new KeyAdapter() {
+            
+            @Override
+            public void keyReleased(KeyEvent e) {
+                String uid = txtRFID.getText().trim();
+                
+                // Jika panjang UID mencukupi (contoh: 10 karakter)
+                if (uid.length() >= 10) {
+                    // Cek apakah UID terdaftar di database
+                    if (autentikasiRFID(uid)) {
+                        JOptionPane.showMessageDialog(InputManajemenUser.this, "Login berhasil via RFID!");
+                        dispose(); // Tutup LoginForm
+                        new FormDashboard().setVisible(true); // Buka dashboard
+                    } else {
+                        JOptionPane.showMessageDialog(InputManajemenUser.this, "Kartu RFID tidak terdaftar!");
+                    }
+                    txtRFID.setText(""); // Reset field
+                }
+            }
+          });
+    }
+              private boolean autentikasiRFID(String uid) {
+         
+                  
+    boolean isValid = false;
+    Connection conn = null;
+    PreparedStatement ps = null;
+    ResultSet rs = null;
 
+    try {
+        // Ganti dengan koneksi database milikmu
+        conn = ps.getConnection(); 
+        String sql = "SELECT * FROM user WHERE rfid_uid = ?";
+        ps = conn.prepareStatement(sql);
+        ps.setString(1, uid);
+        rs = ps.executeQuery();
+
+        if (rs.next()) {
+            isValid = true; // UID ditemukan
+        }
+    } catch (SQLException ex) {
+        ex.printStackTrace();
+        JOptionPane.showMessageDialog(InputManajemenUser.this, "Terjadi kesalahan saat mengakses database.");
+    } finally {
+        // Tutup koneksi
+        try { if (rs != null) rs.close(); } catch (SQLException e) { e.printStackTrace(); }
+        try { if (ps != null) ps.close(); } catch (SQLException e) { e.printStackTrace(); }
+        try { if (conn != null) conn.close(); } catch (SQLException e) { e.printStackTrace(); }
+    }
+    return isValid;
+}
+              
+ 
+}
+
+   
  
 
-}

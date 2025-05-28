@@ -8,6 +8,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 import raven.model.modelBarang;
@@ -89,9 +90,17 @@ switch (columnIndex) {
     public String getColumnName(int column) {
         return columnNames[column];
     }
-}
+        public static void hideIdColumn(JTable table) {
+        TableColumnModel columnModel = table.getColumnModel();
+        for (int i = 0; i < columnModel.getColumnCount(); i++) {
+            if ("Id User".equals(columnModel.getColumn(i).getHeaderValue())) {
+                table.removeColumn(columnModel.getColumn(i));
+                break;
+            }
+        }
+    }
 
-    
+}
    
   
 

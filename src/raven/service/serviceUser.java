@@ -22,6 +22,8 @@ public interface serviceUser {
     String generateSHA256(String password);
     modelUser prosesLogin(modelUser model);
     modelUser getUserByRFID(String rfid);
+    modelUser loginByRFID(String rfid);
+    modelUser prosesLoginByRFID(String rfid);
     boolean isRFIDRegistered(String rfid);
     
     boolean validasiPasswordLama(String username, String passwordLama);
