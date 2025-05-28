@@ -14,6 +14,25 @@ public class modelBarang {
     private String namaProduk;
     private double stokProduk;
     private int hargaProduk;
+    private int hargaBeli;
+    private int idKategori;
+    private String namaKategori;
+    
+    public int getIdKategori() {
+    return idKategori;
+}
+
+public void setIdKategori(int idKategori) {
+    this.idKategori = idKategori;
+}
+
+public String getNamaKategori() {
+    return namaKategori;
+}
+
+public void setNamaKategori(String namaKategori) {
+    this.namaKategori = namaKategori;
+}
     
     public String getBarcode() {
         return barcode;
@@ -36,6 +55,13 @@ public class modelBarang {
 
     public void setHargaProduk(int hargaProduk) {
         this.hargaProduk = hargaProduk;
+    }
+     public int getHargaBeli() {
+        return hargaBeli;
+    }
+
+    public void setHargaBeli(int hargaBeli) {
+        this.hargaBeli = hargaBeli;
     }
 
 //    public int getNilaiObat() {
@@ -77,16 +103,4 @@ public class modelBarang {
 //    public double getJumlahMasuk(){
 //        return jumlahMasuk;
 //    }
-
-    public void setIdPenjualan(String idPenjualan) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-
-    public void setJumlah(int jumlah) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-
-    public void setAlasan(String alasan) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
 }

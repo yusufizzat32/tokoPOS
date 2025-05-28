@@ -41,6 +41,10 @@ public class cariBrg extends javax.swing.JDialog {
     /**
      * Creates new form InputMasterProduk
      */
+    
+
+    
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -177,42 +181,31 @@ public class cariBrg extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void simpanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_simpanActionPerformed
-        int selectedRow = tabel.getSelectedRow();
-    if (selectedRow == -1) {
-        JOptionPane.showMessageDialog(this, "Pilih barang terlebih dahulu!");
-        return;
-    }
-
-    try {
-        // Ambil data dari tabel
-        String hargaStr = tabel.getValueAt(selectedRow, 2).toString();
-        String stokStr = tabel.getValueAt(selectedRow, 3).toString();
-
-        // Parse ke double terlebih dahulu
-        double hargaDouble = Double.parseDouble(hargaStr);
-        double stokDouble = Double.parseDouble(stokStr);
-
-        // Validasi: pastikan nilai desimal adalah bilangan bulat
-        if (hargaDouble % 1 != 0 || stokDouble % 1 != 0) {
-            JOptionPane.showMessageDialog(this, "Nilai harga atau stok tidak valid (harus bilangan bulat)!");
+        int row = tabel.getSelectedRow();
+        if (row == -1) {
+            JOptionPane.showMessageDialog(this, "Pilih barang terlebih dahulu!");
             return;
         }
+        
+        try {
+            String kode = tabel.getValueAt(row, 1).toString();
+            String nama = tabel.getValueAt(row, 2).toString();
+            double stok = Double.parseDouble(tabel.getValueAt(row, 4).toString().replace(",", ""));
+            int harga = Integer.parseInt(tabel.getValueAt(row, 3).toString().replace(",", ""));
+            String barcode = tabel.getValueAt(row, 5).toString();
 
-        // Konversi ke integer
-        int harga = (int) hargaDouble;
-        int stok = (int) stokDouble;
+            selectedBarang = new modelBarang();
+            selectedBarang.setIdProduk(kode);
+            selectedBarang.setNamaProduk(nama);
+            selectedBarang.setHargaProduk(harga);
+            selectedBarang.setStokProduk(stok);
+            selectedBarang.setBarcode(barcode);
 
-        // Simpan ke modelBarang
-        selectedBarang = new modelBarang();
-        selectedBarang.setIdProduk(tabel.getValueAt(selectedRow, 0).toString());
-        selectedBarang.setNamaProduk(tabel.getValueAt(selectedRow, 1).toString());
-        selectedBarang.setHargaProduk(harga); // ✅ Tipe integer
-        selectedBarang.setStokProduk(stok);
-
+            dispose();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
+        }
         dispose();
-    } catch (Exception e) {
-        JOptionPane.showMessageDialog(this, "Gagal memproses data: " + e.getMessage());
-    }
     }//GEN-LAST:event_simpanActionPerformed
 
     private void batalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_batalActionPerformed
@@ -246,54 +239,6 @@ public class cariBrg extends javax.swing.JDialog {
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(cariBrg.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
         //</editor-fold>
         //</editor-fold>
         //</editor-fold>

@@ -17,7 +17,7 @@ import javax.swing.table.AbstractTableModel;
 public class tableBarang extends AbstractTableModel {
 
     private final List<modelBarang> list = new ArrayList<>();
-    private final String[] columnNames = {"NO","KODE", "NAMA OBAT", "HARGA", "STOK", "BARCODE",};
+    private final String[] columnNames = {"NO","KODE", "NAMA OBAT", "HARGA","HARGA BELI", "STOK", "BARCODE", "KATEGORI"};
     
     public void insertData(modelBarang barang) {
         list.add(barang);
@@ -70,6 +70,7 @@ public class tableBarang extends AbstractTableModel {
         DecimalFormat df1 = new DecimalFormat("#,##0");
         String stok = df1.format(barang.getStokProduk());
         String harga = df1.format(barang.getHargaProduk());
+        String hargaBeli = df1.format(barang.getHargaBeli());
         switch (columnIndex) {
             case 0:
                 return rowIndex + 1;
@@ -79,10 +80,14 @@ public class tableBarang extends AbstractTableModel {
                 return barang.getNamaProduk();
             case 3:
                 return harga;
-            case 4:
-                return stok;
+                case 4:
+                return hargaBeli;
             case 5:
+                return stok;
+            case 6:
                 return barang.getBarcode();
+            case 7:
+                return barang.getNamaKategori();
             default:
                 return null;
         }
@@ -92,5 +97,6 @@ public class tableBarang extends AbstractTableModel {
     public String getColumnName(int column){
         return columnNames[column];
     }
-      
+    
+    
 }

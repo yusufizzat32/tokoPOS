@@ -79,7 +79,53 @@ public class penjualanDAO implements servicePenjualan{
 
         return listPenjualan;
     }
+    
+    // Tambahkan di penjualanDAO.java
+@Override
+public List<modelPenjualan> tampilPenjualanByPeriod(int idUser, String period) {
+    List<modelPenjualan> listPenjualan = new ArrayList<>();
+    String sql = "";
+    
+    switch(period) {
+        case "Hari Ini":
+            sql = "SELECT Ref, Kasir, DATE_FORMAT(Tanggal,'%d-%m-%Y') AS Tanggal, Total, Bayar, Kembalian, Diskon " +
+                  "FROM tabel_transaksipenjualan WHERE id_user = ? AND Tanggal = CURDATE() ORDER BY create_at DESC";
+            break;
+        case "Minggu Ini":
+            sql = "SELECT Ref, Kasir, DATE_FORMAT(Tanggal,'%d-%m-%Y') AS Tanggal, Total, Bayar, Kembalian, Diskon " +
+                  "FROM tabel_transaksipenjualan WHERE id_user = ? AND YEARWEEK(Tanggal, 1) = YEARWEEK(CURDATE(), 1) ORDER BY create_at DESC";
+            break;
+        case "Bulan Ini":
+            sql = "SELECT Ref, Kasir, DATE_FORMAT(Tanggal,'%d-%m-%Y') AS Tanggal, Total, Bayar, Kembalian, Diskon " +
+                  "FROM tabel_transaksipenjualan WHERE id_user = ? AND MONTH(Tanggal) = MONTH(CURDATE()) AND YEAR(Tanggal) = YEAR(CURDATE()) ORDER BY create_at DESC";
+            break;
+        default: // Semua
+            sql = "SELECT Ref, Kasir, DATE_FORMAT(Tanggal,'%d-%m-%Y') AS Tanggal, Total, Bayar, Kembalian, Diskon " +
+                  "FROM tabel_transaksipenjualan WHERE id_user = ? ORDER BY create_at DESC";
+    }
+    
+    try (PreparedStatement st = conn.prepareStatement(sql)) {
+        st.setInt(1, idUser);
+        ResultSet rs = st.executeQuery();
+        while (rs.next()) {
+            modelPenjualan model = new modelPenjualan();
+            model.setRef(rs.getString("Ref"));
+            model.setKasir(rs.getString("Kasir"));
+            model.setTanggal(rs.getString("Tanggal"));
+            model.setTotal(rs.getDouble("Total"));
+            model.setBayar(rs.getDouble("Bayar"));
+            model.setKembalian(rs.getDouble("Kembalian"));
+            model.setDiskon(rs.getDouble("Diskon"));
 
+            listPenjualan.add(model);
+        }
+    } catch (SQLException e) {
+        System.out.println("Gagal mengambil data: " + e.getMessage());
+    }
+
+    return listPenjualan;
+}
+    
     @Override
     public List<modelPenjualan> cariData(String keyword) {
         List<modelPenjualan> listObat = new ArrayList<>();
@@ -160,7 +206,128 @@ public class penjualanDAO implements servicePenjualan{
         }
         return null;
     }
+    
+    public List<modelPenjualan> getPenjualanPerHari() {
+    List<modelPenjualan> listPenjualan = new ArrayList<>();
+    String sql = "SELECT DATE_FORMAT(Tanggal, '%Y-%m-%d') AS Tanggal, SUM(Total) AS TotalHarian " +
+                 "FROM tabel_transaksipenjualan " +
+                 "GROUP BY DATE_FORMAT(Tanggal, '%Y-%m-%d') " +
+                 "ORDER BY Tanggal ASC";
 
+    try (PreparedStatement st = conn.prepareStatement(sql);
+         ResultSet rs = st.executeQuery()) {
+        while (rs.next()) {
+            modelPenjualan model = new modelPenjualan();
+            model.setTanggal(rs.getString("Tanggal"));
+            model.setTotal(rs.getDouble("TotalHarian"));
+            listPenjualan.add(model);
+        }
+    } catch (SQLException e) {
+        System.out.println("Gagal mengambil data penjualan harian: " + e.getMessage());
+    }
+    return listPenjualan;
+}
+    
+    public double getPendapatanHariIni() {
+    String sql = "SELECT SUM(Total) AS TotalHariIni FROM tabel_transaksipenjualan WHERE Tanggal = CURDATE()";
+    try (PreparedStatement st = conn.prepareStatement(sql);
+         ResultSet rs = st.executeQuery()) {
+        if (rs.next()) {
+            return rs.getDouble("TotalHariIni");
+        }
+    } catch (SQLException e) {
+        System.out.println("Gagal mengambil pendapatan hari ini: " + e.getMessage());
+    }
+    return 0.0;
+}
+    public int getTotalJumlahTransaksi() {
+    String sql = "SELECT COUNT(*) AS TotalTransaksi FROM tabel_transaksipenjualan";
+    try (PreparedStatement st = conn.prepareStatement(sql);
+         ResultSet rs = st.executeQuery()) {
+        if (rs.next()) {
+            return rs.getInt("TotalTransaksi");
+        }
+    } catch (SQLException e) {
+        System.out.println("Gagal mengambil total transaksi: " + e.getMessage());
+    }
+    return 0;
+}
+    public double getTotalPendapatan() {
+    String sql = "SELECT SUM(Total) AS TotalPendapatan FROM tabel_transaksipenjualan";
+    try (PreparedStatement st = conn.prepareStatement(sql);
+         ResultSet rs = st.executeQuery()) {
+        if (rs.next()) {
+            return rs.getDouble("TotalPendapatan");
+        }
+    } catch (SQLException e) {
+        System.out.println("Gagal mengambil total pendapatan: " + e.getMessage());
+    }
+    return 0.0;
+}
+    public static String generateKodeTransaksi(Connection conn) throws SQLException {
+    String prefix = "TRX";
+    String tanggal = new java.text.SimpleDateFormat("yyyyMMdd").format(new java.util.Date());
+    String sql = "SELECT COUNT(*) FROM penjualan WHERE kd_trx LIKE ?";
+    
+    PreparedStatement ps = conn.prepareStatement(sql);
+    ps.setString(1, prefix + tanggal + "%");
+    ResultSet rs = ps.executeQuery();
+    
+    int count = 0;
+    if (rs.next()) {
+        count = rs.getInt(1) + 1;
+    }
+
+    String nomorUrut = String.format("%04d", count);
+    return prefix + tanggal + nomorUrut;
+}
+    public List<modelPenjualan> getPenjualanByPeriod(String period) {
+    List<modelPenjualan> listPenjualan = new ArrayList<>();
+    String sql = "";
+    
+    switch(period) {
+        case "7 Hari Terakhir":
+            sql = "SELECT DATE_FORMAT(Tanggal, '%Y-%m-%d') AS Tanggal, SUM(Total) AS TotalHarian " +
+                  "FROM tabel_transaksipenjualan " +
+                  "WHERE Tanggal >= DATE_SUB(CURDATE(), INTERVAL 7 DAY) " +
+                  "GROUP BY DATE_FORMAT(Tanggal, '%Y-%m-%d') " +
+                  "ORDER BY Tanggal ASC";
+            break;
+        case "1 Bulan Terakhir":
+            sql = "SELECT DATE_FORMAT(Tanggal, '%Y-%m-%d') AS Tanggal, SUM(Total) AS TotalHarian " +
+                  "FROM tabel_transaksipenjualan " +
+                  "WHERE Tanggal >= DATE_SUB(CURDATE(), INTERVAL 1 MONTH) " +
+                  "GROUP BY DATE_FORMAT(Tanggal, '%Y-%m-%d') " +
+                  "ORDER BY Tanggal ASC";
+            break;
+        case "1 Tahun Terakhir":
+            sql = "SELECT DATE_FORMAT(Tanggal, '%Y-%m') AS Tanggal, SUM(Total) AS TotalHarian " +
+                  "FROM tabel_transaksipenjualan " +
+                  "WHERE Tanggal >= DATE_SUB(CURDATE(), INTERVAL 1 YEAR) " +
+                  "GROUP BY DATE_FORMAT(Tanggal, '%Y-%m') " +
+                  "ORDER BY Tanggal ASC";
+            break;
+        default: // Default 7 Hari Terakhir
+            sql = "SELECT DATE_FORMAT(Tanggal, '%Y-%m-%d') AS Tanggal, SUM(Total) AS TotalHarian " +
+                  "FROM tabel_transaksipenjualan " +
+                  "WHERE Tanggal >= DATE_SUB(CURDATE(), INTERVAL 7 DAY) " +
+                  "GROUP BY DATE_FORMAT(Tanggal, '%Y-%m-%d') " +
+                  "ORDER BY Tanggal ASC";
+    }
+    
+    try (PreparedStatement st = conn.prepareStatement(sql);
+         ResultSet rs = st.executeQuery()) {
+        while (rs.next()) {
+            modelPenjualan model = new modelPenjualan();
+            model.setTanggal(rs.getString("Tanggal"));
+            model.setTotal(rs.getDouble("TotalHarian"));
+            listPenjualan.add(model);
+        }
+    } catch (SQLException e) {
+        System.out.println("Gagal mengambil data penjualan: " + e.getMessage());
+    }
+    return listPenjualan;
+}
     @Override
     public List<modelBarang> getTransaksiDetailByRef(String ref) {
          List<modelBarang> list = new ArrayList<>();
@@ -186,6 +353,5 @@ public class penjualanDAO implements servicePenjualan{
     }
     return list;
     }
-    
     
 }

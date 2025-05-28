@@ -15,7 +15,7 @@ import raven.model.modelRekapTransaksi;
  */
 public class tableRekapTransaksi extends AbstractTableModel {
     private final List<modelRekapTransaksi> list = new ArrayList<>();
-    private final String[] columnNames = {"NO", "BARCODE", "ID PRODUK", "NAMA PRODUK", "HARGA", "STOK", "QTY", "SUBTOTAL"};
+    private final String[] columnNames = {"NO", "BARCODE",  "NAMA PRODUK", "HARGA",  "QTY", "SUBTOTAL"};
     
     public void insertData(modelRekapTransaksi model) {
         list.add(model);
@@ -49,7 +49,7 @@ public class tableRekapTransaksi extends AbstractTableModel {
     
     @Override
     public boolean isCellEditable(int row, int column) {
-        return column == 4 || column == 3; // Mengizinkan edit pada kolom QTY (index 4) dan Harga (index 3)
+        return column == 4 || column == 3;
     }
 
     @Override
@@ -63,37 +63,26 @@ public class tableRekapTransaksi extends AbstractTableModel {
     }
 
     @Override
-    public Object getValueAt(int rowIndex, int columnIndex) {
-        modelRekapTransaksi model = list.get(rowIndex);
-        DecimalFormat df1 = new DecimalFormat("#,##0");
-        String stok = df1.format(model.getModelBarang().getStokProduk());
-        String qty = df1.format(model.getModelPendet().getQty());
-        String harga = df1.format(model.getModelBarang().getHargaProduk());
-        String nilai = df1.format(model.getModelPendet().getNilai());
-        switch (columnIndex) {
-            case 0:
-                return rowIndex+1;
-            case 1: 
-                return model.getModelBarang().getBarcode();
-            case 2: 
-                return model.getModelBarang().getIdProduk();
-            case 3:
-                return model.getModelBarang().getNamaProduk();
-            case 4:
-                return harga;
-            case 5:
-                return stok;
-            case 6:
-                return qty;
-            case 7: 
-                return nilai;
-            default:
-                return null;
-        }  
+public Object getValueAt(int rowIndex, int columnIndex) {
+    modelRekapTransaksi model = list.get(rowIndex);
+    DecimalFormat df1 = new DecimalFormat("#,##0");
+    
+    switch (columnIndex) {
+        case 0: return rowIndex+1;
+        case 1: return model.getModelBarang().getBarcode();
+        case 2: return model.getModelBarang().getNamaProduk();
+        case 3: return df1.format(model.getModelBarang().getHargaProduk());
+        case 4: return df1.format(model.getModelPendet().getQty());
+        case 5: return df1.format(model.getModelPendet().getNilai());
+        default: return null;
     }
- 
+}
     @Override
     public String getColumnName(int column){
         return columnNames[column];
     }
+    public void clearData() {
+    list.clear();
+    fireTableDataChanged();
+}
 }

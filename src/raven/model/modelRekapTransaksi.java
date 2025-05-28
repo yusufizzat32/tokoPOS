@@ -13,8 +13,8 @@ public class modelRekapTransaksi {
     private modelBarang modelBarang;
 
     public modelRekapTransaksi() {
-        this.modelBarang = new modelBarang(); // Pastikan ini ada
-        this.modelPendet = new modelPenjualanDetail();
+        this.modelBarang = new modelBarang(); // Inisialisasi
+        this.modelPendet = new modelPenjualanDetail(); // Inisialisasi
     }
      
     public modelPenjualanDetail getModelPendet() {

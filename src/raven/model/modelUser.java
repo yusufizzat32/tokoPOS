@@ -16,6 +16,7 @@ public class modelUser {
     private String alamat;
     private String no_telepon;
     private String role;
+    private String rfid;
     
     
     public int getIdUser() {
@@ -58,11 +59,11 @@ public class modelUser {
         this.alamat = alamat;
     }
 
-    public String getNo_telepon() {
+    public String getno_telepon() {
         return no_telepon;
     }
 
-    public void setNo_telepon(String no_telepon) {
+    public void setno_telepon(String no_telepon) {
         this.no_telepon = no_telepon;
     }
 
@@ -72,5 +73,17 @@ public class modelUser {
 
     public void setRole(String role) {
         this.role = role;
+    }  
+
+     public String getRFID() {
+        return rfid;
+    }
+
+    public void setRFID(String rfid) {
+        this.rfid = rfid;
     }
 }
+ 
+    
+
+       

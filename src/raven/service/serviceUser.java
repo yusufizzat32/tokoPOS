@@ -21,7 +21,17 @@ public interface serviceUser {
     
     String generateSHA256(String password);
     modelUser prosesLogin(modelUser model);
+    modelUser getUserByRFID(String rfid);
+    boolean isRFIDRegistered(String rfid);
     
     boolean validasiPasswordLama(String username, String passwordLama);
     boolean pergantianPassword(String username, String passwordLama, String passwordBaru);
+
+    public List<modelUser> showData();
+
+    public void insertData(modelUser u);
+
+    public void updateData(modelUser u);
+
+    public boolean isUsernameExists(String username);
 }

@@ -4,6 +4,8 @@
  */
 package raven.model;
 
+import java.util.Date;
+
 /**
  *
  * @author yusuf
@@ -18,6 +20,8 @@ public class modelBarangMasuk {
     private double nilaiProduk;
     private double jumlahMasuk;
     private String tanggal;
+    private Date tanggalKadaluarsa;
+    private String tanggalKadaluarsaFormatted;
 
     public Integer getIdProdukMasuk() {
         return idProdukMasuk;
@@ -90,4 +94,18 @@ public class modelBarangMasuk {
     public void setTanggal(String tanggal) {
         this.tanggal = tanggal;
     }
+public Date getTanggalKadaluarsa() {
+    return tanggalKadaluarsa;
+}
+
+public void setTanggalKadaluarsa(Date tanggalKadaluarsa) {
+    this.tanggalKadaluarsa = tanggalKadaluarsa;
+}
+public String getTanggalKadaluarsaFormatted() {
+    return tanggalKadaluarsaFormatted;
+}
+
+public void setTanggalKadaluarsaFormatted(String tanggalKadaluarsaFormatted) {
+    this.tanggalKadaluarsaFormatted = tanggalKadaluarsaFormatted;
+}
 }

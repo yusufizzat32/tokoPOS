@@ -23,8 +23,8 @@ import raven.application.form.other.FormMasterProduk;
 import raven.application.form.other.FormProdukMasuk;
 import raven.application.form.other.FormReturBarang;
 import raven.application.form.other.ReturBarang;
-//import raven.application.form.other.FormUser;
-//import raven.application.form.other.InputGantiPassword;
+import raven.application.form.other.FormUser;
+import raven.application.form.other.InputGantiPassword;
 import raven.menu.Menu;
 import raven.menu.MenuAction;
 import raven.model.modelUser;
@@ -142,10 +142,10 @@ public class MainForm extends JLayeredPane {
                 }   
             } else if (index == 3) {
                 if (subIndex == 1) {
-//                    Application.showForm(new FormUser()); 
+                    Application.showForm(new FormUser()); 
                 
                 } else if(subIndex == 2){
-//                  new InputGantiPassword(Application.getApp(), true, model).setVisible(true);
+                  new InputGantiPassword(Application.getApp(), true, model).setVisible(true);
             }
             else {
                 action.cancel();
