@@ -15,5 +15,7 @@ public interface serviceRekapTransaksi {
     void updateData (modelRekapTransaksi model);
     void hapusData (modelRekapTransaksi model);
     void updateQty (String idProduk, int Qty);
+    void updateStok (String idProduk, int qty);
+    boolean cekStok(String idProduk, int qty);
     List<modelRekapTransaksi> tampilData();
 }

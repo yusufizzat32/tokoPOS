@@ -17,7 +17,6 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import raven.application.Application;
 import raven.application.form.other.FormDashboard;
-import raven.application.form.other.FormGantiPassword;
 import raven.application.form.other.FormKasir;
 import raven.application.form.other.FormTransaksi;
 import raven.application.form.other.FormMasterProduk;
@@ -27,6 +26,12 @@ import raven.application.form.other.InputGantiPassword;
 import raven.menu.Menu;
 import raven.menu.MenuAction;
 import raven.model.modelUser;
+
+/**
+ *
+ * @author Raven
+ */
+
 
 /**
  *
@@ -83,7 +88,39 @@ public class MainForm extends JLayeredPane {
     private void initMenuEvent() {
         menu.addMenuEvent((int index, int subIndex, MenuAction action) -> {
             // Application.mainForm.showForm(new DefaultForm("Form : " + index + " " + subIndex));
-            if (index == 0) {
+//            if (index == 0) {
+//                Application.showForm(new FormDashboard());
+//            } else if (index == 1) {
+//                if (subIndex == 1) {
+//                    Application.showForm(new FormKasir());
+//                } else if (subIndex == 2) {
+//                    Application.showForm(new FormTransaksi(model));
+//                }else {
+//                    action.cancel();
+//                }   
+//            } else if (index == 2) {
+//                if (subIndex == 1) {
+//                    Application.showForm(new FormMasterProduk());
+//                } else if (subIndex == 2) {
+//                    Application.showForm(new FormProdukMasuk());
+//                }else {
+//                    action.cancel();
+//                }  
+//                
+//              } else if (index == 3) {
+//                    if (subIndex == 1) {
+//                    Application.showForm(new FormUser()); 
+//      
+//            } else if(subIndex == 2){
+//                  new InputGantiPassword(Application.getApp(), true, model).setVisible(true);
+//            }
+//            else {
+//                action.cancel();
+//            }
+//           } else if (index == 4) {
+//       
+//}
+        if (index == 0) {
                 Application.showForm(new FormDashboard());
             } else if (index == 1) {
                 if (subIndex == 1) {
@@ -100,21 +137,23 @@ public class MainForm extends JLayeredPane {
                     Application.showForm(new FormProdukMasuk());
                 }else {
                     action.cancel();
-                }  
-                
-              } else if (index == 3) {
-                    if (subIndex == 1) {
+                }   
+            } else if (index == 3) {
+                if (subIndex == 1) {
                     Application.showForm(new FormUser()); 
-      
-            } else if(subIndex == 2){
+                
+                } else if(subIndex == 2){
                   new InputGantiPassword(Application.getApp(), true, model).setVisible(true);
             }
             else {
                 action.cancel();
+            }  
+            } 
+            else if (index == 4) {
+//                Application.logout(); 
+            } else {
+                action.cancel();
             }
-           } else if (index == 4) {
-       
-}
         });
     }
 

@@ -6,6 +6,10 @@ package raven.application.form.other;
 
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import raven.dao.barangDAO;
 import raven.model.modelBarang;
 import raven.service.serviceBarang;
@@ -13,6 +17,7 @@ import raven.tablemodel.tableBarang;
 import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
+import raven.config.connectionDB;
 /**
  *
  * @author yusuf
@@ -29,29 +34,31 @@ public class InputMasterProduk extends javax.swing.JDialog {
     private int row;
     private FormMasterProduk formMasterProduk;
     
+    
     public InputMasterProduk(java.awt.Frame parent, boolean modal,int row, modelBarang barang,FormMasterProduk formMasterProduk) {
         super(parent, modal);
-    this.barang = barang;
-    this.row = row;
-    this.formMasterProduk = formMasterProduk;
+        this.barang = barang;
+        this.row = row;
+        this.formMasterProduk = formMasterProduk;
+        
+        initComponents();  // This must be called first to initialize components
     
-    initComponents();  // This must be called first to initialize components
+        // Now we can safely access UI components
+        txtIdBarang.requestFocusInWindow();
+        setupBarcodeScannerHandling();
     
-    // Now we can safely access UI components
-    txtIdBarang.requestFocusInWindow();
-    setupBarcodeScannerHandling();
-    
-    setLocationRelativeTo(null);
-    if (barang != null) {
+        setLocationRelativeTo(null);        
+        loadKategori();
+        if (barang != null) {
         dataTable();
-    }
-    loadData();
+        }
+        loadData();
         
     }
         private void loadData(){
-        List<modelBarang> list = servis.showData();
-        tblModel.setData(list);
-    }
+            List<modelBarang> list = servis.showData();
+            tblModel.setData(list);
+        }
         private boolean validasiInput() {
             if (txtIdBarang.getText().trim().isEmpty()) {
             JOptionPane.showMessageDialog(this, "ID Obat tidak boleh kosong.");
@@ -66,6 +73,11 @@ public class InputMasterProduk extends javax.swing.JDialog {
             if (txtHargaJual.getText().trim().isEmpty() || !isNumeric(txtHargaJual.getText().trim())) {
             JOptionPane.showMessageDialog(this, "Harga harus berupa angka dan tidak boleh kosong.");
             txtHargaJual.requestFocus();
+            return false;
+        }
+            if (cbxKategori.getSelectedIndex() <= 0) {
+            JOptionPane.showMessageDialog(this, "Harap pilih kategori produk");
+            cbxKategori.requestFocus();
             return false;
         }
     
@@ -105,72 +117,163 @@ public class InputMasterProduk extends javax.swing.JDialog {
         }
     }
         private void tambahData() {
-       
-            if (!validasiInput()) {
-                return;
-            }
-            // Log untuk debug
-            System.out.println("Mulai menyimpan data...");
-        
-            String namaBarang = txtNamaBarang.getText().trim();
-            int harga = Integer.parseInt(txtHargaJual.getText().trim());
-            double stok = ((Number) txtStok.getValue()).doubleValue();
-            String idBarang = txtIdBarang.getText().trim();
-
-            modelBarang brg = new modelBarang();
-            brg.setIdProduk(idBarang);
-            brg.setNamaProduk(namaBarang);
-            brg.setHargaProduk(harga);
-            brg.setStokProduk(stok);
-            brg.setBarcode(idBarang);
-        
-            servis.tambahData(brg);
-            tblModel.insertData(brg);
-            formMasterProduk.refreshTable();
-            resetForm();
-        }    
-        private void dataTable() {
-        simpan.setText("UPDATE");
-        idProduk = barang.getIdProduk();
-        txtIdBarang.setText(barang.getIdProduk());
-        txtNamaBarang.setText(barang.getNamaProduk());
-        txtHargaJual.setText(String.valueOf(barang.getHargaProduk()));
-        txtStok.setValue(barang.getStokProduk());
-//        cbxSatuan.setSelectedItem(obat.getSatuanObat());
+    if (!validasiInput()) {
+        return;
     }
+    
+    // Validasi kategori dipilih
+    if (cbxKategori.getSelectedIndex() <= 0) {
+        JOptionPane.showMessageDialog(this, "Harap pilih kategori", "Peringatan", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+    
+    String namaBarang = txtNamaBarang.getText().trim();
+    int harga = Integer.parseInt(txtHargaJual.getText().trim());
+    int hargaBeli = Integer.parseInt(txtHargaBeli.getText().trim());
+    double stok = ((Number) txtStok.getValue()).doubleValue();
+    String idBarang = txtIdBarang.getText().trim();
+    
+    // Get selected kategori id
+    int idKategori = getSelectedKategoriId();
+
+    modelBarang brg = new modelBarang();
+    brg.setIdProduk(idBarang);
+    brg.setNamaProduk(namaBarang);
+    brg.setHargaProduk(harga);
+    brg.setHargaBeli(hargaBeli);
+    brg.setStokProduk(stok);
+    brg.setBarcode(idBarang);
+    brg.setIdKategori(idKategori);
+    
+    servis.tambahData(brg);
+    tblModel.insertData(brg);
+    formMasterProduk.refreshTable();
+    resetForm();
+}    
+        private void dataTable() {
+    simpan.setText("UPDATE");
+    idProduk = barang.getIdProduk();
+    txtIdBarang.setText(barang.getIdProduk());
+    txtNamaBarang.setText(barang.getNamaProduk());
+    txtHargaJual.setText(String.valueOf(barang.getHargaProduk()));
+    txtHargaBeli.setText(String.valueOf(barang.getHargaBeli()));
+    txtStok.setValue(barang.getStokProduk());
+    
+    // Set selected kategori
+    if (barang.getIdKategori() > 0) {
+        try {
+            Connection conn = connectionDB.getConnection();
+            String sql = "SELECT nama_kategori FROM kategori WHERE id_kategori = ?";
+            PreparedStatement st = conn.prepareStatement(sql);
+            st.setInt(1, barang.getIdKategori());
+            ResultSet rs = st.executeQuery();
+            
+            if (rs.next()) {
+                String namaKategori = rs.getString("nama_kategori");
+                cbxKategori.setSelectedItem(namaKategori);
+            }
+            
+            rs.close();
+            st.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+}
         
         private void resetForm() {
         txtIdBarang.setText(""); 
         txtHargaJual.setText(""); 
+        txtHargaBeli.setText(""); 
         txtStok.setValue(0); 
         txtNamaBarang.setText("");
         txtIdBarang.requestFocus();
         this.dispose();
     }
-         private void updateData(){
-            if (!validasiInput()) {
-                return;
-            }
-            // Log untuk debug
-            System.out.println("Mulai menyimpan data...");
+         private void updateData() {
+    if (!validasiInput()) {
+        return;
+    }
+    
+    // Validasi kategori dipilih
+    if (cbxKategori.getSelectedIndex() <= 0) {
+        JOptionPane.showMessageDialog(this, "Harap pilih kategori", "Peringatan", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
 
-            String namaBarang = txtNamaBarang.getText().trim();
-//          String satuan = cbxSatuan.getSelectedItem().toString();
-            int hargaJual = Integer.parseInt(txtHargaJual.getText().trim());
-            double stok = ((Number) txtStok.getValue()).doubleValue(); // Correctly handle Double
-            modelBarang brg = new modelBarang();
-            brg.setIdProduk(idProduk);
-            brg.setNamaProduk(namaBarang);
-            brg.setHargaProduk(hargaJual);
-//        brg.setSatuanObat(satuan);
-            brg.setStokProduk(stok);
-            brg.setBarcode(idProduk);
+    String namaBarang = txtNamaBarang.getText().trim();
+    int hargaJual = Integer.parseInt(txtHargaJual.getText().trim());
+    int hargaBeli = Integer.parseInt(txtHargaBeli.getText().trim());
+    double stok = ((Number) txtStok.getValue()).doubleValue();
+    
+    // Get selected kategori id
+    int idKategori = getSelectedKategoriId();
+
+    modelBarang brg = new modelBarang();
+    brg.setIdProduk(idProduk);
+    brg.setNamaProduk(namaBarang);
+    brg.setHargaProduk(hargaJual);
+    brg.setHargaBeli(hargaBeli);
+    brg.setStokProduk(stok);
+    brg.setBarcode(idProduk);
+    brg.setIdKategori(idKategori);
+    
+    servis.updateData(brg);
+    tblModel.updateData(row, brg);
+    resetForm();
+    dispose();
+}
+         private int getSelectedKategoriId() {
+    String selectedKategori = (String) cbxKategori.getSelectedItem();
+    if (selectedKategori == null || selectedKategori.equals("-- Pilih Kategori --")) {
+        return 0;
+    }
+    
+    try {
+        Connection conn = connectionDB.getConnection();
+        String sql = "SELECT id_kategori FROM kategori WHERE nama_kategori = ?";
+        PreparedStatement st = conn.prepareStatement(sql);
+        st.setString(1, selectedKategori);
+        ResultSet rs = st.executeQuery();
         
-            servis.updateData(brg);
-            tblModel.updateData(row, brg);
-            resetForm();
-            dispose();
+        if (rs.next()) {
+            return rs.getInt("id_kategori");
         }
+        
+        rs.close();
+        st.close();
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    
+    return 0;
+}
+         private void loadKategori() {
+    try {
+        Connection conn = connectionDB.getConnection();
+        String sql = "SELECT id_kategori, nama_kategori FROM kategori";
+        PreparedStatement st = conn.prepareStatement(sql);
+        ResultSet rs = st.executeQuery();
+        
+        // Clear existing items
+        cbxKategori.removeAllItems();
+        
+        // Add default empty item
+        cbxKategori.addItem("-- Pilih Kategori --");
+        
+        while(rs.next()) {
+            // Add kategori to combobox
+            cbxKategori.addItem(rs.getString("nama_kategori"));
+        }
+        
+        rs.close();
+        st.close();
+    } catch (SQLException e) {
+        JOptionPane.showMessageDialog(this, "Gagal memuat kategori: " + e.getMessage(), 
+            "Error", JOptionPane.ERROR_MESSAGE);
+        e.printStackTrace();
+    }
+}
         
 
     
@@ -184,6 +287,8 @@ public class InputMasterProduk extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jLabel1 = new javax.swing.JLabel();
+        jLabel9 = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
@@ -199,6 +304,14 @@ public class InputMasterProduk extends javax.swing.JDialog {
         simpan = new com.raven.swing.ButtonGradient();
         jSeparator1 = new javax.swing.JSeparator();
         txtStok = new javax.swing.JSpinner();
+        jLabel8 = new javax.swing.JLabel();
+        txtHargaBeli = new javax.swing.JTextField();
+        cbxKategori = new javax.swing.JComboBox<>();
+        jLabel10 = new javax.swing.JLabel();
+
+        jLabel1.setText("jLabel1");
+
+        jLabel9.setText("jLabel9");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -259,6 +372,12 @@ public class InputMasterProduk extends javax.swing.JDialog {
             }
         });
 
+        jLabel8.setText("HARGA BELI");
+
+        cbxKategori.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+
+        jLabel10.setText("KATEGORI");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -268,13 +387,6 @@ public class InputMasterProduk extends javax.swing.JDialog {
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jSeparator1)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(txtHargaJual, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 273, Short.MAX_VALUE)
-                            .addComponent(txtNamaBarang)
-                            .addComponent(txtStok, javax.swing.GroupLayout.Alignment.LEADING)))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(batal, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -287,7 +399,19 @@ public class InputMasterProduk extends javax.swing.JDialog {
                             .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addGap(18, 18, 18)
                         .addComponent(txtIdBarang, javax.swing.GroupLayout.DEFAULT_SIZE, 211, Short.MAX_VALUE)
-                        .addGap(62, 62, 62)))
+                        .addGap(62, 62, 62))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jLabel8, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jLabel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jLabel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(cbxKategori, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(txtHargaJual, javax.swing.GroupLayout.DEFAULT_SIZE, 273, Short.MAX_VALUE)
+                            .addComponent(txtNamaBarang, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(txtStok)
+                            .addComponent(txtHargaBeli, javax.swing.GroupLayout.DEFAULT_SIZE, 273, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -306,11 +430,19 @@ public class InputMasterProduk extends javax.swing.JDialog {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(txtHargaJual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel6))
+                .addGap(22, 22, 22)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(txtHargaBeli, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel8))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel7)
-                    .addComponent(txtStok, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 115, Short.MAX_VALUE)
+                    .addComponent(txtStok, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel7))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(cbxKategori)
+                    .addComponent(jLabel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 79, Short.MAX_VALUE)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -323,17 +455,11 @@ public class InputMasterProduk extends javax.swing.JDialog {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 389, Short.MAX_VALUE)
-            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 405, Short.MAX_VALUE)
-            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGap(0, 3, Short.MAX_VALUE)))
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         pack();
@@ -354,10 +480,10 @@ public class InputMasterProduk extends javax.swing.JDialog {
             dispose();
         }
     }//GEN-LAST:event_batalActionPerformed
-private void handleBarcodeInput(String barcode) {
-    if (barcode.isEmpty()) {
-        return;
-    }
+    private void handleBarcodeInput(String barcode) {
+        if (barcode.isEmpty()) {
+            return;
+        }
     
     modelBarang existingItem = servis.cariBarangByBarcode(barcode);
     
@@ -460,16 +586,22 @@ private void handleBarcodeInput(String barcode) {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private com.raven.swing.ButtonGradient batal;
+    private javax.swing.JComboBox<String> cbxKategori;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JSeparator jSeparator1;
     private com.raven.swing.ButtonGradient simpan;
+    private javax.swing.JTextField txtHargaBeli;
     private javax.swing.JTextField txtHargaJual;
     private javax.swing.JTextField txtIdBarang;
     private javax.swing.JTextField txtNamaBarang;

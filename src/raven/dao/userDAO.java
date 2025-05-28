@@ -432,7 +432,7 @@ public void updateData(modelUser u) {
 public void insertData(modelUser u) {
     PreparedStatement st = null;
     try {
-        String sql = "INSERT INTO tabel_user(nama, username, password, alamat, no_telepon, role, rfid) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO tabel_user(nama, username, password, alamat, no_telepon, role, rfid) VALUES (?, ?, ?, ?, ?, ?, ?)";
         st = conn.prepareStatement(sql);
 
         // Set parameter

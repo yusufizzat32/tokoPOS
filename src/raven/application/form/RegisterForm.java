@@ -525,9 +525,10 @@ private void perbaruiData() {
     }//GEN-LAST:event_txtRoleActionPerformed
 
     private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
-    
+        
         loginForm.setVisible(true);
         dispose();
+        
     }//GEN-LAST:event_btnBackActionPerformed
 
     private void txtRFIDActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtRFIDActionPerformed

@@ -28,20 +28,19 @@ import java.util.List;
 import java.util.Locale;
 import javax.swing.JOptionPane;
 import javax.swing.Timer;
+import javax.swing.table.DefaultTableModel;
 import raven.model.session;
 /**
  *
  * @author Raven
  */
-public class FormTransaksi extends javax.swing.JPanel {
+public class FormDetailTransaksi extends javax.swing.JPanel {
     private tablePenjualan tblModelPen = new tablePenjualan();
     private tableRekapTransaksi tblModelSmt = new tableRekapTransaksi();
-
     private serviceRekapTransaksi servisSmt = new rekapTransaksiDAO();
     private servicePenjualanDetail servisDetail = new penjualanDetailDAO();
     private servicePenjualan servis = new penjualanDAO();
     private serviceBarang servisBarang = new barangDAO();
-    
     private String idObat;
     private Integer idKaryawan;
     private int id = 1;
@@ -50,38 +49,57 @@ public class FormTransaksi extends javax.swing.JPanel {
     
     
     private modelPenjualan mp = new modelPenjualan();
-    public FormTransaksi(modelUser modeluser) {
+    public FormDetailTransaksi(String refTransaksi) {
         initComponents();
         this.idKaryawan = sess.getUserId();
+        tblData.setModel(new javax.swing.table.DefaultTableModel(
+    new Object [][] {},
+    new String [] {"Kode Transaksi", "Kode Produk", "Nama Produk", "Harga", "Qty", "Subtotal"}
+));
         
-        tblData.setModel(tblModelPen);
-        loadData();
-        setLebarKolom();    
-        filterComboBox.addItem("Semua");
-        filterComboBox.addItem("Hari Ini");
-        filterComboBox.addItem("Minggu Ini");
-        filterComboBox.addItem("Bulan Ini");
+        loadDetailData(refTransaksi);
+        setLebarKolom();
     }
-    
+   private void setLebarKolom() {
+    TableColumnModel kolom = tblData.getColumnModel();
+    kolom.getColumn(0).setPreferredWidth(100);  // Kode Transaksi
+    kolom.getColumn(1).setPreferredWidth(100);  // Kode Produk
+    kolom.getColumn(2).setPreferredWidth(200);  // Nama Produk  
+    kolom.getColumn(3).setPreferredWidth(80);   // Harga   
+    kolom.getColumn(4).setPreferredWidth(50);   // Qty   
+    kolom.getColumn(5).setPreferredWidth(100);  // Subtotal
+}
+    private void loadDetailData(String refTransaksi) {
+    System.out.println("Loading details for ref: " + refTransaksi);
+    try {
+        List<modelPenjualanDetail> details = servisDetail.tampil_detail_P(refTransaksi);
+        System.out.println("Found " + details.size() + " details");
+        
+        DefaultTableModel model = (DefaultTableModel) tblData.getModel();
+        model.setRowCount(0);
+        
+        for (modelPenjualanDetail detail : details) {
+            System.out.println("Adding row: " + detail.getModelBaraang().getIdProduk());
+            model.addRow(new Object[]{
+                detail.getKdTrx(), // Tambahkan Kd_Trx
+                detail.getModelBaraang().getIdProduk(),
+                detail.getModelBaraang().getNamaProduk(),
+                detail.getModelBaraang().getHargaProduk(),
+                detail.getQty(),
+                detail.getNilai()
+            });
+        }
+    } catch (Exception e) {
+        System.err.println("Error loading details: " + e.getMessage());
+        e.printStackTrace();
+    }
+}
+
     private void loadData() {
         List<modelPenjualan> list = servis.tampilPenjualan(idKaryawan);
         tblModelPen.setData(list);
     }
-     private void loadDataByPeriod(String period) {
-        List<modelPenjualan> list = servis.tampilPenjualanByPeriod(idKaryawan, period);
-        tblModelPen.setData(list);
-    }
     
-    private void setLebarKolom() {
-        TableColumnModel kolom = table1.getColumnModel();
-        kolom.getColumn(0).setPreferredWidth(50);
-        kolom.getColumn(0).setMaxWidth(50);
-        kolom.getColumn(0).setMinWidth(50);
-    }
-    
-    
-    
-   
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -92,15 +110,9 @@ public class FormTransaksi extends javax.swing.JPanel {
         edit = new javax.swing.JToggleButton();
         hapus = new javax.swing.JToggleButton();
         jLabel1 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        detail = new javax.swing.JToggleButton();
         jLabel2 = new javax.swing.JLabel();
         jScrollPane3 = new javax.swing.JScrollPane();
         tblData = new com.raven.swing.Table();
-        jTextField1 = new javax.swing.JTextField();
-        jLabel4 = new javax.swing.JLabel();
-        filterComboBox = new javax.swing.JComboBox<>();
-        jButton1 = new javax.swing.JButton();
 
         table1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -139,17 +151,8 @@ public class FormTransaksi extends javax.swing.JPanel {
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         jLabel1.setText("MASTER PRODUK");
 
-        jLabel3.setText("Search");
-
-        detail.setText("DETAIL");
-        detail.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                detailActionPerformed(evt);
-            }
-        });
-
         jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
-        jLabel2.setText("RIWAYAT TRANSAKSI");
+        jLabel2.setText("Detail Transaksi");
 
         tblData.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -164,16 +167,6 @@ public class FormTransaksi extends javax.swing.JPanel {
         ));
         jScrollPane3.setViewportView(tblData);
 
-        jLabel4.setText("Search");
-
-        filterComboBox.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                filterComboBoxActionPerformed(evt);
-            }
-        });
-
-        jButton1.setText("print");
-
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -182,16 +175,6 @@ public class FormTransaksi extends javax.swing.JPanel {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 831, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(detail, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(filterComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 169, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jButton1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel4)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 228, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jScrollPane3))
                 .addContainerGap())
         );
@@ -200,13 +183,6 @@ public class FormTransaksi extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel2)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(detail, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel4)
-                    .addComponent(filterComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton1))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -225,42 +201,13 @@ public class FormTransaksi extends javax.swing.JPanel {
 
     }//GEN-LAST:event_hapusActionPerformed
 
-    private void detailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_detailActionPerformed
-  
-    int selectedRow = tblData.getSelectedRow();
-    if (selectedRow == -1) {
-        JOptionPane.showMessageDialog(this, "Pilih transaksi terlebih dahulu!");
-        return;
-    }
-    
-    String ref = tblModelPen.getValueAt(selectedRow, 0).toString(); 
-    FormDetailTransaksi detailForm = new FormDetailTransaksi(ref);
-    javax.swing.JFrame frame = new javax.swing.JFrame();
-    frame.setContentPane(detailForm);
-    frame.pack();
-    frame.setLocationRelativeTo(null);
-    frame.setVisible(true);
-
-    }//GEN-LAST:event_detailActionPerformed
-
-    private void filterComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filterComboBoxActionPerformed
-         String selectedPeriod = (String) filterComboBox.getSelectedItem();
-        loadDataByPeriod(selectedPeriod);
-    }//GEN-LAST:event_filterComboBoxActionPerformed
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JToggleButton detail;
     private javax.swing.JToggleButton edit;
-    private javax.swing.JComboBox<String> filterComboBox;
     private javax.swing.JToggleButton hapus;
-    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane3;
-    private javax.swing.JTextField jTextField1;
     private javax.swing.JTable table1;
     private javax.swing.JToggleButton tambah;
     private com.raven.swing.Table tblData;

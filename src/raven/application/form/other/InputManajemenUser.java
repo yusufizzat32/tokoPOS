@@ -65,6 +65,7 @@ public class InputManajemenUser extends javax.swing.JDialog {
         txtRole.setSelectedItem(user.getRole());
         txtNotelp.setText(user.getno_telepon());
         txtAlamat.setText(user.getAlamat());
+        txtRFID.setText(user.getRFID());
     } else if (mode == 0) {
         // Mode insert
         userDAO dao = new userDAO();
@@ -134,6 +135,7 @@ private void simpanData() {
         u.setRole(txtRole.getSelectedItem().toString());
         u.setno_telepon(txtNotelp.getText());
         u.setAlamat(txtAlamat.getText());
+        u.setRFID(txtRFID.getText());
 
         // Panggil service untuk insert data
         servis.insertData(u);
@@ -166,7 +168,8 @@ private void perbaruiData() {
     model.setAlamat(txtAlamat.getText());
     model.setno_telepon(txtNotelp.getText());
     model.setRole(txtRole.getSelectedItem().toString());
-
+    model.setRFID(txtRFID.getText());
+    
     // Hanya set password jika diubah (field tidak kosong)
     String newPassword = new String(txtPassword.getPassword()).trim();
     if (!newPassword.isEmpty()) {
@@ -433,6 +436,7 @@ private void perbaruiData() {
         model.setno_telepon(txtNotelp.getText());
         model.setRole(txtRole.getSelectedItem().toString());
         model.setIdUser(idUserEdit);
+        model.setRFID(txtRFID.getText());
 
          String password = new String(txtPassword.getPassword()).trim();
         // Cek apakah password diisi atau tidak
@@ -503,6 +507,7 @@ private void perbaruiData() {
         txtRole.setSelectedIndex(0);
         txtNotelp.setText("");
         txtAlamat.setText("");
+        txtRFID.setText("");
     }
 
     private void tambahData() {

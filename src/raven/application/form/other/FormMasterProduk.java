@@ -9,6 +9,7 @@ import raven.model.modelBarang;
 import raven.service.serviceBarang;
 import raven.tablemodel.tableBarang;
 import java.util.List;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
 import javax.swing.table.TableColumnModel;
 /**
@@ -16,34 +17,59 @@ import javax.swing.table.TableColumnModel;
  * @author yusuf
  */
 public class FormMasterProduk extends javax.swing.JPanel {
-
     private final tableBarang tblModel = new tableBarang();
     private final serviceBarang servis = new barangDAO();
-    
+
     public FormMasterProduk() {
         initComponents();
         loadData();
+        loadKategori();
         table1.setModel(tblModel);
         setLebarKolom();
     }
     private void setLebarKolom() {
-        TableColumnModel kolom = table1.getColumnModel();
-        kolom.getColumn(0).setPreferredWidth(50);
-        kolom.getColumn(0).setMaxWidth(50);
-        kolom.getColumn(0).setMinWidth(50);
-    }
+    TableColumnModel kolom = table1.getColumnModel();
+    kolom.getColumn(0).setPreferredWidth(50);
+    kolom.getColumn(0).setMaxWidth(50);
+    kolom.getColumn(0).setMinWidth(50);
+    // Tambahkan pengaturan untuk kolom kategori jika perlu
+    kolom.getColumn(7).setPreferredWidth(100);
+}
     private void loadData() {
-        List<modelBarang> list = servis.showData();
+        List<modelBarang> list = servis.showData(); 
+        tblModel.setData(list);
+    }
+    private void loadKategori() {
+        List<String> listKategori = servis.getKategoriList(); // Anda perlu menambahkan method getKategoriList() di serviceBarang
+        DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>();
+        model.addElement("Semua Kategori"); // Opsi default
+        for (String kategori : listKategori) {
+            model.addElement(kategori);
+        }
+        cbxKategori.setModel(model);
+    }
+    private void searchData(){
+         String keyword = txtSearch.getText();
+        String kategori = cbxKategori.getSelectedItem().toString();
+        
+        List<modelBarang> list;
+        if (kategori.equals("Semua Kategori")) {
+            list = servis.searchData(keyword); // Cari berdasarkan keyword saja
+        } else {
+            list = servis.searchDataByKategori(keyword, kategori); // Cari berdasarkan keyword dan kategori
+        }
         tblModel.setData(list);
     }
     private void tambahData(){
         InputMasterProduk input = new InputMasterProduk(null,true,1,null,this);
         input.setVisible(true);
         loadData();
+        
     }
     void refreshTable() {
         loadData();
     }
+    
     private void editData() {
         int row = table1.getSelectedRow();
         if (row != -1){
@@ -74,9 +100,12 @@ public class FormMasterProduk extends javax.swing.JPanel {
         jLabel1 = new javax.swing.JLabel();
         tambah = new javax.swing.JToggleButton();
         hapus = new javax.swing.JToggleButton();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        table1 = new javax.swing.JTable();
         edit = new javax.swing.JToggleButton();
+        txtSearch = new javax.swing.JTextField();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        table1 = new com.raven.swing.Table();
+        jLabel2 = new javax.swing.JLabel();
+        cbxKategori = new javax.swing.JComboBox<>();
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         jLabel1.setText("MASTER PRODUK");
@@ -95,6 +124,27 @@ public class FormMasterProduk extends javax.swing.JPanel {
             }
         });
 
+        edit.setText("EDIT");
+        edit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                editActionPerformed(evt);
+            }
+        });
+
+        txtSearch.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtSearchActionPerformed(evt);
+            }
+        });
+        txtSearch.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtSearchKeyPressed(evt);
+            }
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txtSearchKeyReleased(evt);
+            }
+        });
+
         table1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -106,12 +156,14 @@ public class FormMasterProduk extends javax.swing.JPanel {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        jScrollPane1.setViewportView(table1);
+        jScrollPane2.setViewportView(table1);
 
-        edit.setText("EDIT");
-        edit.addActionListener(new java.awt.event.ActionListener() {
+        jLabel2.setText("Search");
+
+        cbxKategori.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cbxKategori.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                editActionPerformed(evt);
+                cbxKategoriActionPerformed(evt);
             }
         });
 
@@ -122,17 +174,22 @@ public class FormMasterProduk extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 908, Short.MAX_VALUE)
+                    .addComponent(jScrollPane2)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel1)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(tambah)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(edit, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(hapus, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                                .addComponent(hapus, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 206, Short.MAX_VALUE)
+                                .addComponent(cbxKategori, javax.swing.GroupLayout.PREFERRED_SIZE, 177, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jLabel2))
+                            .addComponent(jLabel1))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 230, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -144,10 +201,13 @@ public class FormMasterProduk extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(hapus)
                     .addComponent(tambah)
-                    .addComponent(edit))
+                    .addComponent(edit)
+                    .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel2)
+                    .addComponent(cbxKategori, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 245, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(105, Short.MAX_VALUE))
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -163,13 +223,32 @@ public class FormMasterProduk extends javax.swing.JPanel {
         hapusData();
     }//GEN-LAST:event_hapusActionPerformed
 
+    private void txtSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtSearchActionPerformed
+        
+    }//GEN-LAST:event_txtSearchActionPerformed
+
+    private void txtSearchKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSearchKeyPressed
+        
+    }//GEN-LAST:event_txtSearchKeyPressed
+
+    private void txtSearchKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSearchKeyReleased
+        searchData();
+    }//GEN-LAST:event_txtSearchKeyReleased
+
+    private void cbxKategoriActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbxKategoriActionPerformed
+    searchData();        // TODO add your handling code here:
+    }//GEN-LAST:event_cbxKategoriActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JComboBox<String> cbxKategori;
     private javax.swing.JToggleButton edit;
     private javax.swing.JToggleButton hapus;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable table1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JScrollPane jScrollPane2;
+    private com.raven.swing.Table table1;
     private javax.swing.JToggleButton tambah;
+    private javax.swing.JTextField txtSearch;
     // End of variables declaration//GEN-END:variables
 }

@@ -17,6 +17,7 @@ public interface servicePenjualan {
     
     List<modelPenjualan> tampilPenjualan(int id);
     List<modelPenjualan> cariData(String keyword);
+    List<modelPenjualan> tampilPenjualanByPeriod(int idUser, String period);
     
     String noTransaksi();
     void printNota (String id);
