@@ -120,7 +120,7 @@ private String getCurrentPassword(int userId) throws SQLException {
         st.setInt(1, userId);
         ResultSet rs = st.executeQuery();
         if (rs.next()) {
-            return rs.getString("password");
+            return rs.getString("Password");
         }
     }
     return "";
@@ -128,30 +128,32 @@ private String getCurrentPassword(int userId) throws SQLException {
 
     public boolean gantiPassword(String username, String passwordBaru) {
     try {
-       
-        String sql = "SELECT password FROM tabel_user WHERE Username = ?"; 
+          String hashedPassword = generateSHA256(passwordBaru);
+         if (hashedPassword == null) {
+            System.err.println("Gagal generate hash password");
+            return false;
+        }
+        String sql = "SELECT password, Username FROM tabel_user WHERE Username = ?"; 
         PreparedStatement ps = conn.prepareStatement(sql);
         ps.setString(1, username);
         ResultSet rs = ps.executeQuery();
 
-        if (rs.next()) {
-            String username1 = rs.getString("Username");
-
-            if (username1.equals(username)) {
+       if (rs.next()) {
                 // Password lama cocok, lanjut update
                 String updateSql = "UPDATE tabel_user SET password = ? WHERE Username = ?";
                 PreparedStatement psUpdate = conn.prepareStatement(updateSql);
-                psUpdate.setString(1, passwordBaru);
+                psUpdate.setString(1, hashedPassword);
                 psUpdate.setString(2, username);
                 int updated = psUpdate.executeUpdate();
 
                 return updated > 0;
-            }
-        }
+            
+       }
     } catch (Exception e) {
         e.printStackTrace();
     }
     return false;
+    
 }
 
 
@@ -360,14 +362,14 @@ public void hapusData(int idUser) {
         PreparedStatement st = null;
         PreparedStatement stUpdate = null;
         ResultSet rs = null;
-        String enkripsiPasswordLama = generateSHA256(passwordLama);
+  
         String enkripsiPasswordBaru = generateSHA256(passwordBaru);
         String sql = "SELECT * FROM tabel_user WHERE username = ? AND password = ?";
 
         try {
             st = conn.prepareStatement(sql);
             st.setString(1, username);
-            st.setString(2, enkripsiPasswordLama);
+            st.setString(2, enkripsiPasswordBaru);
             rs = st.executeQuery();
 
             if (rs.next()) {
