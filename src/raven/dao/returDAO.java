@@ -123,5 +123,28 @@ public void insertDetailRetur(int idRetur, String kdProduk, int quantity, int ha
         }
         return list;
     }
+    
+    public void updatePenjualanAfterRetur(String refPenjualan, int totalPengembalian) {
+    // Update tabel_transaksipenjualan
+    String sqlUpdatePenjualan = "UPDATE tabel_transaksipenjualan SET Total = Total - ?, Bayar = Bayar - ? WHERE Ref = ?";
+    
+    // Update tabel_transaksidetail (akan dilakukan per produk)
+    String sqlUpdateDetail = "UPDATE tabel_transaksidetail SET Quantity = Quantity - ?, Subtotal = Subtotal - ? WHERE Ref = ? AND Kd_Produk = ?";
+    
+    try (Connection conn = connectionDB.getConnection();
+         PreparedStatement stmtPenjualan = conn.prepareStatement(sqlUpdatePenjualan);
+         PreparedStatement stmtDetail = conn.prepareStatement(sqlUpdateDetail)) {
+        
+        // Update header penjualan
+        stmtPenjualan.setInt(1, totalPengembalian);
+        stmtPenjualan.setInt(2, totalPengembalian);
+        stmtPenjualan.setString(3, refPenjualan);
+        stmtPenjualan.executeUpdate();
+        
+    } catch (SQLException ex) {
+        Logger.getLogger(returDAO.class.getName()).log(Level.SEVERE, null, ex);
+        throw new RuntimeException("Gagal mengupdate data penjualan setelah retur", ex);
+    }
+}
    
 }

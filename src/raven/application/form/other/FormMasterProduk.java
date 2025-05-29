@@ -4,14 +4,23 @@
  */
 package raven.application.form.other;
 
+import java.sql.Connection;
+import java.util.HashMap;
 import raven.dao.barangDAO;
 import raven.model.modelBarang;
 import raven.service.serviceBarang;
 import raven.tablemodel.tableBarang;
 import java.util.List;
+import java.util.Map;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
 import javax.swing.table.TableColumnModel;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.util.JRLoader;
+import net.sf.jasperreports.view.JasperViewer;
+import raven.config.connectionDB;
 /**
  *
  * @author yusuf
@@ -20,13 +29,18 @@ public class FormMasterProduk extends javax.swing.JPanel {
     private final tableBarang tblModel = new tableBarang();
     private final serviceBarang servis = new barangDAO();
     // Tambahkan variabel instance di awal class
-private int currentPage = 1;
-private int rowsPerPage = 10; // Jumlah baris per halaman
-private int totalRows = 0;
+    private int currentPage = 1;
+    private int rowsPerPage = 10; // Jumlah baris per halaman
+    private int totalRows = 0;
 
     public FormMasterProduk() {
         initComponents();
         btnPrev.setText("Sebelumnya");
+btnPrint.addActionListener(new java.awt.event.ActionListener() {
+    public void actionPerformed(java.awt.event.ActionEvent evt) {
+        printLaporanMasterProduk();
+    }
+});
 btnPrev.addActionListener(new java.awt.event.ActionListener() {
     public void actionPerformed(java.awt.event.ActionEvent evt) {
         goToPage(currentPage - 1);
@@ -72,6 +86,32 @@ cbxRowsPerPage.addActionListener(new java.awt.event.ActionListener() {
         tblModel.setData(list);
         updatePaginationInfo();
     }
+    private void printLaporanMasterProduk() {
+    try {
+        // Path ke file laporan .jasper
+        String reportPath = "src/raven/reports/LaporanMasterProduk.jasper"; // sesuaikan path-nya
+
+        // Load file laporan
+        JasperReport jasperReport = (JasperReport) JRLoader.loadObjectFromFile(reportPath);
+
+        // Buat parameter kosong (jika tidak ada parameter)
+        Map<String, Object> params = new HashMap<>();
+
+        // Hubungkan ke database
+        Connection conn = connectionDB.getConnection(); // asumsi kamu punya class Koneksi
+
+        // Isi laporan dengan data dari database
+        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, params, conn);
+
+        // Tampilkan laporan
+        JasperViewer.viewReport(jasperPrint, false);
+
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(this, "Gagal mencetak laporan: " + e.getMessage());
+        e.printStackTrace();
+    }
+}
+
     private void updatePaginationInfo() {
         int totalPages = (int) Math.ceil((double) totalRows / rowsPerPage);
         lblPageInfo.setText("Halaman " + currentPage + " dari " + totalPages);
@@ -161,6 +201,7 @@ cbxRowsPerPage.addActionListener(new java.awt.event.ActionListener() {
         btnPrev = new javax.swing.JButton();
         btnNext = new javax.swing.JButton();
         cbxRowsPerPage = new javax.swing.JComboBox<>();
+        btnPrint = new javax.swing.JButton();
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         jLabel1.setText("MASTER PRODUK");
@@ -230,6 +271,8 @@ cbxRowsPerPage.addActionListener(new java.awt.event.ActionListener() {
 
         cbxRowsPerPage.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
+        btnPrint.setText("PRINT");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -246,7 +289,9 @@ cbxRowsPerPage.addActionListener(new java.awt.event.ActionListener() {
                                 .addComponent(edit, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(hapus, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 206, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 128, Short.MAX_VALUE)
+                                .addComponent(btnPrint)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(cbxKategori, javax.swing.GroupLayout.PREFERRED_SIZE, 177, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jLabel2))
@@ -275,7 +320,8 @@ cbxRowsPerPage.addActionListener(new java.awt.event.ActionListener() {
                     .addComponent(edit)
                     .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel2)
-                    .addComponent(cbxKategori, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(cbxKategori, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnPrint))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 384, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -320,6 +366,7 @@ cbxRowsPerPage.addActionListener(new java.awt.event.ActionListener() {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnNext;
     private javax.swing.JButton btnPrev;
+    private javax.swing.JButton btnPrint;
     private javax.swing.JComboBox<String> cbxKategori;
     private javax.swing.JComboBox<String> cbxRowsPerPage;
     private javax.swing.JToggleButton edit;

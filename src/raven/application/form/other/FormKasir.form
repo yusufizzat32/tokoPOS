@@ -297,6 +297,9 @@
       </Events>
     </Component>
     <Component class="javax.swing.JTextField" name="txtKembalian">
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtKembalianActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel12">
       <Properties>

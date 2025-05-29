@@ -27,7 +27,7 @@ public interface serviceBarang {
     String generateProductId();
     List<modelBarang> getDataWithPagination(int offset, int limit);
     int getTotalRowCount();
-
+    modelBarang getByKode(String kodeProduk);
     List<modelBarang> searchDataWithPagination(String keyword, int offset, int limit);
     int getSearchRowCount(String keyword);
 

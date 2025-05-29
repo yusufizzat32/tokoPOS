@@ -1,0 +1,424 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" 
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" 
+              name="transaction_history_report" 
+              pageWidth="842" 
+              pageHeight="595" 
+              orientation="Landscape" 
+              columnWidth="802" 
+              leftMargin="20" 
+              rightMargin="20" 
+              topMargin="20" 
+              bottomMargin="20" 
+              uuid="ee9a1c9f-c785-4d8e-af49-fa5dd517b873">
+    
+    <property name="ireport.zoom" value="1.0"/>
+    <property name="ireport.x" value="0"/>
+    <property name="ireport.y" value="0"/>
+    
+    <!-- Parameters -->
+    <parameter name="start_date" class="java.util.Date">
+        <defaultValueExpression><![CDATA[new java.util.Date(System.currentTimeMillis() - 30L * 24 * 60 * 60 * 1000)]]></defaultValueExpression>
+    </parameter>
+    <parameter name="end_date" class="java.util.Date">
+        <defaultValueExpression><![CDATA[new java.util.Date()]]></defaultValueExpression>
+    </parameter>
+    <parameter name="cashier" class="java.lang.String">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
+    <parameter name="user_id" class="java.lang.Integer">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
+    <parameter name="company_name" class="java.lang.String" isForPrompting="false">
+        <defaultValueExpression><![CDATA["TOKO GARREN JAYA 2"]]></defaultValueExpression>
+    </parameter>
+    
+    <!-- Query String - Disesuaikan dengan struktur database db_tokopos -->
+    <queryString>
+        <![CDATA[SELECT 
+            tp.Ref as ref_number,
+            tp.Tanggal as transaction_date,
+            COALESCE(tp.Kasir, 'N/A') as cashier,
+            CAST(COALESCE(tp.Total, 0) as DECIMAL(15,2)) as total_amount,
+            CAST(COALESCE(tp.Bayar, 0) as DECIMAL(15,2)) as payment_amount,
+            CAST(COALESCE(tp.Kembalian, 0) as DECIMAL(15,2)) as change_amount,
+            CAST(COALESCE(tp.Diskon, 0) as DECIMAL(15,2)) as discount,
+            COALESCE(tu.Nama, 'Unknown') as user_name,
+            tp.create_at as created_at,
+            (SELECT GROUP_CONCAT(
+                CONCAT(td2.Nama_Produk, ' (', td2.Quantity, 'x', FORMAT(td2.Harga_Satuan, 0), ')')
+                SEPARATOR ', '
+            ) 
+            FROM tabel_transaksidetail td2 
+            WHERE td2.Ref = tp.Ref) as transaction_details
+        FROM 
+            tabel_transaksipenjualan tp
+        LEFT JOIN 
+            tabel_user tu ON tp.Id_User = tu.Id_User
+        WHERE 
+            1=1
+            AND (
+                $P{start_date} IS NULL 
+                OR DATE(tp.Tanggal) >= DATE($P{start_date})
+            )
+            AND (
+                $P{end_date} IS NULL 
+                OR DATE(tp.Tanggal) <= DATE($P{end_date})
+            )
+            AND (
+                $P{cashier} IS NULL 
+                OR $P{cashier} = '' 
+                OR tp.Kasir = $P{cashier}
+            )
+            AND (
+                $P{user_id} IS NULL 
+                OR tp.Id_User = $P{user_id}
+            )
+        ORDER BY 
+            tp.Tanggal DESC, tp.create_at DESC]]>
+    </queryString>
+    
+    <!-- Fields -->
+    <field name="ref_number" class="java.lang.String"/>
+    <field name="transaction_date" class="java.sql.Date"/>
+    <field name="cashier" class="java.lang.String"/>
+    <field name="total_amount" class="java.math.BigDecimal"/>
+    <field name="payment_amount" class="java.math.BigDecimal"/>
+    <field name="change_amount" class="java.math.BigDecimal"/>
+    <field name="discount" class="java.math.BigDecimal"/>
+    <field name="user_name" class="java.lang.String"/>
+    <field name="created_at" class="java.sql.Timestamp"/>
+    <field name="transaction_details" class="java.lang.String"/>
+    
+    <!-- Variables -->
+    <variable name="total_sum" class="java.math.BigDecimal" calculation="Sum">
+        <variableExpression><![CDATA[$F{total_amount}]]></variableExpression>
+        <initialValueExpression><![CDATA[new java.math.BigDecimal(0)]]></initialValueExpression>
+    </variable>
+    <variable name="payment_sum" class="java.math.BigDecimal" calculation="Sum">
+        <variableExpression><![CDATA[$F{payment_amount}]]></variableExpression>
+        <initialValueExpression><![CDATA[new java.math.BigDecimal(0)]]></initialValueExpression>
+    </variable>
+    <variable name="change_sum" class="java.math.BigDecimal" calculation="Sum">
+        <variableExpression><![CDATA[$F{change_amount}]]></variableExpression>
+        <initialValueExpression><![CDATA[new java.math.BigDecimal(0)]]></initialValueExpression>
+    </variable>
+    <variable name="discount_sum" class="java.math.BigDecimal" calculation="Sum">
+        <variableExpression><![CDATA[$F{discount}]]></variableExpression>
+        <initialValueExpression><![CDATA[new java.math.BigDecimal(0)]]></initialValueExpression>
+    </variable>
+    <variable name="record_count" class="java.lang.Integer" calculation="Count">
+        <variableExpression><![CDATA[$F{ref_number}]]></variableExpression>
+        <initialValueExpression><![CDATA[0]]></initialValueExpression>
+    </variable>
+    
+    <!-- Title -->
+    <title>
+        <band height="120" splitType="Stretch">
+            <rectangle>
+                <reportElement x="0" y="0" width="802" height="100" forecolor="#FFFFFF" backcolor="#0D904F" uuid="77ae2344-06ca-4b16-a3a3-9e86a8ad31b1"/>
+            </rectangle>
+            <staticText>
+                <reportElement x="20" y="15" width="762" height="35" forecolor="#FFFFFF" uuid="e53df68a-aa9c-4cf4-b4e2-d8ece9ea05ec"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="24" isBold="true"/>
+                </textElement>
+                <text><![CDATA[LAPORAN RIWAYAT TRANSAKSI]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="20" y="55" width="762" height="20" forecolor="#FFFFFF" uuid="3a454f78-8462-4706-aa68-fc40491b9f33"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="14" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{company_name}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="20" y="75" width="762" height="15" forecolor="#FFFFFF" uuid="a1a1a1a1-b2b2-c3c3-d4d4-e5e5e5e5e5e5"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="10"/>
+                </textElement>
+                <textFieldExpression><![CDATA["Periode: " + 
+                    ($P{start_date} != null ? new java.text.SimpleDateFormat("dd/MM/yyyy").format($P{start_date}) : "Semua") + 
+                    " s/d " + 
+                    ($P{end_date} != null ? new java.text.SimpleDateFormat("dd/MM/yyyy").format($P{end_date}) : "Semua")]]></textFieldExpression>
+            </textField>
+            <!-- Filter Info -->
+            <textField>
+                <reportElement x="0" y="105" width="802" height="15" uuid="f1f1f1f1-f2f2-f3f3-f4f4-f5f5f5f5f5f5"/>
+                <textElement textAlignment="Center">
+                    <font size="8"/>
+                </textElement>
+                <textFieldExpression><![CDATA[
+                    ($P{cashier} != null && !$P{cashier}.isEmpty() ? "Kasir: " + $P{cashier} + " | " : "") +
+                    ($P{user_id} != null ? "User ID: " + $P{user_id} + " | " : "") +
+                    "Dicetak pada: " + new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new java.util.Date())
+                ]]></textFieldExpression>
+            </textField>
+        </band>
+    </title>
+    
+    <!-- Column Header -->
+    <columnHeader>
+        <band height="35" splitType="Stretch">
+            <rectangle>
+                <reportElement x="0" y="0" width="802" height="30" forecolor="#FFFFFF" backcolor="#0D904F" uuid="886cc65c-17a0-4499-8d3b-66faf1771f3c"/>
+                <graphicElement>
+                    <pen lineWidth="1.0"/>
+                </graphicElement>
+            </rectangle>
+            <staticText>
+                <reportElement x="5" y="5" width="70" height="20" forecolor="#FFFFFF" uuid="33675234-1cf8-4af2-9a0f-ca591696df6b"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="9" isBold="true"/>
+                </textElement>
+                <text><![CDATA[REF]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="80" y="5" width="70" height="20" forecolor="#FFFFFF" uuid="31e53978-2c97-472e-82a8-66c6b4112d7b"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="9" isBold="true"/>
+                </textElement>
+                <text><![CDATA[TANGGAL]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="155" y="5" width="70" height="20" forecolor="#FFFFFF" uuid="26c99a4c-6ea5-4730-bcc3-554c50bcee9d"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="9" isBold="true"/>
+                </textElement>
+                <text><![CDATA[KASIR]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="230" y="5" width="80" height="20" forecolor="#FFFFFF" uuid="d9aee4d4-3bbc-4537-9b50-05bf66db980c"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="9" isBold="true"/>
+                </textElement>
+                <text><![CDATA[TOTAL]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="315" y="5" width="80" height="20" forecolor="#FFFFFF" uuid="71427fcb-40ae-42b0-80a9-6596da202b9d"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="9" isBold="true"/>
+                </textElement>
+                <text><![CDATA[BAYAR]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="400" y="5" width="80" height="20" forecolor="#FFFFFF" uuid="e28ef930-45b2-4fae-bbf0-0e32227bd9b5"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="9" isBold="true"/>
+                </textElement>
+                <text><![CDATA[KEMBALIAN]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="485" y="5" width="60" height="20" forecolor="#FFFFFF" uuid="737ae398-14d3-4b00-917c-1ab1f67f92f4"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="9" isBold="true"/>
+                </textElement>
+                <text><![CDATA[DISKON]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="550" y="5" width="80" height="20" forecolor="#FFFFFF" uuid="445a4f63-9852-4f39-a7ac-617d4b86e947"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="9" isBold="true"/>
+                </textElement>
+                <text><![CDATA[USER]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="635" y="5" width="162" height="20" forecolor="#FFFFFF" uuid="b1b1b1b1-b2b2-b3b3-b4b4-b5b5b5b5b5b5"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="9" isBold="true"/>
+                </textElement>
+                <text><![CDATA[DETAIL PRODUK]]></text>
+            </staticText>
+        </band>
+    </columnHeader>
+    
+    <!-- Detail -->
+    <detail>
+        <band height="40" splitType="Stretch">
+            <!-- Alternating row background -->
+            <frame>
+                <reportElement x="0" y="0" width="802" height="35" backcolor="#F8F8F8" uuid="e8589607-581b-45d8-9987-3a3a97589a85">
+                    <printWhenExpression><![CDATA[$V{REPORT_COUNT} % 2 == 0]]></printWhenExpression>
+                </reportElement>
+            </frame>
+            
+            <!-- Border -->
+            <rectangle>
+                <reportElement x="0" y="0" width="802" height="35" backcolor="rgba(0, 0, 0, 0.0)" uuid="06b3ba65-6af4-47c1-831e-6c2534282b7d"/>
+                <graphicElement>
+                    <pen lineWidth="0.5" lineColor="#CCCCCC"/>
+                </graphicElement>
+            </rectangle>
+            
+            <!-- Data Fields -->
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement x="5" y="2" width="70" height="15" uuid="f0affad8-5264-48d0-ade3-3e0348f3edaf"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="8"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{ref_number}]]></textFieldExpression>
+            </textField>
+            
+            <textField pattern="dd/MM/yyyy" isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement x="80" y="2" width="70" height="15" uuid="fa1a9c68-18e6-40ac-b1b5-0bc33ec47906"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="8"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{transaction_date}]]></textFieldExpression>
+            </textField>
+            
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement x="155" y="2" width="70" height="15" uuid="b881e6aa-61b8-42a2-ad5c-5ece71d56134"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="8"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{cashier}]]></textFieldExpression>
+            </textField>
+            
+            <textField pattern="#,##0" isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement x="230" y="2" width="80" height="15" uuid="eff170da-4e81-42c9-92a2-97f250b569f7"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle">
+                    <font size="8"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{total_amount}]]></textFieldExpression>
+            </textField>
+            
+            <textField pattern="#,##0" isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement x="315" y="2" width="80" height="15" uuid="53140f69-9192-465e-a80d-a99f8910a9c4"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle">
+                    <font size="8"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{payment_amount}]]></textFieldExpression>
+            </textField>
+            
+            <textField pattern="#,##0" isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement x="400" y="2" width="80" height="15" uuid="9856d219-28bf-4355-b5fc-1e204379b79a"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle">
+                    <font size="8"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{change_amount}]]></textFieldExpression>
+            </textField>
+            
+            <textField pattern="#,##0" isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement x="485" y="2" width="60" height="15" uuid="aa652d1d-f7c0-4af0-baab-859b406bb6ac"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle">
+                    <font size="8"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{discount}]]></textFieldExpression>
+            </textField>
+            
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement x="550" y="2" width="80" height="15" uuid="16ed721d-26af-414f-af11-ac175c7c12d7"/>
+                <textElement textAlignment="Left" verticalAlignment="Middle">
+                    <font size="8"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{user_name}]]></textFieldExpression>
+            </textField>
+            
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement x="635" y="2" width="162" height="30" uuid="c1c1c1c1-c2c2-c3c3-c4c4-c5c5c5c5c5c5"/>
+                <textElement textAlignment="Left" verticalAlignment="Top">
+                    <font size="7"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{transaction_details}]]></textFieldExpression>
+            </textField>
+        </band>
+    </detail>
+    
+    <!-- Page Footer -->
+    <pageFooter>
+        <band height="20" splitType="Stretch">
+            <textField>
+                <reportElement x="0" y="5" width="400" height="15" uuid="d1d1d1d1-d2d2-d3d3-d4d4-d5d5d5d5d5d5"/>
+                <textElement textAlignment="Left">
+                    <font size="8"/>
+                </textElement>
+                <textFieldExpression><![CDATA["Total Transaksi: " + $V{record_count}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="400" y="5" width="402" height="15" uuid="e1e1e1e1-e2e2-e3e3-e4e4-e5e5e5e5e5e5"/>
+                <textElement textAlignment="Right">
+                    <font size="8"/>
+                </textElement>
+                <textFieldExpression><![CDATA["Halaman " + $V{PAGE_NUMBER} + " dari " + $V{PAGE_COUNT}]]></textFieldExpression>
+            </textField>
+        </band>
+    </pageFooter>
+    
+    <!-- Summary -->
+    <summary>
+        <band height="80" splitType="Stretch">
+            <rectangle>
+                <reportElement x="0" y="10" width="802" height="50" backcolor="#0D904F" uuid="4d690e95-92b1-458c-861f-ade103dbdd71"/>
+                <graphicElement>
+                    <pen lineWidth="1.0"/>
+                </graphicElement>
+            </rectangle>
+            
+            <staticText>
+                <reportElement x="155" y="15" width="70" height="20" forecolor="#FFFFFF" uuid="fca1246e-0728-4122-afe7-3e7211c141fb"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="10" isBold="true"/>
+                </textElement>
+                <text><![CDATA[TOTAL:]]></text>
+            </staticText>
+            
+            <textField pattern="#,##0">
+                <reportElement x="230" y="15" width="80" height="20" forecolor="#FFFFFF" uuid="7abc485d-07d1-4e41-a874-77a04c7ea8b9"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle">
+                    <font size="9" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$V{total_sum}]]></textFieldExpression>
+            </textField>
+            
+            <textField pattern="#,##0">
+                <reportElement x="315" y="15" width="80" height="20" forecolor="#FFFFFF" uuid="c7321897-f8af-4454-a805-4eb51cae6b30"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle">
+                    <font size="9" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$V{payment_sum}]]></textFieldExpression>
+            </textField>
+            
+            <textField pattern="#,##0">
+                <reportElement x="400" y="15" width="80" height="20" forecolor="#FFFFFF" uuid="d6af6b86-7acb-47d1-b4d0-339c06831b14"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle">
+                    <font size="9" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$V{change_sum}]]></textFieldExpression>
+            </textField>
+            
+            <textField pattern="#,##0">
+                <reportElement x="485" y="15" width="60" height="20" forecolor="#FFFFFF" uuid="a2a2a2a2-a3a3-a4a4-a5a5-a6a6a6a6a6a6"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle">
+                    <font size="9" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$V{discount_sum}]]></textFieldExpression>
+            </textField>
+            
+            <staticText>
+                <reportElement x="5" y="40" width="100" height="15" forecolor="#FFFFFF" uuid="b2b2b2b2-b3b3-b4b4-b5b5-b6b6b6b6b6b6"/>
+                <textElement textAlignment="Left" verticalAlignment="Middle">
+                    <font size="9" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Jumlah Transaksi:]]></text>
+            </staticText>
+            
+            <textField>
+                <reportElement x="110" y="40" width="100" height="15" forecolor="#FFFFFF" uuid="c2c2c2c2-c3c3-c4c4-c5c5-c6c6c6c6c6c6"/>
+                <textElement textAlignment="Left" verticalAlignment="Middle">
+                    <font size="9" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$V{record_count} + " transaksi"]]></textFieldExpression>
+            </textField>
+            
+            <textField>
+                <reportElement x="0" y="65" width="802" height="15" uuid="205adf05-523d-45e6-8412-a8a108aa67c1"/>
+                <textElement textAlignment="Center">
+                    <font size="8"/>
+                </textElement>
+                <textFieldExpression><![CDATA["Laporan dicetak pada: " + new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new java.util.Date())]]></textFieldExpression>
+            </textField>
+        </band>
+    </summary>
+</jasperReport>

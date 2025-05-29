@@ -17,7 +17,6 @@ public class modelReturBarang {
     public modelReturBarang(int idRetur, String ref, String alasanRetur, int totalPengembalian, String statusRetur) {
         this.idRetur = idRetur;
         this.ref = ref;
-        this.idMember = idMember;
         this.alasanRetur = alasanRetur;
         this.totalPengembalian = totalPengembalian;
         this.statusRetur = statusRetur;

@@ -128,7 +128,7 @@ private modelBarang selectedBarang;
                 {null, null, null, null}
             },
             new String [] {
-                "BARCODE", "NAMA PRODUK", "HARGA", "STOK"
+                "KD PRODUK", "NAMA PRODUK", "HARGA", "QTY"
             }
         ));
         jScrollPane1.setViewportView(tabel);

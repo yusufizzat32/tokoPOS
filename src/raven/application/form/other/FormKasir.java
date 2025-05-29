@@ -214,6 +214,12 @@ public class FormKasir extends javax.swing.JPanel {
             }
         });
 
+        txtKembalian.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtKembalianActionPerformed(evt);
+            }
+        });
+
         jLabel12.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel12.setText("Kembalian");
 
@@ -849,6 +855,10 @@ private void hitungTotal() {
     // Fokus ke barcode
     txtBarcode.requestFocusInWindow();
     }//GEN-LAST:event_btnResetActionPerformed
+
+    private void txtKembalianActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtKembalianActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtKembalianActionPerformed
     private void handleBarcodeInput(String barcode) {
     if (barcode.isEmpty()) {
         return;

@@ -495,6 +495,43 @@ public String generateProductId() {
         return "PRD001"; // Fallback jika format tidak sesuai
     }
 }
+@Override
+public modelBarang getByKode(String kodeProduk) {
+    PreparedStatement st = null;
+    ResultSet rs = null;
+    String sql = "SELECT b.*, k.nama_kategori FROM tabel_barang b " +
+                 "LEFT JOIN kategori k ON b.id_kategori = k.id_kategori " +
+                 "WHERE b.Kd_Produk = ?";
+    
+    try {
+        st = conn.prepareStatement(sql);
+        st.setString(1, kodeProduk);
+        rs = st.executeQuery();
+
+        if (rs.next()) {
+            modelBarang barang = new modelBarang();
+            barang.setIdProduk(rs.getString("Kd_Produk"));
+            barang.setNamaProduk(rs.getString("Nama_Produk"));
+            barang.setHargaProduk(rs.getInt("Harga_Jual"));
+            barang.setHargaBeli(rs.getInt("Harga_Beli"));
+            barang.setStokProduk(rs.getDouble("Stok"));
+            barang.setBarcode(rs.getString("Barcode"));
+            barang.setIdKategori(rs.getInt("id_kategori"));
+            barang.setNamaKategori(rs.getString("nama_kategori"));
+            return barang;
+        }
+    } catch (SQLException e) {
+        System.out.println("Gagal mendapatkan data barang: " + e.getMessage());
+    } finally {
+        try {
+            if (rs != null) rs.close();
+            if (st != null) st.close();
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+    }
+    return null;
+}
 
 
 

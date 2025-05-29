@@ -390,10 +390,8 @@ private void perbaruiData() {
                             .addComponent(jLAlamat1))
                         .addGap(36, 36, 36)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGap(6, 6, 6)
-                                .addComponent(txtRFID))
-                            .addComponent(txtAlamat))))
+                            .addComponent(txtAlamat)
+                            .addComponent(txtRFID))))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(

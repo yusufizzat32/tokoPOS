@@ -45,11 +45,38 @@ public class FormReturBarang extends javax.swing.JPanel {
     // Inisialisasi tabel model
     tabelretur.setModel(new DefaultTableModel(
     new Object[][]{},
-    new String[]{"Barcode", "Nama Produk", "Harga", "Jumlah", "Alasan"}
+    new String[]{"Kd Produk", "Nama Produk", "Harga", "Jumlah", "Alasan","Sub Total"}
 ));
-   
+    checkTableAndButtonStatus();
+    
+    // Tambahkan listener untuk perubahan tabel
+    tabelretur.getModel().addTableModelListener(e -> checkTableAndButtonStatus());
+
+    }
+    private void checkTableAndButtonStatus() {
+    boolean isTableEmpty = tabelretur.getRowCount() == 0;
+    simpan1.setEnabled(!isTableEmpty);
+}
+private void updateTotal() {
+    DefaultTableModel model = (DefaultTableModel) tabelretur.getModel();
+    int total = 0;
+
+    for (int i = 0; i < model.getRowCount(); i++) {
+        // Pastikan kolom subtotal adalah kolom ke-5 (indeks 5)
+        Object subtotalObj = model.getValueAt(i, 5);
+        if (subtotalObj instanceof Integer) {
+            total += (Integer) subtotalObj;
+        } else if (subtotalObj instanceof String) {
+            try {
+                total += Integer.parseInt((String) subtotalObj);
+            } catch (NumberFormatException e) {
+                // Handle error jika subtotal bukan angka
+            }
+        }
     }
 
+    txtTotal1.setText(String.valueOf(total));
+}
 private void setLayoutform(){
     idref.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "id penjualan" );
     txtscanbarcode.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "Barcode");
@@ -59,6 +86,24 @@ private void setLayoutform(){
     txtalasan.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "Alasan");
     
     }
+private void clearAllFields() {
+    idref.setText("");
+    txtscanbarcode.setText("");
+    txtnamaproduk.setText("");
+    txtharga.setText("");
+    txtjumlah.setText("");
+    txtalasan.setText("");
+    txtTotal1.setText("0");
+    txtBayar.setText("");
+    txtKembalian.setText("");
+    
+    // Kosongkan tabel
+    DefaultTableModel model = (DefaultTableModel) tabelretur.getModel();
+    model.setRowCount(0);
+    
+    // Periksa status tombol setelah membersihkan
+    checkTableAndButtonStatus();
+}
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -89,6 +134,13 @@ private void setLayoutform(){
         jLabel12 = new javax.swing.JLabel();
         jLabel13 = new javax.swing.JLabel();
         jLabel14 = new javax.swing.JLabel();
+        txtTotal1 = new javax.swing.JTextField();
+        txtBayar = new javax.swing.JTextField();
+        txtKembalian = new javax.swing.JTextField();
+        jLabel15 = new javax.swing.JLabel();
+        jLabel16 = new javax.swing.JLabel();
+        jLabel17 = new javax.swing.JLabel();
+        btnReset = new com.raven.swing.ButtonGradient();
 
         save1.setText("EDIT");
         save1.setColor1(new java.awt.Color(46, 204, 113));
@@ -225,6 +277,36 @@ private void setLayoutform(){
 
         jLabel14.setText("Alasan");
 
+        txtTotal1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtTotal1ActionPerformed(evt);
+            }
+        });
+
+        txtBayar.addCaretListener(new javax.swing.event.CaretListener() {
+            public void caretUpdate(javax.swing.event.CaretEvent evt) {
+                txtBayarCaretUpdate(evt);
+            }
+        });
+
+        jLabel15.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabel15.setText("Kembalian");
+
+        jLabel16.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabel16.setText("Bayar");
+
+        jLabel17.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabel17.setText("Total");
+
+        btnReset.setText("RESET");
+        btnReset.setColor1(new java.awt.Color(46, 204, 113));
+        btnReset.setColor2(new java.awt.Color(46, 204, 113));
+        btnReset.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnResetActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -236,9 +318,6 @@ private void setLayoutform(){
                         .addComponent(jLabel2)
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addComponent(jScrollPane3, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jSeparator2)
-                        .addGap(542, 542, 542))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(idref, javax.swing.GroupLayout.DEFAULT_SIZE, 99, Short.MAX_VALUE)
@@ -273,9 +352,30 @@ private void setLayoutform(){
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(save3, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(simpan1, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel17, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(txtTotal1, javax.swing.GroupLayout.PREFERRED_SIZE, 153, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel15, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(txtKembalian, javax.swing.GroupLayout.PREFERRED_SIZE, 153, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel16, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(txtBayar, javax.swing.GroupLayout.PREFERRED_SIZE, 153, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jSeparator2)
+                                .addGap(542, 542, 542))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(simpan1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(btnReset, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE))))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -308,9 +408,26 @@ private void setLayoutform(){
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 251, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(simpan1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 57, Short.MAX_VALUE)
-                .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(simpan1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(btnReset, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel17)
+                            .addComponent(txtTotal1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel16)
+                            .addComponent(txtBayar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(txtKembalian, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel15))))
                 .addGap(38, 38, 38))
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -405,38 +522,42 @@ private void setLayoutform(){
     }//GEN-LAST:event_save2ActionPerformed
 
     private void save3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_save3ActionPerformed
-        if(txtscanbarcode.getText().isEmpty() ||
-            txtnamaproduk.getText().isEmpty() ||
-            txtharga.getText().isEmpty() ||
-            txtjumlah.getText().isEmpty() ||
-            txtalasan.getText().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Harap isi semua field!");
-            return;
-        }
+        if (txtscanbarcode.getText().isEmpty() ||
+        txtnamaproduk.getText().isEmpty() ||
+        txtharga.getText().isEmpty() ||
+        txtjumlah.getText().isEmpty() ||
+        txtalasan.getText().isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Harap isi semua field!");
+        return;
+    }
 
-        try {
-            String barcode = txtscanbarcode.getText();
-            String nama = txtnamaproduk.getText();
-            int harga = Integer.parseInt(txtharga.getText());
-            int jumlah = Integer.parseInt(txtjumlah.getText());
-            String alasan = txtalasan.getText();
+    try {
+        String barcode = txtscanbarcode.getText();
+        String nama = txtnamaproduk.getText();
+        int harga = Integer.parseInt(txtharga.getText());
+        int jumlah = Integer.parseInt(txtjumlah.getText());
+        String alasan = txtalasan.getText();
+        int subtotal = harga * jumlah; // Hitung subtotal
 
-            DefaultTableModel model = (DefaultTableModel) tabelretur.getModel();
-            // Ganti addRow menjadi insertRow dengan indeks 0
-            model.insertRow(0, new Object[]{
-                barcode,
-                nama,
-                harga,
-                jumlah,
-                alasan
-            });
+        DefaultTableModel model = (DefaultTableModel) tabelretur.getModel();
+        model.insertRow(0, new Object[]{
+            barcode,
+            nama,
+            harga,
+            jumlah,
+            alasan,
+            subtotal // Tambahkan subtotal ke tabel
+        });
 
-            txtjumlah.setText("");
-            txtalasan.setText("");
+        // Update total
+        updateTotal();
 
-        } catch(NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Format angka tidak valid!");
-        }
+        txtjumlah.setText("");
+        txtalasan.setText("");
+
+    } catch (NumberFormatException e) {
+        JOptionPane.showMessageDialog(this, "Format angka tidak valid!");
+    }
     }//GEN-LAST:event_save3ActionPerformed
 
     private void batalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_batalActionPerformed
@@ -550,115 +671,184 @@ private void setLayoutform(){
     private void simpan1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_simpan1ActionPerformed
 
         // Validasi apakah tabel kosong
-        if (tabelretur.getRowCount() == 0) {
-            JOptionPane.showMessageDialog(this, "Tidak ada data retur yang akan disimpan!");
+    if (tabelretur.getRowCount() == 0) {
+        JOptionPane.showMessageDialog(this, "Tidak ada data retur yang akan disimpan!");
+        return;
+    }
+
+    // Validasi ID Ref penjualan
+    String refPenjualan = idref.getText().trim();
+    if (refPenjualan.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "ID Ref Penjualan harus diisi!");
+        return;
+    }
+
+    try {
+        // Inisialisasi service
+        returDAO returService = new returDAO();
+        penjualanDAO penjualanService = new penjualanDAO();
+
+        // Hitung total pengembalian
+        int totalPengembalian = 0;
+        DefaultTableModel model = (DefaultTableModel) tabelretur.getModel();
+
+        // Buat objek retur
+        modelReturBarang retur = new modelReturBarang();
+        retur.setRef(refPenjualan);
+        
+        // Simpan alasan retur (ambil dari baris pertama)
+        if (model.getRowCount() > 0) {
+            retur.setAlasanRetur(model.getValueAt(0, 4).toString());
+        }
+        
+        retur.setStatusRetur("selesai");
+        retur.setTotalPengembalian(0);
+
+        // Simpan header retur dan dapatkan ID retur
+        int idRetur = returService.insertReturAndGetId(retur);
+        if (idRetur == -1) {
+            JOptionPane.showMessageDialog(this, "Gagal menyimpan data retur!");
             return;
         }
 
-        // Validasi ID Ref penjualan
-        String refPenjualan = idref.getText().trim();
-        if (refPenjualan.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "ID Ref Penjualan harus diisi!");
-            return;
-        }
+        // Simpan detail retur dan kumpulkan data untuk update penjualan
+        for (int i = 0; i < model.getRowCount(); i++) {
+            try {
+                String barcode = String.valueOf(model.getValueAt(i, 0));
+                String namaProduk = String.valueOf(model.getValueAt(i, 1));
+                String hargaStr = String.valueOf(model.getValueAt(i, 2));
+                String jumlahStr = String.valueOf(model.getValueAt(i, 3));
+                String alasan = String.valueOf(model.getValueAt(i, 4));
 
-        try {
-            // Inisialisasi service
-            returDAO returService = new returDAO();
-            penjualanDAO penjualanService = new penjualanDAO();
-
-            // Hitung total pengembalian
-            int totalPengembalian = 0;
-            DefaultTableModel model = (DefaultTableModel) tabelretur.getModel();
-
-            // Buat objek retur
-            modelReturBarang retur = new modelReturBarang();
-            retur.setRef(refPenjualan);
-            for (int i = 0; i < model.getRowCount(); i++) {
-                String alasan = model.getValueAt(i, 4).toString(); // kolom ke-4 (indeks 4 = kolom ke-5)
-
-                retur.setAlasanRetur(alasan);
-            }
-            retur.setStatusRetur("selesai");
-            retur.setTotalPengembalian(0);
-
-            // Simpan header retur dan dapatkan ID retur
-            int idRetur = returService.insertReturAndGetId(retur);
-            if (idRetur == -1) {
-                JOptionPane.showMessageDialog(this, "Gagal menyimpan data retur!");
-                return;
-            }
-
-            // Simpan detail retur
-            for (int i = 0; i < model.getRowCount(); i++) {
-                try {
-                    // Ambil data dengan indeks yang benar
-                    String barcode = String.valueOf(model.getValueAt(i, 0)); // Kolom 0: Barcode
-                    String namaProduk = String.valueOf(model.getValueAt(i, 1)); // Kolom 1: Nama Produk
-                    String hargaStr = String.valueOf(model.getValueAt(i, 2)); // Kolom 2: Harga
-                    String jumlahStr = String.valueOf(model.getValueAt(i, 3)); // Kolom 3: Jumlah
-                    String alasan = String.valueOf(model.getValueAt(i, 4)); // Kolom 4: Alasan
-
-                    // Validasi data kosong/null
-                    if (hargaStr.isEmpty() || hargaStr.equals("null") ||
-                        jumlahStr.isEmpty() || jumlahStr.equals("null")) {
-                        JOptionPane.showMessageDialog(this, "Data Harga/Jumlah pada baris " + (i+1) + " tidak valid!");
-                        continue; // Lewati baris ini
-                    }
-
-                    int harga = Integer.parseInt(hargaStr);
-                    int jumlah = Integer.parseInt(jumlahStr);
-
-                    // Cari Kd_Produk berdasarkan barcode
-                    modelBarang barang = penjualanService.cariBarangByBarcode(barcode);
-
-                    if (barang != null && barang.getIdProduk() != null) {
-                        returService.insertDetailRetur(
-                            idRetur,
-                            barcode,
-                            jumlah,
-                            harga,
-                            alasan
-                        );
-
-                        totalPengembalian += (harga * jumlah);
-
-                        // Update stok barang
-                        penjualanDetailService.updateStok(barang.getIdProduk(), -jumlah);
-                    } else {
-                        JOptionPane.showMessageDialog(this, "Barang dengan barcode " + barcode + " tidak ditemukan!");
-                    }
-                } catch (NumberFormatException e) {
-                    JOptionPane.showMessageDialog(this, "Format angka tidak valid pada baris " + (i+1) + "!");
-                } catch (Exception e) {
-                    JOptionPane.showMessageDialog(this, "Error pada baris " + (i+1) + ": " + e.getMessage());
+                // Validasi data
+                if (hargaStr.isEmpty() || hargaStr.equals("null") ||
+                    jumlahStr.isEmpty() || jumlahStr.equals("null")) {
+                    JOptionPane.showMessageDialog(this, "Data Harga/Jumlah pada baris " + (i+1) + " tidak valid!");
+                    continue;
                 }
 
+                int harga = Integer.parseInt(hargaStr);
+                int jumlah = Integer.parseInt(jumlahStr);
+                int subtotal = harga * jumlah;
+
+                // Cari Kd_Produk berdasarkan barcode
+                modelBarang barang = penjualanService.cariBarangByBarcode(barcode);
+
+                if (barang != null && barang.getIdProduk() != null) {
+                    // Simpan detail retur
+                    returService.insertDetailRetur(
+                        idRetur,
+                        barcode,
+                        jumlah,
+                        harga,
+                        alasan
+                    );
+
+                    totalPengembalian += subtotal;
+
+                    // Update stok barang
+                    penjualanDetailService.updateStok(barang.getIdProduk(), -jumlah);
+                    
+                    // Update detail penjualan
+                    updatePenjualanDetail(refPenjualan, barcode, jumlah, subtotal);
+                } else {
+                    JOptionPane.showMessageDialog(this, "Barang dengan barcode " + barcode + " tidak ditemukan!");
+                }
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(this, "Format angka tidak valid pada baris " + (i+1) + "!");
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, "Error pada baris " + (i+1) + ": " + e.getMessage());
             }
-
-            // Update total pengembalian di header retur
-            retur.setIdRetur(idRetur);
-            retur.setTotalPengembalian(totalPengembalian);
-            returService.updateRetur(retur);
-
-            JOptionPane.showMessageDialog(this, "Data retur berhasil disimpan!");
-
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
-            e.printStackTrace();
         }
+
+        // Update total pengembalian di header retur
+        retur.setIdRetur(idRetur);
+        retur.setTotalPengembalian(totalPengembalian);
+        returService.updateRetur(retur);
+        
+        // Update header penjualan
+        returService.updatePenjualanAfterRetur(refPenjualan, totalPengembalian);
+
+        JOptionPane.showMessageDialog(this, "Data retur berhasil disimpan!");
+        clearAllFields();
+
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
+        e.printStackTrace();
+    }
     }//GEN-LAST:event_simpan1ActionPerformed
+private void updatePenjualanDetail(String refPenjualan, String kdProduk, int jumlahRetur, int subtotalRetur) {
+    String sql = "UPDATE tabel_transaksidetail SET Quantity = Quantity - ?, Subtotal = Subtotal - ? WHERE Ref = ? AND Kd_Produk = ?";
+    
+    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setInt(1, jumlahRetur);
+        stmt.setInt(2, subtotalRetur);
+        stmt.setString(3, refPenjualan);
+        stmt.setString(4, kdProduk);
+        
+        int affectedRows = stmt.executeUpdate();
+        if (affectedRows == 0) {
+            System.out.println("Tidak ada baris yang diupdate untuk Ref: " + refPenjualan + " dan Kd_Produk: " + kdProduk);
+        }
+    } catch (SQLException ex) {
+        System.out.println("Gagal mengupdate detail penjualan: " + ex.getMessage());
+        ex.printStackTrace();
+    }
+}
+    private void txtTotal1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtTotal1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtTotal1ActionPerformed
+
+    private void txtBayarCaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_txtBayarCaretUpdate
+         String bayarStr = txtBayar.getText().replace(",", "").trim();
+    String totalStr = txtTotal1.getText().replace(",", "").trim();
+
+    if (!bayarStr.matches("\\d+")) {
+        txtKembalian.setText("0");
+        simpan1.setEnabled(false);
+//        btnReset.setEnabled(false);
+        return;
+    }
+
+    try {
+        int bayar = Integer.parseInt(bayarStr);
+        int total = Integer.parseInt(totalStr);
+        int kembali = bayar - total;
+
+        // Hanya tampilkan kembalian jika tidak negatif
+        if (kembali >= 0) {
+            txtKembalian.setText(Integer.toString(kembali));
+            simpan1.setEnabled(true);
+        } else {
+            txtKembalian.setText("0"); // Tampilkan 0 jika bayar < total
+            simpan1.setEnabled(false);  // Nonaktifkan tombol simpan
+        }
+//        btnReset.setEnabled(true);
+    } catch (NumberFormatException ex) {
+        txtKembalian.setText("0");
+        simpan1.setEnabled(false);
+//        btnReset.setEnabled(false);
+    }
+    }//GEN-LAST:event_txtBayarCaretUpdate
+
+    private void btnResetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnResetActionPerformed
+        clearAllFields(); // Bersihkan semua field dan tabel
+    }//GEN-LAST:event_btnResetActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private com.raven.swing.ButtonGradient batal;
     private javax.swing.JToggleButton btnCari;
+    private com.raven.swing.ButtonGradient btnReset;
     private javax.swing.JTextField idref;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel14;
+    private javax.swing.JLabel jLabel15;
+    private javax.swing.JLabel jLabel16;
+    private javax.swing.JLabel jLabel17;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel9;
@@ -672,6 +862,9 @@ private void setLayoutform(){
     private com.raven.swing.ButtonGradient simpan;
     private com.raven.swing.ButtonGradient simpan1;
     private javax.swing.JTable tabelretur;
+    private javax.swing.JTextField txtBayar;
+    private javax.swing.JTextField txtKembalian;
+    private javax.swing.JTextField txtTotal1;
     private javax.swing.JTextField txtalasan;
     private javax.swing.JTextField txtharga;
     private javax.swing.JTextField txtjumlah;
