@@ -206,7 +206,7 @@ public InputGantiPassword(java.awt.Frame parent, boolean modal, modelUser user) 
             txtPasswordBaru.setText("");
             txtKonfirmasiPassword.setText("");
         } else {
-            JOptionPane.showMessageDialog(this, "Password lama salah atau username tidak ditemukan!", "Gagal", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "username tidak ditemukan!", "Gagal", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btnsimpanActionPerformed
 
