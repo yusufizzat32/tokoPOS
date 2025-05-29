@@ -45,9 +45,7 @@ public class ReturBarang extends javax.swing.JDialog {
     new String[]{"Barcode", "Nama Produk", "Harga", "Jumlah", "Alasan"}
 ));
         
-    
-    
-    
+       
   
 }
     
