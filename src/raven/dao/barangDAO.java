@@ -310,6 +310,230 @@ public modelBarang cariBarangByBarcode(String id) {
         }
         return listBarang;
     }
+    // Contoh implementasi di barangDAO
+
+    @Override
+public List<modelBarang> getDataWithPagination(int offset, int limit) {
+    List<modelBarang> list = new ArrayList<>();
+    String sql = "SELECT b.*, k.nama_kategori FROM tabel_barang b " +
+                 "LEFT JOIN kategori k ON b.id_kategori = k.id_kategori " +
+                 "LIMIT ? OFFSET ?";
+    try {
+        PreparedStatement ps = conn.prepareStatement(sql);
+        ps.setInt(1, limit);
+        ps.setInt(2, offset);
+        
+        ResultSet rs = ps.executeQuery();
+        while (rs.next()) {
+            modelBarang barang = new modelBarang();
+            barang.setIdProduk(rs.getString("Kd_Produk"));
+            barang.setNamaProduk(rs.getString("Nama_Produk"));
+            barang.setHargaProduk(rs.getInt("Harga_Jual"));
+            barang.setHargaBeli(rs.getInt("Harga_Beli"));
+            barang.setStokProduk(rs.getDouble("Stok"));
+            barang.setBarcode(rs.getString("Barcode"));
+            barang.setNamaKategori(rs.getString("nama_kategori"));
+            list.add(barang);
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return list;
+}
+
+@Override
+public int getTotalRowCount() {
+    String sql = "SELECT COUNT(*) FROM tabel_barang";
+    try {
+        PreparedStatement ps = conn.prepareStatement(sql);
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            return rs.getInt(1);
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return 0;
+}
+
+@Override
+public List<modelBarang> searchDataWithPagination(String keyword, int offset, int limit) {
+    List<modelBarang> list = new ArrayList<>();
+    String sql = "SELECT b.*, k.nama_kategori FROM tabel_barang b " +
+                 "LEFT JOIN kategori k ON b.id_kategori = k.id_kategori " +
+                 "WHERE b.Nama_Produk LIKE ? OR b.Kd_Produk LIKE ? OR b.Barcode LIKE ? " +
+                 "LIMIT ? OFFSET ?";
+    try {
+        PreparedStatement ps = conn.prepareStatement(sql);
+        String searchPattern = "%" + keyword + "%";
+        ps.setString(1, searchPattern);
+        ps.setString(2, searchPattern);
+        ps.setString(3, searchPattern);
+        ps.setInt(4, limit);
+        ps.setInt(5, offset);
+        
+        ResultSet rs = ps.executeQuery();
+        while (rs.next()) {
+            modelBarang barang = new modelBarang();
+            barang.setIdProduk(rs.getString("Kd_Produk"));
+            barang.setNamaProduk(rs.getString("Nama_Produk"));
+            barang.setHargaProduk(rs.getInt("Harga_Jual"));
+            barang.setHargaBeli(rs.getInt("Harga_Beli"));
+            barang.setStokProduk(rs.getDouble("Stok"));
+            barang.setBarcode(rs.getString("Barcode"));
+            barang.setNamaKategori(rs.getString("nama_kategori"));
+            list.add(barang);
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return list;
+}
+
+@Override
+public int getSearchRowCount(String keyword) {
+    String sql = "SELECT COUNT(*) FROM tabel_barang " +
+                 "WHERE Nama_Produk LIKE ? OR Kd_Produk LIKE ? OR Barcode LIKE ?";
+    try {
+        PreparedStatement ps = conn.prepareStatement(sql);
+        String searchPattern = "%" + keyword + "%";
+        ps.setString(1, searchPattern);
+        ps.setString(2, searchPattern);
+        ps.setString(3, searchPattern);
+        
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            return rs.getInt(1);
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return 0;
+}
+
+@Override
+public List<modelBarang> searchDataByKategoriWithPagination(String keyword, String kategori, int offset, int limit) {
+    List<modelBarang> list = new ArrayList<>();
+    String sql = "SELECT b.*, k.nama_kategori FROM tabel_barang b " +
+                 "JOIN kategori k ON b.id_kategori = k.id_kategori " +
+                 "WHERE (b.Nama_Produk LIKE ? OR b.Kd_Produk LIKE ? OR b.Barcode LIKE ?) " +
+                 "AND k.nama_kategori = ? " +
+                 "LIMIT ? OFFSET ?";
+    try {
+        PreparedStatement ps = conn.prepareStatement(sql);
+        String searchPattern = "%" + keyword + "%";
+        ps.setString(1, searchPattern);
+        ps.setString(2, searchPattern);
+        ps.setString(3, searchPattern);
+        ps.setString(4, kategori);
+        ps.setInt(5, limit);
+        ps.setInt(6, offset);
+        
+        ResultSet rs = ps.executeQuery();
+        while (rs.next()) {
+            modelBarang barang = new modelBarang();
+            barang.setIdProduk(rs.getString("Kd_Produk"));
+            barang.setNamaProduk(rs.getString("Nama_Produk"));
+            barang.setHargaProduk(rs.getInt("Harga_Jual"));
+            barang.setHargaBeli(rs.getInt("Harga_Beli"));
+            barang.setStokProduk(rs.getDouble("Stok"));
+            barang.setBarcode(rs.getString("Barcode"));
+            barang.setNamaKategori(rs.getString("nama_kategori"));
+            list.add(barang);
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return list;
+}
+
+@Override
+public int getSearchByKategoriRowCount(String keyword, String kategori) {
+    String sql = "SELECT COUNT(*) FROM tabel_barang b " +
+                 "JOIN kategori k ON b.id_kategori = k.id_kategori " +
+                 "WHERE (b.Nama_Produk LIKE ? OR b.Kd_Produk LIKE ? OR b.Barcode LIKE ?) " +
+                 "AND k.nama_kategori = ?";
+    try {
+        PreparedStatement ps = conn.prepareStatement(sql);
+        String searchPattern = "%" + keyword + "%";
+        ps.setString(1, searchPattern);
+        ps.setString(2, searchPattern);
+        ps.setString(3, searchPattern);
+        ps.setString(4, kategori);
+        
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            return rs.getInt(1);
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return 0;
+}
+@Override
+public String generateProductId() {
+    String sql = "SELECT MAX(Kd_Produk) FROM tabel_barang WHERE Kd_Produk LIKE 'PRD%'";
+    try {
+        PreparedStatement ps = conn.prepareStatement(sql);
+        ResultSet rs = ps.executeQuery();
+        
+        if (rs.next()) {
+            String lastId = rs.getString(1);
+            if (lastId != null) {
+                // Ambil angka terakhir dan increment
+                int num = Integer.parseInt(lastId.substring(3)) + 1;
+                return String.format("PRD%03d", num);
+            }
+        }
+        // Jika belum ada data, mulai dari PRD001
+        return "PRD001";
+    } catch (SQLException e) {
+        e.printStackTrace();
+        return "PRD001"; // Fallback
+    } catch (NumberFormatException e) {
+        e.printStackTrace();
+        return "PRD001"; // Fallback jika format tidak sesuai
+    }
+}
+@Override
+public modelBarang getByKode(String kodeProduk) {
+    PreparedStatement st = null;
+    ResultSet rs = null;
+    String sql = "SELECT b.*, k.nama_kategori FROM tabel_barang b " +
+                 "LEFT JOIN kategori k ON b.id_kategori = k.id_kategori " +
+                 "WHERE b.Kd_Produk = ?";
+    
+    try {
+        st = conn.prepareStatement(sql);
+        st.setString(1, kodeProduk);
+        rs = st.executeQuery();
+
+        if (rs.next()) {
+            modelBarang barang = new modelBarang();
+            barang.setIdProduk(rs.getString("Kd_Produk"));
+            barang.setNamaProduk(rs.getString("Nama_Produk"));
+            barang.setHargaProduk(rs.getInt("Harga_Jual"));
+            barang.setHargaBeli(rs.getInt("Harga_Beli"));
+            barang.setStokProduk(rs.getDouble("Stok"));
+            barang.setBarcode(rs.getString("Barcode"));
+            barang.setIdKategori(rs.getInt("id_kategori"));
+            barang.setNamaKategori(rs.getString("nama_kategori"));
+            return barang;
+        }
+    } catch (SQLException e) {
+        System.out.println("Gagal mendapatkan data barang: " + e.getMessage());
+    } finally {
+        try {
+            if (rs != null) rs.close();
+            if (st != null) st.close();
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+    }
+    return null;
+}
+
+
 
 
 }

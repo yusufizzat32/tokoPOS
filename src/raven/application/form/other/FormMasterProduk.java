@@ -4,14 +4,23 @@
  */
 package raven.application.form.other;
 
+import java.sql.Connection;
+import java.util.HashMap;
 import raven.dao.barangDAO;
 import raven.model.modelBarang;
 import raven.service.serviceBarang;
 import raven.tablemodel.tableBarang;
 import java.util.List;
+import java.util.Map;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
 import javax.swing.table.TableColumnModel;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.util.JRLoader;
+import net.sf.jasperreports.view.JasperViewer;
+import raven.config.connectionDB;
 /**
  *
  * @author yusuf
@@ -19,9 +28,40 @@ import javax.swing.table.TableColumnModel;
 public class FormMasterProduk extends javax.swing.JPanel {
     private final tableBarang tblModel = new tableBarang();
     private final serviceBarang servis = new barangDAO();
+    // Tambahkan variabel instance di awal class
+    private int currentPage = 1;
+    private int rowsPerPage = 10; // Jumlah baris per halaman
+    private int totalRows = 0;
 
     public FormMasterProduk() {
         initComponents();
+        btnPrev.setText("Sebelumnya");
+btnPrint.addActionListener(new java.awt.event.ActionListener() {
+    public void actionPerformed(java.awt.event.ActionEvent evt) {
+        printLaporanMasterProduk();
+    }
+});
+btnPrev.addActionListener(new java.awt.event.ActionListener() {
+    public void actionPerformed(java.awt.event.ActionEvent evt) {
+        goToPage(currentPage - 1);
+    }
+});
+
+btnNext.setText("Selanjutnya");
+btnNext.addActionListener(new java.awt.event.ActionListener() {
+    public void actionPerformed(java.awt.event.ActionEvent evt) {
+        goToPage(currentPage + 1);
+    }
+});
+
+cbxRowsPerPage.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "10", "25", "50", "100" }));
+cbxRowsPerPage.addActionListener(new java.awt.event.ActionListener() {
+    public void actionPerformed(java.awt.event.ActionEvent evt) {
+        rowsPerPage = Integer.parseInt(cbxRowsPerPage.getSelectedItem().toString());
+        currentPage = 1;
+        loadData();
+    }
+});
         loadData();
         loadKategori();
         table1.setModel(tblModel);
@@ -36,9 +76,55 @@ public class FormMasterProduk extends javax.swing.JPanel {
     kolom.getColumn(7).setPreferredWidth(100);
 }
     private void loadData() {
-        List<modelBarang> list = servis.showData(); 
+        // Hitung offset berdasarkan halaman saat ini
+        int offset = (currentPage - 1) * rowsPerPage;
+    
+        // Dapatkan data dengan pagination
+        List<modelBarang> list = servis.getDataWithPagination(offset, rowsPerPage); 
+        totalRows = servis.getTotalRowCount(); // Total semua data
+    
         tblModel.setData(list);
+        updatePaginationInfo();
     }
+    private void printLaporanMasterProduk() {
+    try {
+        // Path ke file laporan .jasper
+        String reportPath = "src/raven/reports/LaporanMasterProduk.jasper"; // sesuaikan path-nya
+
+        // Load file laporan
+        JasperReport jasperReport = (JasperReport) JRLoader.loadObjectFromFile(reportPath);
+
+        // Buat parameter kosong (jika tidak ada parameter)
+        Map<String, Object> params = new HashMap<>();
+
+        // Hubungkan ke database
+        Connection conn = connectionDB.getConnection(); // asumsi kamu punya class Koneksi
+
+        // Isi laporan dengan data dari database
+        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, params, conn);
+
+        // Tampilkan laporan
+        JasperViewer.viewReport(jasperPrint, false);
+
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(this, "Gagal mencetak laporan: " + e.getMessage());
+        e.printStackTrace();
+    }
+}
+
+    private void updatePaginationInfo() {
+        int totalPages = (int) Math.ceil((double) totalRows / rowsPerPage);
+        lblPageInfo.setText("Halaman " + currentPage + " dari " + totalPages);
+        btnPrev.setEnabled(currentPage > 1);
+        btnNext.setEnabled(currentPage < totalPages);
+    }
+    private void goToPage(int page) {
+        if (page >= 1 && page <= Math.ceil((double) totalRows / rowsPerPage)) {
+            currentPage = page;
+            loadData();
+        }
+    }
+
     private void loadKategori() {
         List<String> listKategori = servis.getKategoriList(); // Anda perlu menambahkan method getKategoriList() di serviceBarang
         DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>();
@@ -48,18 +134,23 @@ public class FormMasterProduk extends javax.swing.JPanel {
         }
         cbxKategori.setModel(model);
     }
-    private void searchData(){
-         String keyword = txtSearch.getText();
-        String kategori = cbxKategori.getSelectedItem().toString();
-        
-        List<modelBarang> list;
-        if (kategori.equals("Semua Kategori")) {
-            list = servis.searchData(keyword); // Cari berdasarkan keyword saja
-        } else {
-            list = servis.searchDataByKategori(keyword, kategori); // Cari berdasarkan keyword dan kategori
-        }
-        tblModel.setData(list);
+    private void searchData() {
+    String keyword = txtSearch.getText();
+    String kategori = cbxKategori.getSelectedItem().toString();
+    
+    int offset = (currentPage - 1) * rowsPerPage;
+    
+    List<modelBarang> list;
+    if (kategori.equals("Semua Kategori")) {
+        list = servis.searchDataWithPagination(keyword, offset, rowsPerPage);
+        totalRows = servis.getSearchRowCount(keyword);
+    } else {
+        list = servis.searchDataByKategoriWithPagination(keyword, kategori, offset, rowsPerPage);
+        totalRows = servis.getSearchByKategoriRowCount(keyword, kategori);
     }
+    tblModel.setData(list);
+    updatePaginationInfo();
+}
     private void tambahData(){
         InputMasterProduk input = new InputMasterProduk(null,true,1,null,this);
         input.setVisible(true);
@@ -106,6 +197,11 @@ public class FormMasterProduk extends javax.swing.JPanel {
         table1 = new com.raven.swing.Table();
         jLabel2 = new javax.swing.JLabel();
         cbxKategori = new javax.swing.JComboBox<>();
+        lblPageInfo = new javax.swing.JLabel();
+        btnPrev = new javax.swing.JButton();
+        btnNext = new javax.swing.JButton();
+        cbxRowsPerPage = new javax.swing.JComboBox<>();
+        btnPrint = new javax.swing.JButton();
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         jLabel1.setText("MASTER PRODUK");
@@ -167,6 +263,16 @@ public class FormMasterProduk extends javax.swing.JPanel {
             }
         });
 
+        lblPageInfo.setText("jLabel3");
+
+        btnPrev.setText("Prev");
+
+        btnNext.setText("Next");
+
+        cbxRowsPerPage.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+
+        btnPrint.setText("PRINT");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -183,13 +289,23 @@ public class FormMasterProduk extends javax.swing.JPanel {
                                 .addComponent(edit, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(hapus, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 206, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 128, Short.MAX_VALUE)
+                                .addComponent(btnPrint)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(cbxKategori, javax.swing.GroupLayout.PREFERRED_SIZE, 177, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jLabel2))
                             .addComponent(jLabel1))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 230, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 230, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lblPageInfo, javax.swing.GroupLayout.PREFERRED_SIZE, 228, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(cbxRowsPerPage, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnPrev)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnNext)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -204,10 +320,17 @@ public class FormMasterProduk extends javax.swing.JPanel {
                     .addComponent(edit)
                     .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel2)
-                    .addComponent(cbxKategori, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(cbxKategori, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnPrint))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 384, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblPageInfo)
+                    .addComponent(btnPrev)
+                    .addComponent(btnNext)
+                    .addComponent(cbxRowsPerPage, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(23, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -241,12 +364,17 @@ public class FormMasterProduk extends javax.swing.JPanel {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnNext;
+    private javax.swing.JButton btnPrev;
+    private javax.swing.JButton btnPrint;
     private javax.swing.JComboBox<String> cbxKategori;
+    private javax.swing.JComboBox<String> cbxRowsPerPage;
     private javax.swing.JToggleButton edit;
     private javax.swing.JToggleButton hapus;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JLabel lblPageInfo;
     private com.raven.swing.Table table1;
     private javax.swing.JToggleButton tambah;
     private javax.swing.JTextField txtSearch;

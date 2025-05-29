@@ -20,14 +20,23 @@ import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.table.TableColumnModel;
 import java.awt.event.ActionEvent;
+import java.sql.Connection;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import javax.swing.JOptionPane;
 import javax.swing.Timer;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.util.JRLoader;
+import net.sf.jasperreports.view.JasperViewer;
+import raven.config.connectionDB;
 import raven.model.session;
 /**
  *
@@ -46,12 +55,40 @@ public class FormTransaksi extends javax.swing.JPanel {
     private Integer idKaryawan;
     private int id = 1;
     private Timer timer;
+    private int currentPage = 1;
+private int rowsPerPage = 10; // Jumlah baris per halaman
+private int totalRows = 0;  
     session sess = session.getInstance();
     
     
     private modelPenjualan mp = new modelPenjualan();
     public FormTransaksi(modelUser modeluser) {
         initComponents();
+        btnPrev.setText("Prev");
+    btnPrev.addActionListener(new java.awt.event.ActionListener() {
+        public void actionPerformed(java.awt.event.ActionEvent evt) {
+            if (currentPage > 1) {
+                currentPage--;
+                loadData();
+            }
+        }
+    });
+
+    btnNext.setText("Next");
+    btnNext.addActionListener(new java.awt.event.ActionListener() {
+        public void actionPerformed(java.awt.event.ActionEvent evt) {
+            int totalPages = (int) Math.ceil((double) servis.getTotalPenjualanCount(idKaryawan) / rowsPerPage);
+            if (currentPage < totalPages) {
+                currentPage++;
+                loadData();
+            }
+        }
+    });
+        btnPrint.addActionListener(new java.awt.event.ActionListener() {
+    public void actionPerformed(java.awt.event.ActionEvent evt) {
+        printLaporanMasterProduk();
+    }
+});
         this.idKaryawan = sess.getUserId();
         
         tblData.setModel(tblModelPen);
@@ -62,15 +99,62 @@ public class FormTransaksi extends javax.swing.JPanel {
         filterComboBox.addItem("Minggu Ini");
         filterComboBox.addItem("Bulan Ini");
     }
+    private void updatePagination() {
+    totalRows = servis.getTotalPenjualanCount(idKaryawan);
+    int totalPages = (int) Math.ceil((double) totalRows / rowsPerPage);
     
+    lblPageInfo.setText("Halaman " + currentPage + " dari " + totalPages);
+    
+    // Enable/disable tombol berdasarkan halaman
+    btnPrev.setEnabled(currentPage > 1);
+    btnNext.setEnabled(currentPage < totalPages);
+}
     private void loadData() {
         List<modelPenjualan> list = servis.tampilPenjualan(idKaryawan);
         tblModelPen.setData(list);
+        updatePagination();
     }
+    private void searchData() {
+    List<modelPenjualan> list = servis.cariData(jTextField1.getText());
+    tblModelPen.setData(list);
+    // Untuk search, kita tampilkan semua hasil tanpa pagination
+    lblPageInfo.setText("Menampilkan semua hasil pencarian");
+    btnPrev.setEnabled(false);
+    btnNext.setEnabled(false);
+}
+    private void printLaporanMasterProduk() {
+    try {
+        // Path ke file laporan .jasper
+        String reportPath = "src/raven/reports/RiwayatTransaksi.jasper"; // sesuaikan path-nya
+
+        // Load file laporan
+        JasperReport jasperReport = (JasperReport) JRLoader.loadObjectFromFile(reportPath);
+
+        // Buat parameter kosong (jika tidak ada parameter)
+        Map<String, Object> params = new HashMap<>();
+
+        // Hubungkan ke database
+        Connection conn = connectionDB.getConnection(); // asumsi kamu punya class Koneksi
+
+        // Isi laporan dengan data dari database
+        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, params, conn);
+
+        // Tampilkan laporan
+        JasperViewer.viewReport(jasperPrint, false);
+
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(this, "Gagal mencetak laporan: " + e.getMessage());
+        e.printStackTrace();
+    }
+}
      private void loadDataByPeriod(String period) {
-        List<modelPenjualan> list = servis.tampilPenjualanByPeriod(idKaryawan, period);
-        tblModelPen.setData(list);
-    }
+    List<modelPenjualan> list = servis.tampilPenjualanByPeriod(idKaryawan, period);
+    tblModelPen.setData(list);
+    // Untuk filter period, kita tampilkan semua hasil tanpa pagination
+    lblPageInfo.setText("Menampilkan semua hasil filter");
+    btnPrev.setEnabled(false);
+    btnNext.setEnabled(false);
+}
     
     private void setLebarKolom() {
         TableColumnModel kolom = table1.getColumnModel();
@@ -100,7 +184,10 @@ public class FormTransaksi extends javax.swing.JPanel {
         jTextField1 = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
         filterComboBox = new javax.swing.JComboBox<>();
-        jButton1 = new javax.swing.JButton();
+        btnPrint = new javax.swing.JButton();
+        btnNext = new javax.swing.JButton();
+        btnPrev = new javax.swing.JButton();
+        lblPageInfo = new javax.swing.JLabel();
 
         table1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -172,7 +259,13 @@ public class FormTransaksi extends javax.swing.JPanel {
             }
         });
 
-        jButton1.setText("print");
+        btnPrint.setText("print");
+
+        btnNext.setText("Next");
+
+        btnPrev.setText("Prev");
+
+        lblPageInfo.setText("jLabel3");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -187,12 +280,18 @@ public class FormTransaksi extends javax.swing.JPanel {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(filterComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 169, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jButton1)
+                        .addComponent(btnPrint)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLabel4)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 228, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jScrollPane3))
+                    .addComponent(jScrollPane3)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lblPageInfo, javax.swing.GroupLayout.PREFERRED_SIZE, 228, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnPrev)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnNext)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -202,14 +301,19 @@ public class FormTransaksi extends javax.swing.JPanel {
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(detail, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel4)
                     .addComponent(filterComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton1))
+                    .addComponent(btnPrint)
+                    .addComponent(detail, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 391, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblPageInfo)
+                    .addComponent(btnPrev)
+                    .addComponent(btnNext))
+                .addContainerGap(10, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -249,11 +353,13 @@ public class FormTransaksi extends javax.swing.JPanel {
     }//GEN-LAST:event_filterComboBoxActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnNext;
+    private javax.swing.JButton btnPrev;
+    private javax.swing.JButton btnPrint;
     private javax.swing.JToggleButton detail;
     private javax.swing.JToggleButton edit;
     private javax.swing.JComboBox<String> filterComboBox;
     private javax.swing.JToggleButton hapus;
-    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -261,6 +367,7 @@ public class FormTransaksi extends javax.swing.JPanel {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JTextField jTextField1;
+    private javax.swing.JLabel lblPageInfo;
     private javax.swing.JTable table1;
     private javax.swing.JToggleButton tambah;
     private com.raven.swing.Table tblData;

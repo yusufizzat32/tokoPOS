@@ -90,7 +90,7 @@ public class Application extends javax.swing.JFrame {
     public static void main(String args[]) {
         FlatRobotoFont.install();
         FlatLaf.registerCustomDefaultsSource("raven.theme");
-        UIManager.put("defaultFont", new Font(FlatRobotoFont.FAMILY, Font.PLAIN, 13));
+        UIManager.put("defaultFont", new Font(FlatRobotoFont.FAMILY, Font.PLAIN, 16));
         FlatMacLightLaf.setup();
         java.awt.EventQueue.invokeLater(() -> {
             app = new Application();

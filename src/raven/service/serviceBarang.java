@@ -17,12 +17,22 @@ public interface serviceBarang {
     void hapusData (modelBarang model);
     void updateStok (String id, double stok);
     
+    
     List<modelBarang> showData();
     List<modelBarang> searchData(String keyword);
     List<modelBarang> ambilNamaBarang();
     List<String> getKategoriList();
     List<modelBarang> searchDataByKategori(String keyword, String kategori);
     String ambilNamaBarangId(int id);
+    String generateProductId();
+    List<modelBarang> getDataWithPagination(int offset, int limit);
+    int getTotalRowCount();
+    modelBarang getByKode(String kodeProduk);
+    List<modelBarang> searchDataWithPagination(String keyword, int offset, int limit);
+    int getSearchRowCount(String keyword);
+
+    List<modelBarang> searchDataByKategoriWithPagination(String keyword, String kategori, int offset, int limit);
+    int getSearchByKategoriRowCount(String keyword, String kategori);
 
     modelBarang cariBarangByBarcode(String id); // Perubahan di sini
 }
