@@ -33,9 +33,9 @@ public class Menu extends JPanel {
         {"~MAIN~"},
         {"Dashboard"},
         {"Transaksi","Kasir","Riwayat"},
-        {"Manajemen stok", "Master Produk", "Stok Masuk"},
+        {"Manajemen stok", "Master stok", "Stok masuk"},
         {"Manajemen user","Data user","Ganti password"},
-        
+        {"Retur","Retur Barang"},
         {"Logout"}
     };
 
@@ -63,7 +63,7 @@ public class Menu extends JPanel {
 
     private final List<MenuEvent> events = new ArrayList<>();
     private boolean menuFull = true;
-    private final String headerName = "Toko Garren Jaya";
+    private final String headerName = "Toko Anjay";
 
     protected final boolean hideMenuTitleOnMinimum = true;
     protected final int menuTitleLeftInset = 5;

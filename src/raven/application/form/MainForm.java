@@ -21,6 +21,8 @@ import raven.application.form.other.FormKasir;
 import raven.application.form.other.FormTransaksi;
 import raven.application.form.other.FormMasterProduk;
 import raven.application.form.other.FormProdukMasuk;
+import raven.application.form.other.FormReturBarang;
+import raven.application.form.other.ReturBarang;
 import raven.application.form.other.FormUser;
 import raven.application.form.other.InputGantiPassword;
 import raven.menu.Menu;
@@ -150,8 +152,14 @@ public class MainForm extends JLayeredPane {
             }  
             } 
             else if (index == 4) {
+                if (subIndex == 1) {
+                    Application.showForm(new FormReturBarang()); 
+                
+                } 
+            }
+            else if (index == 5) {
 //                Application.logout(); 
-            } else {
+            }else {
                 action.cancel();
             }
         });

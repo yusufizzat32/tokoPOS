@@ -22,4 +22,5 @@ public interface servicePenjualan {
     String noTransaksi();
     void printNota (String id);
     modelBarang cariBarangByBarcode(String barcode);
+    List<modelBarang> getTransaksiDetailByRef(String ref);
 }
