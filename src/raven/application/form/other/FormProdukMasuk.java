@@ -19,7 +19,10 @@ public class FormProdukMasuk extends javax.swing.JPanel {
 
     private final tableBarangMasuk tblModel = new tableBarangMasuk();
     private final serviceBarangMasuk servis = new barangMasukDAO();
-    
+    private int currentPage = 1;
+    private int rowsPerPage = 10; // Jumlah baris per halaman
+    private int totalRows = 0;
+
     public FormProdukMasuk() {
         initComponents();
         loadData();
@@ -96,6 +99,9 @@ public class FormProdukMasuk extends javax.swing.JPanel {
         txtSearch = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
         filterComboBox = new javax.swing.JComboBox<>();
+        lblPageInfo = new javax.swing.JLabel();
+        btnPrev = new javax.swing.JButton();
+        btnNext = new javax.swing.JButton();
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         jLabel1.setText("PRODUK MASUK");
@@ -142,6 +148,12 @@ public class FormProdukMasuk extends javax.swing.JPanel {
 
         jLabel2.setText("Search");
 
+        lblPageInfo.setText("jLabel3");
+
+        btnPrev.setText("Prev");
+
+        btnNext.setText("Next");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -164,7 +176,13 @@ public class FormProdukMasuk extends javax.swing.JPanel {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(jLabel2)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 228, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 228, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(lblPageInfo, javax.swing.GroupLayout.PREFERRED_SIZE, 228, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnPrev)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnNext)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -181,8 +199,13 @@ public class FormProdukMasuk extends javax.swing.JPanel {
                     .addComponent(jLabel2)
                     .addComponent(filterComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 396, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblPageInfo)
+                    .addComponent(btnPrev)
+                    .addComponent(btnNext))
+                .addContainerGap(11, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -204,12 +227,15 @@ public class FormProdukMasuk extends javax.swing.JPanel {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnNext;
+    private javax.swing.JButton btnPrev;
     private javax.swing.JToggleButton edit;
     private javax.swing.JComboBox<String> filterComboBox;
     private javax.swing.JToggleButton hapus;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JLabel lblPageInfo;
     private com.raven.swing.Table table1;
     private javax.swing.JToggleButton tambah;
     private javax.swing.JTextField txtSearch;
