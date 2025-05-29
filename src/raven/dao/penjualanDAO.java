@@ -328,5 +328,30 @@ public List<modelPenjualan> tampilPenjualanByPeriod(int idUser, String period) {
     }
     return listPenjualan;
 }
+    @Override
+    public List<modelBarang> getTransaksiDetailByRef(String ref) {
+         List<modelBarang> list = new ArrayList<>();
+    String sql = "SELECT td.Kd_Produk, td.Nama_Produk, td.Harga_Satuan, td.Quantity " +
+                 "FROM tabel_transaksidetail td " +
+                 "WHERE td.Ref = ?";
+    
+    try (PreparedStatement st = conn.prepareStatement(sql)) {
+        st.setString(1, ref);
+        ResultSet rs = st.executeQuery();
+        
+        while (rs.next()) {
+            modelBarang barang = new modelBarang();
+            barang.setIdProduk(rs.getString("Kd_Produk"));
+            barang.setNamaProduk(rs.getString("Nama_Produk"));
+            double harga = rs.getDouble("Harga_Satuan");
+            barang.setHargaProduk(rs.getInt("Harga_Satuan"));
+            barang.setStokProduk(rs.getInt("Quantity")); // Quantity dari transaksi
+            list.add(barang);
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return list;
+    }
     
 }
