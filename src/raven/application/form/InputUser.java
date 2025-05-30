@@ -7,6 +7,7 @@ package raven.application.form;
 import java.awt.Dimension;
 import raven.application.form.other.*;
 import java.awt.Frame;
+import java.awt.event.ActionEvent;
 import raven.model.modelUser;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -28,7 +29,7 @@ import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
  *
  * @author Olla
  */
-public class RegisterForm extends javax.swing.JDialog {
+public class InputUser extends javax.swing.JDialog {
     public  int idUserEdit = -1;
     private final tableUser tblUser = new tableUser();
     private final serviceUser servis = new userDAO();
@@ -52,13 +53,12 @@ public class RegisterForm extends javax.swing.JDialog {
       // Komponen GUI
    
     
-     public RegisterForm(java.awt.Frame parent, boolean modal, int mode, modelUser user, FormUser form) {
+     public InputUser(java.awt.Frame parent, boolean modal, int mode, modelUser user, FormUser form) {
        super(parent, modal);
            initComponents();
-             setupRFIDListener();
-        txtRFID = new javax.swing.JTextField(); 
+            setContentPane(jPanel1); 
             setLocationRelativeTo(null);
-          
+             jPanel1.setPreferredSize(new Dimension(500, 600));
         setLocationRelativeTo(parent);
              setDefaultCloseOperation(DISPOSE_ON_CLOSE);
            pack();
@@ -91,7 +91,7 @@ public class RegisterForm extends javax.swing.JDialog {
         txtRole.setSelectedItem(user.getRole());
         txtNotelp.setText(user.getno_telepon());
         txtAlamat.setText(user.getAlamat());
-        txtRFID.setText(user.getRFID());
+       
         
     } else if (mode == 0) {
         // Mode insert
@@ -100,14 +100,7 @@ public class RegisterForm extends javax.swing.JDialog {
     }}
     });
             }
-    public RegisterForm() {
-    
-    setLocationRelativeTo(null);
-    }
-
-    RegisterForm(JFrame jFrame, boolean b) {
-        
-    }
+   
       
       private void loadData() {
         List<modelUser> list = servis.showData();
@@ -151,24 +144,7 @@ public class RegisterForm extends javax.swing.JDialog {
         JOptionPane.showMessageDialog(this, "Silakan pilih Role terlebih dahulu.");
         return false;
     }
-    if (txtRFID.getText().trim().isEmpty()) {
-        JOptionPane.showMessageDialog(this, "Kode RFID tidak boleh kosong.");
-        txtRFID.requestFocus();
-        return false;
-    }
-    
-    if (!txtRFID.getText().matches("[0-9A-Fa-f]+")) {
-        JOptionPane.showMessageDialog(this, "Format RFID tidak valid. Gunakan angka 0-9 dan huruf A-F.");
-        txtRFID.requestFocus();
-        return false;
-    }
-    
-    if (txtRFID.getText().length() != 8) { // Adjust length as needed
-        JOptionPane.showMessageDialog(this, "Kode RFID harus 8 karakter.");
-        txtRFID.requestFocus();
-        return false;
-    }
-    
+ 
         return true;
     }
 private void simpanData() {
@@ -186,8 +162,7 @@ private void simpanData() {
         u.setRole(txtRole.getSelectedItem().toString());
         u.setno_telepon(txtNotelp.getText());
         u.setAlamat(txtAlamat.getText());
-        u.setRFID(txtRFID.getText().trim()); // Add RFID
-        
+    
 
         // Panggil service untuk insert data
         servis.insertData(u);
@@ -220,8 +195,7 @@ private void perbaruiData() {
     model.setAlamat(txtAlamat.getText());
     model.setno_telepon(txtNotelp.getText());
     model.setRole(txtRole.getSelectedItem().toString());
-    model.setRFID(txtRFID.getText());
-
+ 
     // Hanya set password jika diubah (field tidak kosong)
     String newPassword = new String(txtPassword.getPassword()).trim();
     if (!newPassword.isEmpty()) {
@@ -236,7 +210,7 @@ private void perbaruiData() {
 }
 
 
-    private RegisterForm(Frame parent, boolean modal) {
+    private InputUser(Frame parent, boolean modal) {
       
     }
     /**
@@ -268,9 +242,7 @@ private void perbaruiData() {
         batal = new com.raven.swing.ButtonGradient();
         jLNama1 = new javax.swing.JLabel();
         txtIDUser = new javax.swing.JTextField();
-        jLAlamat1 = new javax.swing.JLabel();
-        txtRFID = new javax.swing.JTextField();
-        btnBack = new javax.swing.JButton();
+        jButton1 = new javax.swing.JButton();
 
         jPanel2.setBackground(new java.awt.Color(46, 203, 112));
 
@@ -334,11 +306,10 @@ private void perbaruiData() {
 
         jLNama1.setText("ID User");
 
-        jLAlamat1.setText("Kode RFID");
-
-        txtRFID.addActionListener(new java.awt.event.ActionListener() {
+        jButton1.setText("back");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtRFIDActionPerformed(evt);
+                jButton1ActionPerformed(evt);
             }
         });
 
@@ -346,55 +317,52 @@ private void perbaruiData() {
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(batal, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(simpan, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(22, 22, 22))
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, Short.MAX_VALUE))
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLNotelp)
-                        .addGap(27, 27, 27)
-                        .addComponent(txtNotelp))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLNama1)
-                        .addGap(54, 54, 54)
-                        .addComponent(txtIDUser)
-                        .addGap(69, 69, 69))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addComponent(jButton1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(batal, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(simpan, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(22, 22, 22))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLNama)
-                            .addComponent(jLUsername)
-                            .addComponent(jLPassword)
-                            .addComponent(jLRole))
-                        .addGap(39, 39, 39)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jLNotelp)
+                                .addGap(27, 27, 27)
+                                .addComponent(txtNotelp))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jLNama1)
+                                .addGap(54, 54, 54)
+                                .addComponent(txtIDUser)
+                                .addGap(69, 69, 69))
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(txtPassword)
-                                    .addComponent(txtUsername))
-                                .addGap(69, 69, 69))
-                            .addComponent(txtNama)
+                                    .addComponent(jLNama)
+                                    .addComponent(jLUsername)
+                                    .addComponent(jLPassword)
+                                    .addComponent(jLRole))
+                                .addGap(39, 39, 39)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(jPanel1Layout.createSequentialGroup()
+                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(txtPassword)
+                                            .addComponent(txtUsername))
+                                        .addGap(69, 69, 69))
+                                    .addComponent(txtNama)
+                                    .addGroup(jPanel1Layout.createSequentialGroup()
+                                        .addComponent(txtRole, javax.swing.GroupLayout.PREFERRED_SIZE, 145, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(0, 0, Short.MAX_VALUE))))
                             .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(txtRole, javax.swing.GroupLayout.PREFERRED_SIZE, 145, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(0, 0, Short.MAX_VALUE))))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLAlamat)
-                            .addComponent(jLAlamat1))
-                        .addGap(36, 36, 36)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGap(6, 6, 6)
-                                .addComponent(txtRFID))
-                            .addComponent(txtAlamat))))
-                .addContainerGap())
+                                .addComponent(jLAlamat)
+                                .addGap(54, 54, 54)
+                                .addComponent(txtAlamat)))
+                        .addContainerGap())))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -422,6 +390,11 @@ private void perbaruiData() {
                     .addComponent(txtRole, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(0, 151, Short.MAX_VALUE)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(simpan, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(batal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(18, 18, 18)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLNotelp)
@@ -430,48 +403,24 @@ private void perbaruiData() {
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLAlamat)
                             .addComponent(txtAlamat, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(18, 18, 18)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLAlamat1)
-                            .addComponent(txtRFID, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(0, 151, Short.MAX_VALUE)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(simpan, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(batal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jButton1)
+                        .addGap(14, 14, 14))))
         );
-
-        btnBack.setText("back");
-        btnBack.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnBackActionPerformed(evt);
-            }
-        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(15, 15, 15)
-                .addComponent(btnBack)
-                .addContainerGap(323, Short.MAX_VALUE))
-            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGap(0, 0, Short.MAX_VALUE)))
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(397, Short.MAX_VALUE)
-                .addComponent(btnBack)
-                .addGap(22, 22, 22))
-            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGap(0, 16, Short.MAX_VALUE)))
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 16, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -504,8 +453,7 @@ private void perbaruiData() {
         model.setno_telepon(txtNotelp.getText());
         model.setRole(txtRole.getSelectedItem().toString());
         model.setIdUser(idUserEdit);
-        model.setRFID(txtRFID.getText());
-
+      
          String password = new String(txtPassword.getPassword()).trim();
         // Cek apakah password diisi atau tidak
         if (!password.isEmpty()) {
@@ -524,23 +472,17 @@ private void perbaruiData() {
         // TODO add your handling code here:
     }//GEN-LAST:event_txtRoleActionPerformed
 
-    private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+ 
+        dispose();    
         
-        loginForm.setVisible(true);
-        dispose();
-        
-    }//GEN-LAST:event_btnBackActionPerformed
-
-    private void txtRFIDActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtRFIDActionPerformed
-
-    }//GEN-LAST:event_txtRFIDActionPerformed
+    }//GEN-LAST:event_jButton1ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private com.raven.swing.ButtonGradient batal;
-    private javax.swing.JButton btnBack;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLAlamat;
-    private javax.swing.JLabel jLAlamat1;
     private javax.swing.JLabel jLNama;
     private javax.swing.JLabel jLNama1;
     private javax.swing.JLabel jLNotelp;
@@ -557,7 +499,6 @@ private void perbaruiData() {
     private javax.swing.JTextField txtNama;
     private javax.swing.JTextField txtNotelp;
     private javax.swing.JPasswordField txtPassword;
-    private javax.swing.JTextField txtRFID;
     private javax.swing.JComboBox<String> txtRole;
     private javax.swing.JTextField txtUsername;
     // End of variables declaration//GEN-END:variables
@@ -566,7 +507,7 @@ private void perbaruiData() {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 FormUser formUser = new FormUser();
-                RegisterForm dialog = new RegisterForm(new javax.swing.JFrame(), true, 0, null, formUser);
+                InputUser dialog = new InputUser(new javax.swing.JFrame(), true, 0, null, formUser);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {
@@ -575,7 +516,7 @@ private void perbaruiData() {
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.setSize(600, 500);  // Atur ukuran sesuai kebutuhan
             frame.setLocationRelativeTo(null); // Tengah layar
-            frame.setContentPane(new RegisterForm()); // Tambahkan panel login
+           
             frame.setVisible(true);
                     }
                 });
@@ -592,66 +533,11 @@ private void perbaruiData() {
         txtRole.setSelectedIndex(0);
         txtNotelp.setText("");
         txtAlamat.setText("");
-        txtRFID.setText("");
+      
     }
 
     private void tambahData() {
     simpanData();       
-    }
+    
+    }}
 
-    private void setupRFIDListener() {
-    txtRFID.addKeyListener(new KeyAdapter() {
-            
-            @Override
-            public void keyReleased(KeyEvent e) {
-                String uid = txtRFID.getText().trim();
-                
-                // Jika panjang UID mencukupi (contoh: 10 karakter)
-                if (uid.length() >= 10) {
-                    // Cek apakah UID terdaftar di database
-                    if (autentikasiRFID(uid)) {
-                        JOptionPane.showMessageDialog(RegisterForm.this, "Login berhasil via RFID!");
-                        dispose(); // Tutup LoginForm
-                        new FormDashboard().setVisible(true); // Buka dashboard
-                    } else {
-                        JOptionPane.showMessageDialog(RegisterForm.this, "Kartu RFID tidak terdaftar!");
-                    }
-                    txtRFID.setText(""); // Reset field
-                }
-            }
-
-        private boolean autentikasiRFID(String uid) {
-           
-             boolean isValid = false;
-    Connection conn = null;
-    PreparedStatement ps = null;
-    ResultSet rs = null;
-
-    try {
-        // Ganti dengan koneksi database milikmu
-        conn = ps.getConnection(); 
-        String sql = "SELECT * FROM user WHERE rfid_uid = ?";
-        ps = conn.prepareStatement(sql);
-        ps.setString(1, uid);
-        rs = ps.executeQuery();
-
-        if (rs.next()) {
-            isValid = true; // UID ditemukan
-        }
-    } catch (SQLException ex) {
-        ex.printStackTrace();
-        JOptionPane.showMessageDialog(RegisterForm.this, "Terjadi kesalahan saat mengakses database.");
-    } finally {
-        // Tutup koneksi
-        try { if (rs != null) rs.close(); } catch (SQLException e) { e.printStackTrace(); }
-        try { if (ps != null) ps.close(); } catch (SQLException e) { e.printStackTrace(); }
-        try { if (conn != null) conn.close(); } catch (SQLException e) { e.printStackTrace(); }
-    }
-    return isValid;
-}
-          });
-    }
-
- 
-
-}
