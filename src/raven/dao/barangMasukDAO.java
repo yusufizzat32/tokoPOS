@@ -242,6 +242,74 @@ public List<modelBarangMasuk> showData() {
     }
     return listBarang;
     }
+    // Tambahkan method ini di barangMasukDAO.java
+@Override
+public List<modelBarangMasuk> showDataWithPagination(int page, int rowsPerPage) {
+    List<modelBarangMasuk> listBarang = new ArrayList<>();
+    PreparedStatement st = null;
+    ResultSet rs = null;
+    String sql = "SELECT *, DATE_FORMAT(tanggal_kadaluarsa, '%Y-%m-%d') as formatted_kadaluarsa FROM tabel_produkmasuk LIMIT ? OFFSET ?";
+
+    try {
+        st = conn.prepareStatement(sql);
+        st.setInt(1, rowsPerPage);
+        st.setInt(2, (page - 1) * rowsPerPage);
+        
+        rs = st.executeQuery();
+
+        while (rs.next()) {
+            modelBarangMasuk barang = new modelBarangMasuk();
+            barang.setIdProdukMasuk(rs.getInt("Kd_Produkmasuk"));
+            barang.setIdProduk(rs.getString("Kd_Produk"));
+            barang.setNamaProduk(rs.getString("Nama_Produk"));
+            barang.setHargaProduk(rs.getLong("Harga_Satuan"));
+            barang.setNilaiProduk(rs.getLong("Nilai"));
+            barang.setStokProduk(rs.getLong("Jumlah"));
+            barang.setJumlahMasuk(rs.getLong("Jumlah_masuk"));
+            barang.setTanggal(rs.getString("Tanggal_masuk"));
+            barang.setTanggalKadaluarsaFormatted(rs.getString("formatted_kadaluarsa"));
+            listBarang.add(barang);
+        }
+    } catch (SQLException e) {
+        System.out.println("Gagal menampilkan data: " + e.getMessage());
+        e.printStackTrace();
+    } finally {
+        try {
+            if (rs != null) rs.close();
+            if (st != null) st.close();
+        } catch (SQLException e) {
+            System.out.println("Error closing resources: " + e.getMessage());
+        }
+    }
+    return listBarang;
+}
+
+@Override
+public int getTotalDataCount() {
+    PreparedStatement st = null;
+    ResultSet rs = null;
+    String sql = "SELECT COUNT(*) as total FROM tabel_produkmasuk";
+    int count = 0;
+
+    try {
+        st = conn.prepareStatement(sql);
+        rs = st.executeQuery();
+        
+        if (rs.next()) {
+            count = rs.getInt("total");
+        }
+    } catch (SQLException e) {
+        System.out.println("Gagal mendapatkan jumlah data: " + e.getMessage());
+    } finally {
+        try {
+            if (rs != null) rs.close();
+            if (st != null) st.close();
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+    }
+    return count;
+}
    
     
 }

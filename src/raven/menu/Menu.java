@@ -33,9 +33,9 @@ public class Menu extends JPanel {
         {"~MAIN~"},
         {"Dashboard"},
         {"Transaksi","Kasir","Riwayat"},
-        {"Manajemen stok", "Master Produk", "Stok Masuk"},
+        {"Manajemen stok", "Master stok", "Stok masuk"},
         {"Manajemen user","Data user","Ganti password"},
-        
+        {"Retur","Retur Barang","Riwayat"},
         {"Logout"}
     };
 

@@ -42,9 +42,11 @@ public class InputMasterProduk extends javax.swing.JDialog {
         this.formMasterProduk = formMasterProduk;
         
         initComponents();  // This must be called first to initialize components
-    
+        String generatedId = servis.generateProductId();
+        txtIdProduk.setText(generatedId);
+        txtIdProduk.setEditable(false); // Nonaktifkan edit manual
         // Now we can safely access UI components
-        txtIdBarang.requestFocusInWindow();
+        txtBarcode.requestFocusInWindow();
         setupBarcodeScannerHandling();
     
         setLocationRelativeTo(null);        
@@ -60,9 +62,9 @@ public class InputMasterProduk extends javax.swing.JDialog {
             tblModel.setData(list);
         }
         private boolean validasiInput() {
-            if (txtIdBarang.getText().trim().isEmpty()) {
+            if (txtIdProduk.getText().trim().isEmpty()) {
             JOptionPane.showMessageDialog(this, "ID Obat tidak boleh kosong.");
-            txtIdBarang.requestFocus();
+            txtIdProduk.requestFocus();
             return false;
         }
             if (txtNamaBarang.getText().trim().isEmpty()) {
@@ -131,7 +133,8 @@ public class InputMasterProduk extends javax.swing.JDialog {
     int harga = Integer.parseInt(txtHargaJual.getText().trim());
     int hargaBeli = Integer.parseInt(txtHargaBeli.getText().trim());
     double stok = ((Number) txtStok.getValue()).doubleValue();
-    String idBarang = txtIdBarang.getText().trim();
+    String idBarang = txtIdProduk.getText().trim();
+    String barcode = txtBarcode.getText().trim();
     
     // Get selected kategori id
     int idKategori = getSelectedKategoriId();
@@ -142,7 +145,7 @@ public class InputMasterProduk extends javax.swing.JDialog {
     brg.setHargaProduk(harga);
     brg.setHargaBeli(hargaBeli);
     brg.setStokProduk(stok);
-    brg.setBarcode(idBarang);
+    brg.setBarcode(barcode);
     brg.setIdKategori(idKategori);
     
     servis.tambahData(brg);
@@ -153,7 +156,7 @@ public class InputMasterProduk extends javax.swing.JDialog {
         private void dataTable() {
     simpan.setText("UPDATE");
     idProduk = barang.getIdProduk();
-    txtIdBarang.setText(barang.getIdProduk());
+    txtIdProduk.setText(barang.getIdProduk());
     txtNamaBarang.setText(barang.getNamaProduk());
     txtHargaJual.setText(String.valueOf(barang.getHargaProduk()));
     txtHargaBeli.setText(String.valueOf(barang.getHargaBeli()));
@@ -182,12 +185,13 @@ public class InputMasterProduk extends javax.swing.JDialog {
 }
         
         private void resetForm() {
-        txtIdBarang.setText(""); 
+        txtIdProduk.setText("");
+        txtBarcode.setText("");
         txtHargaJual.setText(""); 
         txtHargaBeli.setText(""); 
         txtStok.setValue(0); 
         txtNamaBarang.setText("");
-        txtIdBarang.requestFocus();
+        txtIdProduk.requestFocus();
         this.dispose();
     }
          private void updateData() {
@@ -294,7 +298,7 @@ public class InputMasterProduk extends javax.swing.JDialog {
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
-        txtIdBarang = new javax.swing.JTextField();
+        txtIdProduk = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
         txtNamaBarang = new javax.swing.JTextField();
         txtHargaJual = new javax.swing.JTextField();
@@ -308,6 +312,8 @@ public class InputMasterProduk extends javax.swing.JDialog {
         txtHargaBeli = new javax.swing.JTextField();
         cbxKategori = new javax.swing.JComboBox<>();
         jLabel10 = new javax.swing.JLabel();
+        txtBarcode = new javax.swing.JTextField();
+        jLabel11 = new javax.swing.JLabel();
 
         jLabel1.setText("jLabel1");
 
@@ -378,6 +384,8 @@ public class InputMasterProduk extends javax.swing.JDialog {
 
         jLabel10.setText("KATEGORI");
 
+        jLabel11.setText("BARCODE");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -388,18 +396,16 @@ public class InputMasterProduk extends javax.swing.JDialog {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jSeparator1)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(batal, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(simpan, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(jLabel4)
+                        .addGap(22, 22, 22)
+                        .addComponent(txtIdProduk)
+                        .addGap(62, 62, 62))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jLabel4)
                             .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addGap(18, 18, 18)
-                        .addComponent(txtIdBarang, javax.swing.GroupLayout.DEFAULT_SIZE, 211, Short.MAX_VALUE)
-                        .addGap(62, 62, 62))
+                            .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(txtNamaBarang, javax.swing.GroupLayout.PREFERRED_SIZE, 273, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(jLabel8, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -409,9 +415,17 @@ public class InputMasterProduk extends javax.swing.JDialog {
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(cbxKategori, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(txtHargaJual, javax.swing.GroupLayout.DEFAULT_SIZE, 273, Short.MAX_VALUE)
-                            .addComponent(txtNamaBarang, javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(txtStok)
-                            .addComponent(txtHargaBeli, javax.swing.GroupLayout.DEFAULT_SIZE, 273, Short.MAX_VALUE))))
+                            .addComponent(txtHargaBeli, javax.swing.GroupLayout.DEFAULT_SIZE, 273, Short.MAX_VALUE)))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(batal, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(simpan, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addComponent(jLabel11, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(18, 18, 18)
+                        .addComponent(txtBarcode, javax.swing.GroupLayout.PREFERRED_SIZE, 273, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -421,8 +435,12 @@ public class InputMasterProduk extends javax.swing.JDialog {
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
-                    .addComponent(txtIdBarang, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtIdProduk, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(txtBarcode, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel11))
+                .addGap(15, 15, 15)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel5)
                     .addComponent(txtNamaBarang, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -441,8 +459,8 @@ public class InputMasterProduk extends javax.swing.JDialog {
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(cbxKategori)
-                    .addComponent(jLabel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 79, Short.MAX_VALUE)
+                    .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 42, Short.MAX_VALUE)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -495,8 +513,8 @@ public class InputMasterProduk extends javax.swing.JDialog {
             "Info Produk",
             JOptionPane.INFORMATION_MESSAGE);
         
-        txtIdBarang.requestFocusInWindow();
-        txtIdBarang.selectAll();
+        txtBarcode.requestFocusInWindow();
+        txtBarcode.selectAll();
     } else {
         txtNamaBarang.requestFocusInWindow();
         
@@ -507,25 +525,25 @@ public class InputMasterProduk extends javax.swing.JDialog {
 }
     private void setupBarcodeScannerHandling() {
     // 1. Fokus otomatis ke field ID Barang saat form dibuka
-    txtIdBarang.requestFocusInWindow();
+    txtBarcode.requestFocusInWindow();
     
     // 2. Seleksi semua teks saat field ID Barang mendapat fokus
-    txtIdBarang.addFocusListener(new java.awt.event.FocusAdapter() {
+    txtBarcode.addFocusListener(new java.awt.event.FocusAdapter() {
         @Override
         public void focusGained(java.awt.event.FocusEvent evt) {
             SwingUtilities.invokeLater(() -> {
-                txtIdBarang.selectAll();
+                txtBarcode.selectAll();
             });
         }
     });
     
     // 3. Handle ketika barcode di-scan (Enter ditekan)
-    txtIdBarang.addActionListener(e -> {
-        handleBarcodeInput(txtIdBarang.getText().trim());
+    txtBarcode.addActionListener(e -> {
+        handleBarcodeInput(txtBarcode.getText().trim());
     });
     
     // 4. Validasi input real-time untuk mencegah karakter tidak valid
-    txtIdBarang.addKeyListener(new KeyAdapter() {
+    txtBarcode.addKeyListener(new KeyAdapter() {
         @Override
         public void keyTyped(KeyEvent e) {
             // Hanya izinkan karakter alfanumerik dan beberapa simbol khusus
@@ -589,6 +607,7 @@ public class InputMasterProduk extends javax.swing.JDialog {
     private javax.swing.JComboBox<String> cbxKategori;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -601,9 +620,10 @@ public class InputMasterProduk extends javax.swing.JDialog {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JSeparator jSeparator1;
     private com.raven.swing.ButtonGradient simpan;
+    private javax.swing.JTextField txtBarcode;
     private javax.swing.JTextField txtHargaBeli;
     private javax.swing.JTextField txtHargaJual;
-    private javax.swing.JTextField txtIdBarang;
+    private javax.swing.JTextField txtIdProduk;
     private javax.swing.JTextField txtNamaBarang;
     private javax.swing.JSpinner txtStok;
     // End of variables declaration//GEN-END:variables

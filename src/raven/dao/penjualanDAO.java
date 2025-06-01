@@ -179,7 +179,7 @@ public List<modelPenjualan> tampilPenjualanByPeriod(int idUser, String period) {
         
         try {
             conn = connectionDB.getConnection();
-            String sql = "SELECT * FROM tabel_barang WHERE Barcode = ?";
+            String sql = "SELECT * FROM tabel_barang WHERE Kd_Produk = ?";
             st = conn.prepareStatement(sql);
             st.setString(1, barcode);
             rs = st.executeQuery();
@@ -328,5 +328,78 @@ public List<modelPenjualan> tampilPenjualanByPeriod(int idUser, String period) {
     }
     return listPenjualan;
 }
+    @Override
+    public List<modelBarang> getTransaksiDetailByRef(String ref) {
+         List<modelBarang> list = new ArrayList<>();
+    String sql = "SELECT td.Kd_Produk, td.Nama_Produk, td.Harga_Satuan, td.Quantity " +
+                 "FROM tabel_transaksidetail td " +
+                 "WHERE td.Ref = ?";
     
+    try (PreparedStatement st = conn.prepareStatement(sql)) {
+        st.setString(1, ref);
+        ResultSet rs = st.executeQuery();
+        
+        while (rs.next()) {
+            modelBarang barang = new modelBarang();
+            barang.setIdProduk(rs.getString("Kd_Produk"));
+            barang.setNamaProduk(rs.getString("Nama_Produk"));
+            double harga = rs.getDouble("Harga_Satuan");
+            barang.setHargaProduk(rs.getInt("Harga_Satuan"));
+            barang.setStokProduk(rs.getInt("Quantity")); // Quantity dari transaksi
+            list.add(barang);
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return list;
+    }
+    @Override
+public List<modelPenjualan> tampilPenjualanWithPagination(int idUser, int page, int rowsPerPage) {
+    List<modelPenjualan> listPenjualan = new ArrayList<>();
+    
+    String sql = "SELECT Ref, Kasir, DATE_FORMAT(Tanggal,'%d-%m-%Y') AS Tanggal, Total, Bayar, Kembalian, Diskon " +
+                 "FROM tabel_transaksipenjualan WHERE id_user = ? ORDER BY create_at DESC LIMIT ? OFFSET ?";
+    
+    try (PreparedStatement st = conn.prepareStatement(sql)) {
+        st.setInt(1, idUser);
+        st.setInt(2, rowsPerPage);
+        st.setInt(3, (page - 1) * rowsPerPage);
+        
+        ResultSet rs = st.executeQuery();
+        while (rs.next()) {
+            modelPenjualan model = new modelPenjualan();
+            model.setRef(rs.getString("Ref"));
+            model.setKasir(rs.getString("Kasir"));
+            model.setTanggal(rs.getString("Tanggal"));
+            model.setTotal(rs.getDouble("Total"));
+            model.setBayar(rs.getDouble("Bayar"));
+            model.setKembalian(rs.getDouble("Kembalian"));
+            model.setDiskon(rs.getDouble("Diskon"));
+
+            listPenjualan.add(model);
+        }
+    } catch (SQLException e) {
+        System.out.println("Gagal mengambil data: " + e.getMessage());
+    }
+
+    return listPenjualan;
+}
+
+@Override
+public int getTotalPenjualanCount(int idUser) {
+    String sql = "SELECT COUNT(*) as total FROM tabel_transaksipenjualan WHERE id_user = ?";
+    int count = 0;
+
+    try (PreparedStatement st = conn.prepareStatement(sql)) {
+        st.setInt(1, idUser);
+        ResultSet rs = st.executeQuery();
+        
+        if (rs.next()) {
+            count = rs.getInt("total");
+        }
+    } catch (SQLException e) {
+        System.out.println("Gagal mendapatkan jumlah data: " + e.getMessage());
+    }
+    return count;
+}
 }

@@ -21,11 +21,15 @@ import raven.application.form.other.FormKasir;
 import raven.application.form.other.FormTransaksi;
 import raven.application.form.other.FormMasterProduk;
 import raven.application.form.other.FormProdukMasuk;
+import raven.application.form.other.FormReturs;
+import raven.application.form.other.FormReturBarang;
+import raven.application.form.other.ReturBarang;
 import raven.application.form.other.FormUser;
 import raven.application.form.other.InputGantiPassword;
 import raven.menu.Menu;
 import raven.menu.MenuAction;
 import raven.model.modelUser;
+import raven.model.session;
 
 /**
  *
@@ -86,6 +90,12 @@ public class MainForm extends JLayeredPane {
     }
 
     private void initMenuEvent() {
+        session sess = session.getInstance();
+        int idUser = sess.getUserId();
+        String nama = sess.getUsername();
+        String role = sess.getRole();
+        
+        
         menu.addMenuEvent((int index, int subIndex, MenuAction action) -> {
             // Application.mainForm.showForm(new DefaultForm("Form : " + index + " " + subIndex));
 //            if (index == 0) {
@@ -144,14 +154,24 @@ public class MainForm extends JLayeredPane {
                 
                 } else if(subIndex == 2){
                   new InputGantiPassword(Application.getApp(), true, model).setVisible(true);
+                  
             }
             else {
                 action.cancel();
             }  
             } 
             else if (index == 4) {
-//                Application.logout(); 
-            } else {
+        if (subIndex == 1) {
+            Application.showForm(new FormReturBarang()); 
+        } else if (subIndex == 2) {
+            Application.showForm(new FormReturs());
+        } else {
+            action.cancel();
+        }
+        }
+            else if (index == 5) {
+                Application.logout(); 
+            }else {
                 action.cancel();
             }
         });

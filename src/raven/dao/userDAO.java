@@ -88,7 +88,7 @@ public void perbaruiData(modelUser model) {
         
         // Ensure role matches exactly one of the enum values
         String role = model.getRole().trim();
-        if (!role.equals("Admin") && !role.equals("Kasir") && !role.equals("Manajemen Stok")) {
+        if (!role.equals("admin") && !role.equals("kasir") && !role.equals("Manajemen Stok")) {
             throw new IllegalArgumentException("Role must be one of: Admin, Kasir, Manajemen Stok");
         }
         st.setString(6, role);

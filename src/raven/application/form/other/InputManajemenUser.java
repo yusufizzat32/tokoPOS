@@ -45,18 +45,18 @@ public class InputManajemenUser extends javax.swing.JDialog {
     
      public InputManajemenUser(java.awt.Frame parent, boolean modal, int mode, modelUser user, FormUser form) {
         super(parent, modal);
-        
 
          initComponents();
        this.user = user;
        this.mode = mode;
         this.formUser = form;
+        
   
          setLocationRelativeTo(null);
           
 txtRole.removeAllItems();           
-txtRole.addItem("Admin");
-txtRole.addItem("Kasir");
+txtRole.addItem("admin");
+txtRole.addItem("kasir");
 txtRole.addItem("Manajemen Stok");  // Must match exactly with database enum
         if (mode == 1 && user != null) {
         // Mode edit
@@ -134,7 +134,7 @@ private void simpanData() {
         // Set nilai dari form ke model
         u.setNama(txtNama.getText());
         u.setUsername(txtUsername.getText());
-        u.setPassword(new String(txtPassword.getPassword())); // Ambil password dari JPasswordField
+        u.setPassword(new String(txtPassword.getPassword())); 
         u.setRole(txtRole.getSelectedItem().toString());
         u.setno_telepon(txtNotelp.getText());
         u.setAlamat(txtAlamat.getText());
@@ -271,6 +271,12 @@ private void perbaruiData() {
         txtRole.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtRoleActionPerformed(evt);
+            }
+        });
+
+        txtNotelp.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtNotelpActionPerformed(evt);
             }
         });
 
@@ -458,6 +464,10 @@ private void perbaruiData() {
     private void txtRoleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtRoleActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txtRoleActionPerformed
+
+    private void txtNotelpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNotelpActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtNotelpActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

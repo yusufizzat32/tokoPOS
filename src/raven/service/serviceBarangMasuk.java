@@ -15,6 +15,8 @@ public interface serviceBarangMasuk {
     void updateData (modelBarangMasuk model);
     void hapusData (modelBarangMasuk model);
     List<modelBarangMasuk> showDataByPeriod(String period);
+    List<modelBarangMasuk> showDataWithPagination(int page, int rowsPerPage);
     List<modelBarangMasuk> showData();
     List<modelBarangMasuk> searchData(String id);
+    int getTotalDataCount();
 }

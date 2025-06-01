@@ -18,8 +18,10 @@ public interface servicePenjualan {
     List<modelPenjualan> tampilPenjualan(int id);
     List<modelPenjualan> cariData(String keyword);
     List<modelPenjualan> tampilPenjualanByPeriod(int idUser, String period);
-    
+    List<modelPenjualan> tampilPenjualanWithPagination(int idUser, int page, int rowsPerPage);
+int getTotalPenjualanCount(int idUser);
     String noTransaksi();
     void printNota (String id);
     modelBarang cariBarangByBarcode(String barcode);
+    List<modelBarang> getTransaksiDetailByRef(String ref);
 }
