@@ -32,7 +32,7 @@ public InputGantiPassword(java.awt.Frame parent, boolean modal, modelUser user) 
     super(parent, modal);
     this.user = user;
     initComponents(); 
-    jPanel1.setPreferredSize(new Dimension(450, 550));
+    jPanel1.setPreferredSize(new Dimension(380,500));
     pack(); // wajib agar ukuran sesuai
     setLocationRelativeTo(parent); 
     setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -108,7 +108,7 @@ public InputGantiPassword(java.awt.Frame parent, boolean modal, modelUser user) 
 
         jLUsername.setFont(new java.awt.Font("Dialog", 0, 14)); // NOI18N
         jLUsername.setText("Username");
-        jPanel1.add(jLUsername, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 109, 89, 23));
+        jPanel1.add(jLUsername, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 110, 89, 23));
 
         jLUsername1.setFont(new java.awt.Font("Dialog", 0, 14)); // NOI18N
         jLUsername1.setText("Konfirmasi Password Baru");

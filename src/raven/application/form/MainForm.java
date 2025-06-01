@@ -29,6 +29,7 @@ import raven.application.form.other.InputGantiPassword;
 import raven.menu.Menu;
 import raven.menu.MenuAction;
 import raven.model.modelUser;
+import raven.model.session;
 
 /**
  *
@@ -89,6 +90,12 @@ public class MainForm extends JLayeredPane {
     }
 
     private void initMenuEvent() {
+        session sess = session.getInstance();
+        int idUser = sess.getUserId();
+        String nama = sess.getUsername();
+        String role = sess.getRole();
+        
+        
         menu.addMenuEvent((int index, int subIndex, MenuAction action) -> {
             // Application.mainForm.showForm(new DefaultForm("Form : " + index + " " + subIndex));
 //            if (index == 0) {

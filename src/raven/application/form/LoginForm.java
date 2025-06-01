@@ -28,6 +28,7 @@ import raven.model.session;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import raven.application.form.other.FormDashboard;
 
 
@@ -45,7 +46,7 @@ public class LoginForm extends javax.swing.JPanel {
         
         setupRFIDListener();
         txtRFID = new javax.swing.JTextField(); 
-        RegisterForm regDialog = new RegisterForm(new JFrame(), true);
+     
         
         init();
     }
@@ -211,9 +212,9 @@ private void init() {
     }//GEN-LAST:event_cmdLoginActionPerformed
 
     private void registerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_registerActionPerformed
-      RegisterForm regDialog = new RegisterForm(new JFrame(), true);
-    regDialog.setLocationRelativeTo(null);
-    regDialog.setVisible(true);
+        JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
+    InputUser inputUserDialog = new InputUser(parentFrame, true, 0, null, null);
+    inputUserDialog.setVisible(true);
     }//GEN-LAST:event_registerActionPerformed
 
     private void txtPasswordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPasswordActionPerformed
