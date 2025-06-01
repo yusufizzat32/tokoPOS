@@ -29,6 +29,7 @@ import raven.application.form.other.InputGantiPassword;
 import raven.menu.Menu;
 import raven.menu.MenuAction;
 import raven.model.modelUser;
+import raven.model.session;
 
 /**
  *
@@ -83,77 +84,88 @@ public class MainForm extends JLayeredPane {
         menuButton.setIcon(new FlatSVGIcon("raven/icon/svg/" + icon, 0.8f));
     }
     public void getModelUser(modelUser model) {
-        this.model = model;
+     this.model = model;
         menu.setModelUser(model);
+        
         
     }
 
     private void initMenuEvent() {
         menu.addMenuEvent((int index, int subIndex, MenuAction action) -> {
-            // Application.mainForm.showForm(new DefaultForm("Form : " + index + " " + subIndex));
-//            if (index == 0) {
-//                Application.showForm(new FormDashboard());
-//            } else if (index == 1) {
-//                if (subIndex == 1) {
-//                    Application.showForm(new FormKasir());
-//                } else if (subIndex == 2) {
-//                    Application.showForm(new FormTransaksi(model));
-//                }else {
-//                    action.cancel();
-//                }   
-//            } else if (index == 2) {
-//                if (subIndex == 1) {
-//                    Application.showForm(new FormMasterProduk());
-//                } else if (subIndex == 2) {
-//                    Application.showForm(new FormProdukMasuk());
-//                }else {
-//                    action.cancel();
-//                }  
-//                
-//              } else if (index == 3) {
-//                    if (subIndex == 1) {
-//                    Application.showForm(new FormUser()); 
-//      
-//            } else if(subIndex == 2){
-//                  new InputGantiPassword(Application.getApp(), true, model).setVisible(true);
-//            }
-//            else {
-//                action.cancel();
-//            }
-//           } else if (index == 4) {
-//       
-//}
-        if (index == 0) {
-                Application.showForm(new FormDashboard());
-            } else if (index == 1) {
-                if (subIndex == 1) {
-                    Application.showForm(new FormKasir());
-                } else if (subIndex == 2) {
-                    Application.showForm(new FormTransaksi(model));
-                }else {
-                    action.cancel();
-                }   
-            } else if (index == 2) {
-                if (subIndex == 1) {
-                    Application.showForm(new FormMasterProduk());
-                } else if (subIndex == 2) {
-                    Application.showForm(new FormProdukMasuk());
-                }else {
-                    action.cancel();
-                }   
-            } else if (index == 3) {
-                if (subIndex == 1) {
-                    Application.showForm(new FormUser()); 
-                
-                } else if(subIndex == 2){
-                  new InputGantiPassword(Application.getApp(), true, model).setVisible(true);
-                  
-            }
-            else {
-                action.cancel();
-            }  
-            } 
-            else if (index == 4) {
+             String role = model != null ? model.getRole() : null;
+//         if (!isAllowedForRole(index, subIndex, role)) {
+//            action.cancel();
+//            return;
+//        }
+
+
+if (index == 0) {
+    // Dashboard accessible to all roles
+    Application.showForm(new FormDashboard());
+} else if ("kasir".equals(role)) {
+    // Kasir access
+    if (index == 1) {
+        if (subIndex == 1) {
+            Application.showForm(new FormKasir());
+        } else if (subIndex == 2) {
+            Application.showForm(new FormTransaksi(model));
+        } else {
+            action.cancel();
+        }
+    } else if (index == 2) {
+        if (subIndex == 1) {
+            Application.showForm(new FormReturBarang());
+        } else if (subIndex == 2) {
+            Application.showForm(new FormReturs());
+        } else {
+            action.cancel();
+        }
+    } else if (index == 3) {
+        Application.logout();
+    } else {
+        action.cancel();
+    }
+} else if ("Manajemen Stok".equals(role)) {
+    if (index == 1) {
+        if (subIndex == 1) {
+            Application.showForm(new FormMasterProduk());
+        } else if (subIndex == 2) {
+            Application.showForm(new FormProdukMasuk());
+        } else {
+            action.cancel();
+        }
+        } else if (index == 2) {
+            Application.logout();
+        } else {
+            action.cancel();
+        }
+}else if ("admin".equals(role)) {
+    // Admin has full access
+    if (index == 1) {
+        if (subIndex == 1) {
+            Application.showForm(new FormKasir());
+        } else if (subIndex == 2) {
+            Application.showForm(new FormTransaksi(model));
+        } else {
+            action.cancel();
+        }   
+    } else if (index == 2) {
+        if (subIndex == 1) {
+            Application.showForm(new FormMasterProduk());
+        } else if (subIndex == 2) {
+            Application.showForm(new FormProdukMasuk());
+        } else {
+            action.cancel();
+        }   
+    } else if (index == 3) {
+        if (subIndex == 1) {
+            Application.showForm(new FormUser()); 
+        } else if (subIndex == 2) {
+            new InputGantiPassword(Application.getApp(), true, model).setVisible(true);
+        } else {
+            action.cancel();
+        }  
+    } else if (index == 4) {
         if (subIndex == 1) {
             Application.showForm(new FormReturBarang()); 
         } else if (subIndex == 2) {
@@ -161,12 +173,15 @@ public class MainForm extends JLayeredPane {
         } else {
             action.cancel();
         }
-        }
-            else if (index == 5) {
-                Application.logout(); 
-            }else {
-                action.cancel();
-            }
+    } else if (index == 5) {
+        Application.logout(); 
+    } else {
+        action.cancel();
+    }
+} else {
+    // Default for unknown roles
+    action.cancel();
+}
         });
     }
 
@@ -181,7 +196,18 @@ public class MainForm extends JLayeredPane {
         menu.setMenuFull(full);
         revalidate();
     }
-
+    private boolean isAllowedForRole(int index, int subIndex, String role) {
+    switch (role) {
+        case "admin":
+            return true;
+        case "kasir":
+            return index == 0 || (index == 1 && (subIndex == 1 || subIndex == 2)) || (index == 2 && (subIndex == 1 || subIndex == 2)) || (index == 5 && (subIndex == 1 || subIndex == 2)) || index == 6;
+        case "Manajemen Stok":
+            return index == 0 || (index == 1 && (subIndex == 1 || subIndex == 2)) || (index == 3 && (subIndex == 1 || subIndex == 2)) || index == 6;
+        default:
+            return false;
+    }
+}
     public void hideMenu() {
         menu.hideMenuItem();
     }

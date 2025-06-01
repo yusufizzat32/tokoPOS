@@ -113,22 +113,17 @@ private void loadData() {
 }
     private void printLaporanMasterProduk() {
     try {
-        // Path ke file laporan .jasper
-        String reportPath = "src/raven/reports/LaporanProdukmasuk.jasper"; // sesuaikan path-nya
 
-        // Load file laporan
+        String reportPath = "src/raven/reports/LaporanProdukmasuk.jasper";
+
         JasperReport jasperReport = (JasperReport) JRLoader.loadObjectFromFile(reportPath);
 
-        // Buat parameter kosong (jika tidak ada parameter)
         Map<String, Object> params = new HashMap<>();
 
-        // Hubungkan ke database
-        Connection conn = connectionDB.getConnection(); // asumsi kamu punya class Koneksi
+        Connection conn = connectionDB.getConnection(); 
 
-        // Isi laporan dengan data dari database
         JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, params, conn);
 
-        // Tampilkan laporan
         JasperViewer.viewReport(jasperPrint, false);
 
     } catch (Exception e) {
@@ -177,8 +172,8 @@ private void loadData() {
         List<modelBarangMasuk> list = servis.searchData(txtSearch.getText());
         tblModel.setData(list);
         lblPageInfo.setText("Menampilkan semua hasil pencarian");
-    btnPrev.setEnabled(false);
-    btnNext.setEnabled(false);
+        btnPrev.setEnabled(false);
+        btnNext.setEnabled(false);
     }
     /**
      * This method is called from within the constructor to initialize the form.
@@ -255,6 +250,11 @@ private void loadData() {
         btnNext.setText("Next");
 
         btnPrint.setText("PRINT");
+        btnPrint.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnPrintActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -329,6 +329,10 @@ private void loadData() {
     private void txtSearchKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSearchKeyReleased
         searchData();
     }//GEN-LAST:event_txtSearchKeyReleased
+
+    private void btnPrintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrintActionPerformed
+
+    }//GEN-LAST:event_btnPrintActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

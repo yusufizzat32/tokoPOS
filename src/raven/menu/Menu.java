@@ -117,9 +117,16 @@ public class Menu extends JPanel {
     }
 
     private void createMenu() {
-        int index = 0;
-        for (int i = 0; i < menuItems.length; i++) {
-            String menuName = menuItems[i][0];
+    panelMenu.removeAll(); // Hapus semua komponen menu yang ada
+    
+    String role = modeluser != null ? modeluser.getRole() : "admin"; // Default ke admin jika modeluser null
+    
+    int index = 0;
+    for (int i = 0; i < menuItems.length; i++) {
+        String menuName = menuItems[i][0];
+        
+        // Filter menu berdasarkan role
+        if (shouldShowMenu(i, role)) {
             if (menuName.startsWith("~") && menuName.endsWith("~")) {
                 panelMenu.add(createTitle(menuName));
             } else {
@@ -128,6 +135,25 @@ public class Menu extends JPanel {
             }
         }
     }
+    panelMenu.revalidate();
+    panelMenu.repaint();
+}
+
+private boolean shouldShowMenu(int menuIndex, String role) {
+    if (role == null) return false;
+    
+    String normalizedRole = role.trim().toLowerCase();
+    switch (normalizedRole) {
+        case "admin":
+            return true;
+        case "kasir":
+            return menuIndex == 0 || menuIndex == 1 || menuIndex == 2 || menuIndex == 5 || menuIndex == 6;
+        case "manajemen stok":
+            return menuIndex == 0 || menuIndex == 1 || menuIndex == 3 || menuIndex == 6;
+        default:
+            return false;
+    }
+}
 
     private JLabel createTitle(String title) {
         String menuName = title.substring(1, title.length() - 1);

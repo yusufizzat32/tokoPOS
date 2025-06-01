@@ -88,9 +88,12 @@ public void perbaruiData(modelUser model) {
         
         // Ensure role matches exactly one of the enum values
         String role = model.getRole().trim();
-        if (!role.equals("Admin") && !role.equals("Kasir") && !role.equals("Manajemen Stok")) {
-            throw new IllegalArgumentException("Role must be one of: Admin, Kasir, Manajemen Stok");
-        }
+        String normalizedRole = role.trim().toLowerCase();
+if (!normalizedRole.equals("admin") && 
+    !normalizedRole.equals("kasir") && 
+    !normalizedRole.equals("manajemen stok")) {
+    throw new IllegalArgumentException("Role must be one of: admin, kasir, manajemen stok");
+}
         st.setString(6, role);
         
         st.setString(7, model.getRFID());
@@ -297,6 +300,7 @@ public void hapusData(int idUser) {
 
     @Override
     public modelUser prosesLogin(modelUser model) {
+        
         PreparedStatement st = null;
         ResultSet rs = null;
         modelUser modelUs = null;
@@ -307,7 +311,7 @@ public void hapusData(int idUser) {
          String hashedPassword = generateSHA256(model.getPassword());
          System.out.println("DEBUG | Username input: " + model.getUsername());
          System.out.println("DEBUG | Password hash input: " + hashedPassword);
-
+//         System.out.println("DEBUG - Login berhasil untuk role: " + rs.getString("role"));
             
             st = conn.prepareStatement(sql);
             st.setString(1, model.getUsername());

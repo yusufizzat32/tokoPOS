@@ -68,36 +68,33 @@ public class LoginForm extends javax.swing.JPanel {
     }
     
  private void prosesLogin() {
-        // Validasi input sebelum melanjutkan
-        if (!validasiInput()) {
-            JOptionPane.showMessageDialog(
-                null, 
-                "Harap isi Username dan Password!", 
-                "Validasi Input", 
-                JOptionPane.WARNING_MESSAGE
-            );
-            return;
-        }
+    if (!validasiInput()) {
+        JOptionPane.showMessageDialog(
+            null, 
+            "Harap isi Username dan Password!", 
+            "Validasi Input", 
+            JOptionPane.WARNING_MESSAGE
+        );
+        return;
+    }
 
-        // Ambil data dari form
-        String user = txtUsername.getText();
-        String pass = new String(txtPassword.getPassword());
-        
-        // Buat model user
-        modelUser model = new modelUser();
-        model.setUsername(user);
-        model.setPassword(pass);
+    String user = txtUsername.getText();
+    String pass = new String(txtPassword.getPassword());
+    
+    modelUser model = new modelUser();
+    model.setUsername(user);
+    model.setPassword(pass);
 
-        // Proses login menggunakan service
-        modelUser hasilLogin = servis.prosesLogin(model);
-        
-       
-        if (hasilLogin != null) {
-            // Login berhasil
-            session sess = session.getInstance();
-            sess.setUserSession(hasilLogin.getIdUser(), hasilLogin.getUsername(), hasilLogin.getRole());
-            Application.login(hasilLogin);
+    modelUser hasilLogin = servis.prosesLogin(model);
+    
+    if (hasilLogin != null) {
+        // Normalisasi role sebelum digunakan
+        String role = hasilLogin.getRole().trim();
+        if (role.equalsIgnoreCase("admin") || 
+            role.equalsIgnoreCase("kasir") || 
+            role.equalsIgnoreCase("manajemen stok")) {
             
+            Application.login(hasilLogin);
             JOptionPane.showMessageDialog(
                 null, 
                 "Login berhasil! Selamat datang, " + hasilLogin.getNama()+ ".", 
@@ -105,21 +102,23 @@ public class LoginForm extends javax.swing.JPanel {
                 JOptionPane.INFORMATION_MESSAGE
             );
             resetForm();
-            
-            
         } else {
-            // Login gagal
             JOptionPane.showMessageDialog(
                 null, 
-                "Username atau Password salah. Silakan coba lagi.", 
+                "Role tidak valid atau tidak diizinkan untuk login.", 
                 "Login Gagal", 
                 JOptionPane.ERROR_MESSAGE
             );
         }
-        
-        
-      
+    } else {
+        JOptionPane.showMessageDialog(
+            null, 
+            "Username atau Password salah. Silakan coba lagi.", 
+            "Login Gagal", 
+            JOptionPane.ERROR_MESSAGE
+        );
     }
+}
 
                                       
 private void init() {

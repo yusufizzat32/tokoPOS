@@ -55,9 +55,9 @@ public class InputManajemenUser extends javax.swing.JDialog {
          setLocationRelativeTo(null);
           
 txtRole.removeAllItems();           
-txtRole.addItem("Admin");
-txtRole.addItem("Kasir");
-txtRole.addItem("Manajemen Stok");  // Must match exactly with database enum
+txtRole.addItem("admin");
+txtRole.addItem("kasir");
+txtRole.addItem("Manajemen Stok"); 
         if (mode == 1 && user != null) {
         // Mode edit
         simpan.setText("UPDATE"); // Tambahkan ini
