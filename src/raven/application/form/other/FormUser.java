@@ -94,7 +94,7 @@ public class FormUser extends javax.swing.JPanel {
     if (confirm == JOptionPane.YES_OPTION) {
         try {
             // Ambil ID dari baris yang dipilih (kolom pertama)
-            int idUser = (int) tableUser.getValueAt(selectedRow, 1);
+            int idUser = (int) tableUser.getValueAt(selectedRow, 0);
             
             // Panggil DAO untuk hapus data
             userDAO dao = new userDAO();
@@ -288,7 +288,6 @@ public class FormUser extends javax.swing.JPanel {
     private void hapusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hapusActionPerformed
        hapusData();
     }//GEN-LAST:event_hapusActionPerformed
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToggleButton edit;

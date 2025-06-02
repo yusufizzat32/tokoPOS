@@ -18,18 +18,18 @@
 	</parameter>
 	<queryString>
 		<![CDATA[SELECT 
-  pm.id as no,
-  b.kode_barang,
-  b.nama_barang,
-  pm.jumlah_masuk,
-  pm.tanggal_masuk,
-  pm.tanggal_kadaluarsa
+  pm.Kd_produkmasuk as no,
+  b.Kd_Produk as kode_barang,
+  b.Nama_Produk as nama_barang,
+  pm.Jumlah_masuk as jumlah_masuk,
+  pm.Tanggal_masuk as tanggal_masuk,
+  pm.tanggal_kadaluarsa as tanggal_kadaluarsa
 FROM 
   tabel_produkmasuk pm
 JOIN 
-  tabel_barang b ON pm.kode_barang = b.kode_barang
+  tabel_barang b ON pm.Kd_Produk = b.Kd_Produk
 ORDER BY
-  pm.id ASC;]]>
+  pm.Kd_produkmasuk ASC;]]>
 	</queryString>
 	<field name="no" class="java.lang.Integer"/>
 	<field name="kode_barang" class="java.lang.String"/>
@@ -49,18 +49,18 @@ ORDER BY
 				<reportElement x="0" y="0" width="802" height="100" forecolor="#FFFFFF" backcolor="#0D904F" uuid="1ce09b0d-c681-4886-b5db-728102fcae95"/>
 			</rectangle>
 			<staticText>
-				<reportElement x="50" y="20" width="692" height="40" forecolor="#FFFFFF" uuid="1ce09b0d-c681-4886-b5db-728102fcae95"/>
+				<reportElement x="50" y="20" width="692" height="40" forecolor="#FFFFFF" uuid="1ce09b0d-c681-4886-b5db-728102fcae96"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="24" isBold="true"/>
 				</textElement>
 				<text><![CDATA[LAPORAN PRODUK MASUK]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="50" y="60" width="692" height="20" forecolor="#FFFFFF" uuid="2ce09b0d-c681-4886-b5db-728102fcae96"/>
+				<reportElement x="50" y="60" width="692" height="20" forecolor="#FFFFFF" uuid="2ce09b0d-c681-4886-b5db-728102fcae97"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="14"/>
 				</textElement>
-				<text><![CDATA[Toko Garren Jaya 2 ]]></text>
+				<text><![CDATA[Toko Garren Jaya]]></text>
 			</staticText>
 		</band>
 	</title>
@@ -145,12 +145,12 @@ ORDER BY
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{jumlah_masuk}]]></textFieldExpression>
 			</textField>
-			<textField pattern="yyyy-MM-dd">
+			<textField pattern="dd-MM-yyyy">
 				<reportElement style="table_body" x="500" y="0" width="150" height="25" uuid="224ce69b-4e66-447b-89dd-b74b544ca39b"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{tanggal_masuk}]]></textFieldExpression>
 			</textField>
-			<textField pattern="yyyy-MM-dd" isBlankWhenNull="true">
+			<textField pattern="dd-MM-yyyy" isBlankWhenNull="true">
 				<reportElement style="table_body" x="650" y="0" width="152" height="25" uuid="93e90444-2946-4853-aae4-d637a86f339d"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{tanggal_kadaluarsa}]]></textFieldExpression>
@@ -186,6 +186,13 @@ ORDER BY
 				</textElement>
 				<textFieldExpression><![CDATA[$V{total_produk_masuk}]]></textFieldExpression>
 			</textField>
+			<staticText>
+				<reportElement x="550" y="10" width="50" height="20" uuid="f9caa6ef-76ea-494a-af3a-7e01c39f0a9b"/>
+				<textElement verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[unit]]></text>
+			</staticText>
 		</band>
 	</summary>
 </jasperReport>

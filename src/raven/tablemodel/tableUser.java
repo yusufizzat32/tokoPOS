@@ -33,7 +33,7 @@ public class tableUser extends AbstractTableModel {
     }
 
      private final List<modelUser> list = new ArrayList<>();
-    private final String[] columnNames = {"No","Id User","Nama", "Username", "Password", "Role", "No Telepon","Alamat", "RFID"};
+    private final String[] columnNames = {"No","Nama", "Username", "Password", "Role", "No Telepon","Alamat", "RFID"};
     
     public void insertData(modelUser user) {
         list.add(user);
@@ -77,15 +77,14 @@ public int getColumnCount() {
     public Object getValueAt(int rowIndex, int columnIndex) {
        modelUser user = list.get(rowIndex);
 switch (columnIndex) {
-            case 0: return rowIndex + 1; // Nomor urut
-            case 1: return user.getIdUser();
-            case 2: return user.getNama();
-            case 3: return user.getUsername();
-            case 4: return user.getPassword();
-            case 5: return user.getRole();
-            case 6: return user.getno_telepon();
-            case 7: return user.getAlamat();
-            case 8: return user.getRFID();
+            case 0: return user.getIdUser();
+            case 1: return user.getNama();
+            case 2: return user.getUsername();
+            case 3: return user.getPassword();
+            case 4: return user.getRole();
+            case 5: return user.getno_telepon();
+            case 6: return user.getAlamat();
+            case 7: return user.getRFID();
             default: return null;
     }
 }

@@ -18,19 +18,20 @@
 	</parameter>
 	<queryString>
 		<![CDATA[SELECT 
-  p.Kd_produkmasuk, 
+  b.Kd_Produk,
   b.Nama_Produk, 
   b.Harga_Jual,
-  p.Jumlah_masuk, 
+  b.Harga_Beli,
   b.Stok, 
   b.Barcode,
-  b.Harga_Beli
+  k.nama_kategori
 FROM 
-  tabel_produkmasuk p
-JOIN 
-  tabel_barang b ON p.Kd_Produk = b.Kd_Produk;]]>
+  tabel_barang b
+LEFT JOIN 
+  kategori k ON b.id_kategori = k.id_kategori
+ORDER BY b.Kd_Produk;]]>
 	</queryString>
-	<field name="Kd_produkmasuk" class="java.lang.Integer">
+	<field name="Kd_Produk" class="java.lang.String">
 		<fieldDescription><![CDATA[]]></fieldDescription>
 	</field>
 	<field name="Nama_Produk" class="java.lang.String">
@@ -39,7 +40,7 @@ JOIN
 	<field name="Harga_Jual" class="java.lang.Integer">
 		<fieldDescription><![CDATA[]]></fieldDescription>
 	</field>
-	<field name="Jumlah_masuk" class="java.lang.Integer">
+	<field name="Harga_Beli" class="java.lang.Integer">
 		<fieldDescription><![CDATA[]]></fieldDescription>
 	</field>
 	<field name="Stok" class="java.lang.Double">
@@ -48,7 +49,7 @@ JOIN
 	<field name="Barcode" class="java.lang.String">
 		<fieldDescription><![CDATA[]]></fieldDescription>
 	</field>
-	<field name="Harga_Beli" class="java.lang.Integer">
+	<field name="nama_kategori" class="java.lang.String">
 		<fieldDescription><![CDATA[]]></fieldDescription>
 	</field>
 	<background>
@@ -111,7 +112,7 @@ JOIN
 				<text><![CDATA[Nama Produk]]></text>
 			</staticText>
 			<staticText>
-				<reportElement mode="Opaque" x="170" y="0" width="100" height="30" backcolor="#F0F0F0" uuid="363a86e2-867f-4f5e-8149-9a97cc27a140"/>
+				<reportElement mode="Opaque" x="170" y="0" width="80" height="30" backcolor="#F0F0F0" uuid="363a86e2-867f-4f5e-8149-9a97cc27a140"/>
 				<box>
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -124,7 +125,7 @@ JOIN
 				<text><![CDATA[Harga Jual]]></text>
 			</staticText>
 			<staticText>
-				<reportElement mode="Opaque" x="270" y="0" width="100" height="30" backcolor="#F0F0F0" uuid="093f673d-3d3e-4e6f-bd93-86fffcaf0131"/>
+				<reportElement mode="Opaque" x="250" y="0" width="80" height="30" backcolor="#F0F0F0" uuid="093f673d-3d3e-4e6f-bd93-86fffcaf0131"/>
 				<box>
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -137,7 +138,7 @@ JOIN
 				<text><![CDATA[Harga Beli]]></text>
 			</staticText>
 			<staticText>
-				<reportElement mode="Opaque" x="370" y="0" width="60" height="30" backcolor="#F0F0F0" uuid="5189d244-10b7-48ed-9793-09167492e181"/>
+				<reportElement mode="Opaque" x="330" y="0" width="50" height="30" backcolor="#F0F0F0" uuid="5189d244-10b7-48ed-9793-09167492e181"/>
 				<box>
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -150,7 +151,20 @@ JOIN
 				<text><![CDATA[Stok]]></text>
 			</staticText>
 			<staticText>
-				<reportElement mode="Opaque" x="430" y="0" width="125" height="30" backcolor="#F0F0F0" uuid="eb70559d-0ba1-44ec-844d-3a88067acc5f"/>
+				<reportElement mode="Opaque" x="380" y="0" width="80" height="30" backcolor="#F0F0F0" uuid="eb70559d-0ba1-44ec-844d-3a88067acc5f"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Kategori]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="460" y="0" width="95" height="30" backcolor="#F0F0F0" uuid="ab70559d-0ba1-44ec-844d-3a88067acc5f"/>
 				<box>
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -174,8 +188,10 @@ JOIN
 					<bottomPen lineWidth="0.5"/>
 					<rightPen lineWidth="0.5"/>
 				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[$F{Kd_produkmasuk}]]></textFieldExpression>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Kd_Produk}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="50" y="0" width="120" height="25" uuid="dae5b414-8bf3-464a-a375-8ea19b43fd0e"/>
@@ -186,12 +202,13 @@ JOIN
 					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="8"/>
 					<paragraph leftIndent="5"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{Nama_Produk}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0">
-				<reportElement x="170" y="0" width="100" height="25" uuid="910b6e3d-e96d-4b87-b9aa-1bc472a7e814"/>
+				<reportElement x="170" y="0" width="80" height="25" uuid="910b6e3d-e96d-4b87-b9aa-1bc472a7e814"/>
 				<box>
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -199,12 +216,13 @@ JOIN
 					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<paragraph rightIndent="10"/>
+					<font size="8"/>
+					<paragraph rightIndent="5"/>
 				</textElement>
 				<textFieldExpression><![CDATA["Rp. "+$F{Harga_Jual}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0">
-				<reportElement x="270" y="0" width="100" height="25" uuid="224ce69b-4e66-447b-89dd-b74b544ca39b"/>
+				<reportElement x="250" y="0" width="80" height="25" uuid="224ce69b-4e66-447b-89dd-b74b544ca39b"/>
 				<box>
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -212,30 +230,48 @@ JOIN
 					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<paragraph rightIndent="10"/>
+					<font size="8"/>
+					<paragraph rightIndent="5"/>
 				</textElement>
 				<textFieldExpression><![CDATA["Rp. "+$F{Harga_Beli}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00">
-				<reportElement x="370" y="0" width="60" height="25" uuid="c652b83c-8de2-420f-92cc-73ec617c7d54"/>
+				<reportElement x="330" y="0" width="50" height="25" uuid="c652b83c-8de2-420f-92cc-73ec617c7d54"/>
 				<box>
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
 					<bottomPen lineWidth="0.5"/>
 					<rightPen lineWidth="0.5"/>
 				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$F{Stok}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="430" y="0" width="125" height="25" uuid="93e90444-2946-4853-aae4-d637a86f339d"/>
+				<reportElement x="380" y="0" width="80" height="25" uuid="93e90444-2946-4853-aae4-d637a86f339d"/>
 				<box>
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
 					<bottomPen lineWidth="0.5"/>
 					<rightPen lineWidth="0.5"/>
 				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nama_kategori}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="460" y="0" width="95" height="25" uuid="a3e90444-2946-4853-aae4-d637a86f339e"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$F{Barcode}]]></textFieldExpression>
 			</textField>
 		</band>

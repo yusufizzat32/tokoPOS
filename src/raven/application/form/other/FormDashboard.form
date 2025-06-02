@@ -5,9 +5,6 @@
     <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
       <Dimension value="null"/>
     </Property>
-    <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-      <Dimension value="null"/>
-    </Property>
     <Property name="name" type="java.lang.String" value="" noResource="true"/>
   </Properties>
   <AuxValues>
@@ -303,6 +300,9 @@
         <Property name="text" type="java.lang.String" value="CETAK LAPORAN TRANSAKSI"/>
         <Property name="iconTextGap" type="int" value="10"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cetakLaporanActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JButton" name="cetakLaporanStokMasuk">
       <Properties>
@@ -311,6 +311,9 @@
         </Property>
         <Property name="text" type="java.lang.String" value="CETAK LAPORAN STOK MASUK"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cetakLaporanStokMasukActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JButton" name="jButton1">
       <Properties>
@@ -319,6 +322,9 @@
         </Property>
         <Property name="text" type="java.lang.String" value="CETAK MASTER PRODUK"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton1ActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JComboBox" name="cbxRentangWaktu">
       <Properties>

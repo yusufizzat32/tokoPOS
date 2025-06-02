@@ -46,13 +46,15 @@ public class Application extends javax.swing.JFrame {
     }
 
     public static void login(modelUser modelUs) {
+       
         FlatAnimatedLafChange.showSnapshot();
-        app.setContentPane(app.mainForm);
-        app.mainForm.applyComponentOrientation(app.getComponentOrientation());
-        setSelectedMenu(0, 0);
-        app.mainForm.hideMenu();
-        SwingUtilities.updateComponentTreeUI(app.mainForm);
-        FlatAnimatedLafChange.hideSnapshotWithAnimation();
+    app.mainForm.getModelUser(modelUs);  // Pindahkan ke sini
+    app.setContentPane(app.mainForm);
+    app.mainForm.applyComponentOrientation(app.getComponentOrientation());
+    setSelectedMenu(0, 0);
+    app.mainForm.hideMenu();
+    SwingUtilities.updateComponentTreeUI(app.mainForm);
+    FlatAnimatedLafChange.hideSnapshotWithAnimation();
     }
 
     public static void logout() {

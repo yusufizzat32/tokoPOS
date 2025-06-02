@@ -3,7 +3,16 @@ package raven.application.form.other;
 import com.formdev.flatlaf.FlatClientProperties;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.sql.Connection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import javax.swing.JOptionPane;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.util.JRLoader;
+import net.sf.jasperreports.view.JasperViewer;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -14,6 +23,7 @@ import org.jfree.chart.renderer.category.BarRenderer;
 import org.jfree.chart.renderer.category.LineAndShapeRenderer;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.general.DefaultPieDataset;
+import raven.config.connectionDB;
 import raven.dao.penjualanDAO;
 import raven.model.modelPenjualan;
 import raven.toast.Notifications;
@@ -45,6 +55,76 @@ public final class FormDashboard extends javax.swing.JPanel {
         String selectedPeriod = (String) cbxRentangWaktu.getSelectedItem();
         showPenjualanChart(selectedPeriod);
     }
+    private void printRiwayatTransaksi() {
+    try {
+        // Path ke file laporan .jasper
+        String reportPath = "src/raven/reports/RiwayatTransaksi.jasper"; // sesuaikan path-nya
+
+        // Load file laporan
+        JasperReport jasperReport = (JasperReport) JRLoader.loadObjectFromFile(reportPath);
+
+        // Buat parameter kosong (jika tidak ada parameter)
+        Map<String, Object> params = new HashMap<>();
+
+        // Hubungkan ke database
+        Connection conn = connectionDB.getConnection(); // asumsi kamu punya class Koneksi
+
+        // Isi laporan dengan data dari database
+        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, params, conn);
+
+        // Tampilkan laporan
+        JasperViewer.viewReport(jasperPrint, false);
+
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(this, "Gagal mencetak laporan: " + e.getMessage());
+        e.printStackTrace();
+    }
+}
+    private void printLaporanProdukMasuk() {
+    try {
+
+        String reportPath = "src/raven/reports/LaporanProdukMasuk.jasper";
+
+        JasperReport jasperReport = (JasperReport) JRLoader.loadObjectFromFile(reportPath);
+
+        Map<String, Object> params = new HashMap<>();
+
+        Connection conn = connectionDB.getConnection(); 
+
+        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, params, conn);
+
+        JasperViewer.viewReport(jasperPrint, false);
+
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(this, "Gagal mencetak laporan: " + e.getMessage());
+        e.printStackTrace();
+    }
+}
+    private void printLaporanMasterProduk() {
+    try {
+        // Path ke file laporan .jasper
+        String reportPath = "src/raven/reports/LaporanMasterProduk.jasper"; // sesuaikan path-nya
+
+        // Load file laporan
+        JasperReport jasperReport = (JasperReport) JRLoader.loadObjectFromFile(reportPath);
+
+        // Buat parameter kosong (jika tidak ada parameter)
+        Map<String, Object> params = new HashMap<>();
+
+        // Hubungkan ke database
+        Connection conn = connectionDB.getConnection(); // asumsi kamu punya class Koneksi
+
+        // Isi laporan dengan data dari database
+        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, params, conn);
+
+        // Tampilkan laporan
+        JasperViewer.viewReport(jasperPrint, false);
+
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(this, "Gagal mencetak laporan: " + e.getMessage());
+        e.printStackTrace();
+    }
+}
     public void showPenjualanChart(String period) {
     List<modelPenjualan> dataPenjualan = penjualanDao.getPenjualanByPeriod(period);
 
@@ -149,7 +229,6 @@ public final class FormDashboard extends javax.swing.JPanel {
         jLabel5 = new javax.swing.JLabel();
 
         setMaximumSize(null);
-        setMinimumSize(null);
         setName(""); // NOI18N
 
         panelLineChart.setBackground(new java.awt.Color(204, 204, 204));
@@ -265,12 +344,27 @@ public final class FormDashboard extends javax.swing.JPanel {
         cetakLaporan.setIcon(new javax.swing.ImageIcon(getClass().getResource("/raven/icon/png/cashier 1.png"))); // NOI18N
         cetakLaporan.setText("CETAK LAPORAN TRANSAKSI");
         cetakLaporan.setIconTextGap(10);
+        cetakLaporan.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cetakLaporanActionPerformed(evt);
+            }
+        });
 
         cetakLaporanStokMasuk.setFont(new java.awt.Font("Helvetica", 1, 24)); // NOI18N
         cetakLaporanStokMasuk.setText("CETAK LAPORAN STOK MASUK");
+        cetakLaporanStokMasuk.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cetakLaporanStokMasukActionPerformed(evt);
+            }
+        });
 
         jButton1.setFont(new java.awt.Font("Helvetica", 1, 24)); // NOI18N
         jButton1.setText("CETAK MASTER PRODUK");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         cbxRentangWaktu.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         cbxRentangWaktu.addActionListener(new java.awt.event.ActionListener() {
@@ -340,6 +434,18 @@ public final class FormDashboard extends javax.swing.JPanel {
     private void cbxRentangWaktuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbxRentangWaktuActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_cbxRentangWaktuActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        printLaporanMasterProduk();
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void cetakLaporanStokMasukActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cetakLaporanStokMasukActionPerformed
+       printLaporanProdukMasuk();
+    }//GEN-LAST:event_cetakLaporanStokMasukActionPerformed
+
+    private void cetakLaporanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cetakLaporanActionPerformed
+        printRiwayatTransaksi();
+    }//GEN-LAST:event_cetakLaporanActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox<String> cbxRentangWaktu;
