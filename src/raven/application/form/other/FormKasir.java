@@ -11,6 +11,8 @@ import java.awt.print.Printable;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import raven.dao.penjualanDAO;
@@ -31,6 +33,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 import raven.config.connectionDB;
+import raven.model.modelUser;
 import raven.model.session;
 
 
@@ -40,6 +43,7 @@ public class FormKasir extends javax.swing.JPanel {
         private final servicePenjualanDetail servisDetail = new penjualanDetailDAO();
         private final servicePenjualan servis = new penjualanDAO();
         private final Connection conn;
+ 
 //      private final lp = new LaporanDAO();
         
     
@@ -51,6 +55,7 @@ public class FormKasir extends javax.swing.JPanel {
         public int total;
         
         public FormKasir() {
+         
             conn = connectionDB.getConnection(); // Initialize connection
             initComponents();
             tbPengeluaran.setModel(tblModel);
@@ -118,6 +123,8 @@ public class FormKasir extends javax.swing.JPanel {
             List<modelRekapTransaksi> list = servisSmt.tampilData();
             tblModel.setData(list);
         }
+
+ 
 
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -498,7 +505,7 @@ private int parseNumberField(JTextField field, String fieldName) throws NumberFo
     return Integer.parseInt(text);
 }
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
-        btnSave.setEnabled(false);
+           btnSave.setEnabled(false);
     
     try {
         // Validate inputs
@@ -516,10 +523,11 @@ private int parseNumberField(JTextField field, String fieldName) throws NumberFo
         // Start transaction
         conn.setAutoCommit(false);
 
-        // Save main transaction
+        // Save main transaction first
         String ref = txtNoFaktur.getText();
         modelPenjualan mp = new modelPenjualan();
         session sess = session.getInstance();
+        
         int idUser = sess.getUserId();
         String nama = sess.getUsername();
     
@@ -531,10 +539,17 @@ private int parseNumberField(JTextField field, String fieldName) throws NumberFo
         mp.setKembalian(kembali);
         mp.setTanggal(LocalDate.now().toString());
         mp.setIdUser(idUser);
+        mp.setDiskon(diskon); // Make sure to set diskon
         
+        // Insert header first
         servis.tambahPenjualan(mp);
+        
+        // Verify header was inserted
+        if (!isTransactionExists(ref)) {
+            throw new SQLException("Failed to create transaction header");
+        }
 
-        // Save transaction details
+        // Then save transaction details
         for (int n = 0; n < tbPengeluaran.getRowCount(); n++) {
             modelRekapTransaksi item = tblModel.getData(n);
             
@@ -618,7 +633,15 @@ private int parseNumberField(JTextField field, String fieldName) throws NumberFo
         hitungTotal();
         
     }//GEN-LAST:event_btnHapusActionPerformed
-
+private boolean isTransactionExists(String ref) throws SQLException {
+    String sql = "SELECT 1 FROM tabel_transaksipenjualan WHERE Ref = ?";
+    try (PreparedStatement st = conn.prepareStatement(sql)) {
+        st.setString(1, ref);
+        try (ResultSet rs = st.executeQuery()) {
+            return rs.next();
+        }
+    }
+}
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
          btnCancel.setEnabled(false);
     btnSimpan.setEnabled(false);

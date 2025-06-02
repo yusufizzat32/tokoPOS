@@ -56,6 +56,16 @@ public class RegisterForm extends javax.swing.JDialog {
        super(parent, modal);
            initComponents();
              setupRFIDListener();
+              txtNotelp = new javax.swing.JTextField();
+    txtNotelp.addKeyListener(new java.awt.event.KeyAdapter() {
+        public void keyTyped(java.awt.event.KeyEvent evt) {
+            char c = evt.getKeyChar();
+            if (!(Character.isDigit(c) || c == KeyEvent.VK_BACK_SPACE || c == KeyEvent.VK_DELETE)) {
+                evt.consume();
+                JOptionPane.showMessageDialog(null, "Hanya angka yang diperbolehkan!", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    });
         txtRFID = new javax.swing.JTextField(); 
             setLocationRelativeTo(null);
           
@@ -77,7 +87,7 @@ public class RegisterForm extends javax.swing.JDialog {
     SwingUtilities.invokeLater(() -> {
     if (txtRole != null) {
     txtRole.removeAllItems();            
-    txtRole.addItem("Kasir");
+    txtRole.addItem("kasir");
     txtRole.addItem("Manajemen Stok");
    
     
@@ -301,6 +311,12 @@ private void perbaruiData() {
 
         jLPassword.setText("Password");
 
+        txtPassword.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtPasswordActionPerformed(evt);
+            }
+        });
+
         jLRole.setText("Role");
 
         jLNotelp.setText("No. Telepon");
@@ -311,6 +327,12 @@ private void perbaruiData() {
         txtRole.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtRoleActionPerformed(evt);
+            }
+        });
+
+        txtNotelp.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtNotelpActionPerformed(evt);
             }
         });
 
@@ -532,6 +554,14 @@ private void perbaruiData() {
     private void txtRFIDActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtRFIDActionPerformed
 
     }//GEN-LAST:event_txtRFIDActionPerformed
+
+    private void txtPasswordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPasswordActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtPasswordActionPerformed
+
+    private void txtNotelpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNotelpActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtNotelpActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

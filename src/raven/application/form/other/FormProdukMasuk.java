@@ -114,7 +114,7 @@ private void loadData() {
     private void printLaporanMasterProduk() {
     try {
 
-        String reportPath = "src/raven/reports/LaporanProdukmasuk.jasper";
+        String reportPath = "src/raven/reports/LaporanProdukMasuk.jasper";
 
         JasperReport jasperReport = (JasperReport) JRLoader.loadObjectFromFile(reportPath);
 

@@ -16,6 +16,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import raven.model.modelBarang;
 /**
  *
@@ -31,12 +33,21 @@ public class penjualanDetailDAO implements servicePenjualanDetail{
 
 @Override
 public void tambah_detail_P(modelPenjualanDetail model) {
-    // First check stock availability
-    if (!cekStok(model.getModelBaraang().getIdProduk(), model.getQty())) {
-        System.out.println("Stok tidak mencukupi untuk produk ID: " + 
-            model.getModelBaraang().getIdProduk());
-        return;
-    }
+        try {
+            // First verify the transaction header exists
+            if (!isTransactionExists(model.getModelPenjualan().getRef())) {
+                throw new RuntimeException("Transaction header does not exist for ref: " +
+                        model.getModelPenjualan().getRef());
+            }   } catch (SQLException ex) {
+            Logger.getLogger(penjualanDetailDAO.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    // Then check stock availability
+//    if (!cekStok(model.getModelBaraang().getIdProduk(), model.getQty())) {
+//        System.out.println("Stok tidak mencukupi untuk produk ID: " + 
+//            model.getModelBaraang().getIdProduk());
+//        throw new RuntimeException("Stok tidak mencukupi");
+//    }
 
     String sql = "INSERT INTO tabel_transaksidetail (Kd_Trx, Ref, Kd_Produk, Nama_Produk, Harga_Satuan, Quantity, Subtotal) " 
                + "VALUES (?, ?, ?, ?, ?, ?, ?)";
@@ -61,13 +72,20 @@ public void tambah_detail_P(modelPenjualanDetail model) {
         if (affectedRows == 0) {
             throw new SQLException("Gagal menambahkan detail transaksi, tidak ada baris yang terpengaruh.");
         }
-        
-        System.out.println("Inserted " + affectedRows + " row(s) for ref: " + 
-            model.getModelPenjualan().getRef());
     } catch (SQLException e) {
         System.out.println("Gagal menambahkan detail penjualan: " + e.getMessage());
         e.printStackTrace();
         throw new RuntimeException("Failed to save transaction detail", e);
+    }
+}
+
+private boolean isTransactionExists(String ref) throws SQLException {
+    String sql = "SELECT 1 FROM tabel_transaksipenjualan WHERE Ref = ?";
+    try (PreparedStatement st = conn.prepareStatement(sql)) {
+        st.setString(1, ref);
+        try (ResultSet rs = st.executeQuery()) {
+            return rs.next();
+        }
     }
 }
     @Override

@@ -83,7 +83,7 @@ public final class FormDashboard extends javax.swing.JPanel {
     private void printLaporanProdukMasuk() {
     try {
 
-        String reportPath = "src/raven/reports/LaporanProdukmasuk.jasper";
+        String reportPath = "src/raven/reports/LaporanProdukMasuk.jasper";
 
         JasperReport jasperReport = (JasperReport) JRLoader.loadObjectFromFile(reportPath);
 
@@ -436,7 +436,7 @@ public final class FormDashboard extends javax.swing.JPanel {
     }//GEN-LAST:event_cbxRentangWaktuActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        printRiwayatTransaksi();
+        printLaporanMasterProduk();
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void cetakLaporanStokMasukActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cetakLaporanStokMasukActionPerformed
@@ -444,7 +444,7 @@ public final class FormDashboard extends javax.swing.JPanel {
     }//GEN-LAST:event_cetakLaporanStokMasukActionPerformed
 
     private void cetakLaporanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cetakLaporanActionPerformed
-        printLaporanMasterProduk();
+        printRiwayatTransaksi();
     }//GEN-LAST:event_cetakLaporanActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

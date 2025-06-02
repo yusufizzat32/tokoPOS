@@ -91,6 +91,12 @@ public class MainForm extends JLayeredPane {
     }
 
     private void initMenuEvent() {
+        session sess = session.getInstance();
+        int idUser = sess.getUserId();
+        String nama = sess.getUsername();
+
+        
+        
         menu.addMenuEvent((int index, int subIndex, MenuAction action) -> {
              String role = model != null ? model.getRole() : null;
 //         if (!isAllowedForRole(index, subIndex, role)) {

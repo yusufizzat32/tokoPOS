@@ -28,6 +28,7 @@ import raven.model.session;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import raven.application.form.other.FormDashboard;
 
 
@@ -45,7 +46,7 @@ public class LoginForm extends javax.swing.JPanel {
         
         setupRFIDListener();
         txtRFID = new javax.swing.JTextField(); 
-        RegisterForm regDialog = new RegisterForm(new JFrame(), true);
+     
         
         init();
     }
@@ -67,7 +68,7 @@ public class LoginForm extends javax.swing.JPanel {
         return valid;
     }
     
- private void prosesLogin() {
+private void prosesLogin() {
     if (!validasiInput()) {
         JOptionPane.showMessageDialog(
             null, 
@@ -88,12 +89,28 @@ public class LoginForm extends javax.swing.JPanel {
     modelUser hasilLogin = servis.prosesLogin(model);
     
     if (hasilLogin != null) {
-        // Normalisasi role sebelum digunakan
-        String role = hasilLogin.getRole().trim();
-        if (role.equalsIgnoreCase("admin") || 
-            role.equalsIgnoreCase("kasir") || 
-            role.equalsIgnoreCase("manajemen stok")) {
-            
+        // Pastikan ID user valid
+        if (hasilLogin.getIdUser() <= 0) {
+            JOptionPane.showMessageDialog(
+                null, 
+                "ID User tidak valid!", 
+                "Login Gagal", 
+                JOptionPane.ERROR_MESSAGE
+            );
+            return;
+        }
+        
+        // Set session
+        session sess = session.getInstance();
+        sess.setUserSession(
+            hasilLogin.getIdUser(), 
+            hasilLogin.getUsername(), 
+            hasilLogin.getRole()
+        );
+        
+        // Normalisasi role
+        String role = hasilLogin.getRole().trim().toLowerCase();
+        if (role.equals("admin") || role.equals("kasir") || role.equals("manajemen stok")) {
             Application.login(hasilLogin);
             JOptionPane.showMessageDialog(
                 null, 
@@ -210,9 +227,9 @@ private void init() {
     }//GEN-LAST:event_cmdLoginActionPerformed
 
     private void registerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_registerActionPerformed
-      RegisterForm regDialog = new RegisterForm(new JFrame(), true);
-    regDialog.setLocationRelativeTo(null);
-    regDialog.setVisible(true);
+        JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
+    InputUser inputUserDialog = new InputUser(parentFrame, true, 0, null, null);
+    inputUserDialog.setVisible(true);
     }//GEN-LAST:event_registerActionPerformed
 
     private void txtPasswordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPasswordActionPerformed
