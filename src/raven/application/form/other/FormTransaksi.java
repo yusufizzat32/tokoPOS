@@ -99,6 +99,48 @@ public class FormTransaksi extends javax.swing.JPanel {
         filterComboBox.addItem("Minggu Ini");
         filterComboBox.addItem("Bulan Ini");
     }
+private Map<String, Date> getDateRange(String period) {
+    Map<String, Date> dateRange = new HashMap<>();
+    Calendar calendar = Calendar.getInstance();
+    SimpleDateFormat dbDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+    try {
+        switch (period) {
+            case "Hari Ini":
+                dateRange.put("startDate", dbDateFormat.parse(dbDateFormat.format(calendar.getTime())));
+                dateRange.put("endDate", dbDateFormat.parse(dbDateFormat.format(calendar.getTime())));
+                break;
+            case "Minggu Ini":
+                // Set ke awal minggu (Senin)
+                calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+                dateRange.put("startDate", dbDateFormat.parse(dbDateFormat.format(calendar.getTime())));
+                
+                // Set ke akhir minggu (Minggu)
+                calendar.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
+                calendar.add(Calendar.DATE, 7); // Tambah 7 hari untuk minggu depan
+                dateRange.put("endDate", dbDateFormat.parse(dbDateFormat.format(calendar.getTime())));
+                break;
+            case "Bulan Ini":
+                // Tanggal 1 bulan ini
+                calendar.set(Calendar.DAY_OF_MONTH, 1);
+                dateRange.put("startDate", dbDateFormat.parse(dbDateFormat.format(calendar.getTime())));
+                
+                // Tanggal terakhir bulan ini
+                calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
+                dateRange.put("endDate", dbDateFormat.parse(dbDateFormat.format(calendar.getTime())));
+                break;
+            default:
+                // "Semua"
+                dateRange.put("startDate", null);
+                dateRange.put("endDate", null);
+                break;
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    
+    return dateRange;
+}
     private void updatePagination() {
     totalRows = servis.getTotalPenjualanCount(idKaryawan);
     int totalPages = (int) Math.ceil((double) totalRows / rowsPerPage);
@@ -123,23 +165,30 @@ public class FormTransaksi extends javax.swing.JPanel {
     btnNext.setEnabled(false);
 }
     private void printLaporanMasterProduk() {
-    try {
-        // Path ke file laporan .jasper
-        String reportPath = "src/raven/reports/RiwayatTransaksi.jasper"; // sesuaikan path-nya
-
-        // Load file laporan
+            try {
+        String reportPath = "src/raven/reports/RiwayatTransaksi.jasper";
         JasperReport jasperReport = (JasperReport) JRLoader.loadObjectFromFile(reportPath);
 
-        // Buat parameter kosong (jika tidak ada parameter)
         Map<String, Object> params = new HashMap<>();
+        
+        // Ambil periode yang dipilih
+        String selectedPeriod = (String) filterComboBox.getSelectedItem();
+        
+        // Set parameter berdasarkan pilihan
+        if ("Semua".equals(selectedPeriod)) {
+            params.put("start_date", null);
+            params.put("end_date", null);
+        } else {
+            Map<String, Date> dateRange = getDateRange(selectedPeriod);
+            params.put("start_date", dateRange.get("startDate"));
+            params.put("end_date", dateRange.get("endDate"));
+        }
+        
+        // Tambahkan parameter user_id jika diperlukan
+        params.put("user_id", idKaryawan);
 
-        // Hubungkan ke database
-        Connection conn = connectionDB.getConnection(); // asumsi kamu punya class Koneksi
-
-        // Isi laporan dengan data dari database
+        Connection conn = connectionDB.getConnection();
         JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, params, conn);
-
-        // Tampilkan laporan
         JasperViewer.viewReport(jasperPrint, false);
 
     } catch (Exception e) {
