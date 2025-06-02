@@ -56,8 +56,8 @@ public class FormTransaksi extends javax.swing.JPanel {
     private int id = 1;
     private Timer timer;
     private int currentPage = 1;
-private int rowsPerPage = 10; // Jumlah baris per halaman
-private int totalRows = 0;  
+    private int rowsPerPage = 10; // Jumlah baris per halaman
+    private int totalRows = 0;  
     session sess = session.getInstance();
     
     

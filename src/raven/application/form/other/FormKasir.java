@@ -769,6 +769,7 @@ private boolean isTransactionExists(String ref) throws SQLException {
         txtBayar.setEditable(true);
         txtQty.setEditable(false);
         txtQty.setText("");
+        txtDiskon.setText("0");
         txtBayar.requestFocus();
         hitungTotal();
         txtNoFaktur.setText(servis.noTransaksi());
