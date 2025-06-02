@@ -190,7 +190,7 @@ public class cariBrg extends javax.swing.JDialog {
         try {
             String kode = tabel.getValueAt(row, 1).toString();
             String nama = tabel.getValueAt(row, 2).toString();
-            double stok = Double.parseDouble(tabel.getValueAt(row, 4).toString().replace(",", ""));
+            double stok = Double.parseDouble(tabel.getValueAt(row, 5).toString().replace(",", ""));
             int harga = Integer.parseInt(tabel.getValueAt(row, 3).toString().replace(",", ""));
             String barcode = tabel.getValueAt(row, 5).toString();
 
