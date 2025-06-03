@@ -46,12 +46,11 @@ public class Application extends javax.swing.JFrame {
     }
 
     public static void login(modelUser modelUs) {
-       
-        FlatAnimatedLafChange.showSnapshot();
-    app.mainForm.getModelUser(modelUs);  // Pindahkan ke sini
+    FlatAnimatedLafChange.showSnapshot();
+    app.mainForm.getModelUser(modelUs);
     app.setContentPane(app.mainForm);
     app.mainForm.applyComponentOrientation(app.getComponentOrientation());
-    setSelectedMenu(0, 0);
+    setSelectedMenu(0, 0); // Set menu default ke dashboard
     app.mainForm.hideMenu();
     SwingUtilities.updateComponentTreeUI(app.mainForm);
     FlatAnimatedLafChange.hideSnapshotWithAnimation();

@@ -522,7 +522,7 @@ public void insertData(modelUser u) {
        return user;
     }
     
-   @Override
+@Override
 public modelUser loginByRFID(String rfid) {
     modelUser user = null;
     String sql = "SELECT * FROM tabel_user WHERE rfid = ?";
@@ -539,6 +539,7 @@ public modelUser loginByRFID(String rfid) {
             user.setPassword(rs.getString("password"));
             user.setRole(rs.getString("role"));
             user.setRFID(rs.getString("rfid"));
+            // Tambahkan field lain jika diperlukan
         }
 
         rs.close();
@@ -546,7 +547,6 @@ public modelUser loginByRFID(String rfid) {
     } catch (SQLException e) {
         e.printStackTrace();
     }
-
     return user;
 }
 @Override
