@@ -497,7 +497,7 @@ public void insertData(modelUser u) {
     public modelUser getUserByRFID(String rfid) {
         modelUser user = null;
         String sql = "SELECT * FROM user WHERE rfid=?"; 
-   
+        
        try {
            
            PreparedStatement pst = conn.prepareStatement(sql);

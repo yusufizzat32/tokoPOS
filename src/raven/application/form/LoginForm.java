@@ -39,7 +39,8 @@ import raven.application.form.other.FormDashboard;
 public class LoginForm extends javax.swing.JPanel {
     
     private serviceUser servis = new userDAO();
-      private JTextField txtRFID = new JTextField();
+    private JTextField txtRFID = new JTextField();
+    
       
     public LoginForm() {
         initComponents();
@@ -68,7 +69,7 @@ public class LoginForm extends javax.swing.JPanel {
         return valid;
     }
     
-private void prosesLogin() {
+    private void prosesLogin() {
     if (!validasiInput()) {
         JOptionPane.showMessageDialog(
             null, 

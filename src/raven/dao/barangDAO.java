@@ -229,34 +229,52 @@ public List<modelBarang> showData() {
         return namaObat; 
     }
 
-    @Override
-public modelBarang cariBarangByBarcode(String id) {
+   @Override
+public modelBarang cariBarangByBarcode(String barcode) {
+    if (barcode == null || barcode.trim().isEmpty()) {
+        return null;
+    }
+
     PreparedStatement st = null;
     ResultSet rs = null;
-    String sql = "SELECT * FROM tabel_barang WHERE Barcode = ?";
-
+    // Gunakan LIKE dengan wildcard dan trim() untuk menghindari masalah whitespace
+    String sql = "SELECT b.*, k.nama_kategori FROM tabel_barang b " +
+                 "LEFT JOIN kategori k ON b.id_kategori = k.id_kategori " +
+                 "WHERE TRIM(b.Barcode) = ?";
+    
     try {
         st = conn.prepareStatement(sql);
-        st.setString(1, id);
+        st.setString(1, barcode.trim()); // Gunakan trim() untuk input
+        
+        System.out.println("Executing query: " + st.toString()); // Debug query
+        
         rs = st.executeQuery();
 
         if (rs.next()) {
-            modelBarang obat = new modelBarang();
-            obat.setIdProduk(rs.getString("Kd_Produk"));
-            obat.setNamaProduk(rs.getString("Nama_Produk"));
-            obat.setHargaProduk(rs.getInt("Harga_Jual"));
-            obat.setStokProduk(rs.getDouble("Stok"));
-            obat.setBarcode(rs.getString("Barcode"));
-            return obat;
+            modelBarang barang = new modelBarang();
+            barang.setIdProduk(rs.getString("Kd_Produk"));
+            barang.setNamaProduk(rs.getString("Nama_Produk"));
+            barang.setHargaProduk(rs.getInt("Harga_Jual"));
+            barang.setHargaBeli(rs.getInt("Harga_Beli")); // Tambahkan ini
+            barang.setStokProduk(rs.getDouble("Stok"));
+            barang.setBarcode(rs.getString("Barcode"));
+            barang.setIdKategori(rs.getInt("id_kategori")); // Tambahkan ini
+            barang.setNamaKategori(rs.getString("nama_kategori")); // Tambahkan ini
+            
+            System.out.println("Barang ditemukan: " + barang.getNamaProduk()); // Debug
+            return barang;
+        } else {
+            System.out.println("Barang dengan barcode '" + barcode + "' tidak ditemukan"); // Debug
         }
     } catch (SQLException e) {
+        System.err.println("Error saat mencari barcode: " + e.getMessage());
         e.printStackTrace();
     } finally {
         try {
             if (rs != null) rs.close();
             if (st != null) st.close();
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Error saat menutup resources: " + e.getMessage());
         }
     }
     return null;

@@ -893,7 +893,7 @@ private void hitungTotal() {
 
     if (barang != null) {
         // Isi field dengan data barang
-        txtBarcode.setText(barang.getIdProduk());
+        txtBarcode.setText(barang.getBarcode());
         txtNama.setText(barang.getNamaProduk());
         txtHarga.setText(String.valueOf(barang.getHargaProduk()));
         txtStok.setText(String.valueOf(barang.getStokProduk()));
