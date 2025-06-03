@@ -253,7 +253,7 @@ private void setupRFIDListener() {
     RFID.addKeyListener(new KeyAdapter() {
         @Override
         public void keyPressed(KeyEvent e) {
-            if (e.getKeyCode() == KeyEvent.VK_ENTER) { \
+            if (e.getKeyCode() == KeyEvent.VK_ENTER) { 
                 String rfid = RFID.getText().trim();
                 if (!rfid.isEmpty()) {
                     processRFIDLogin(rfid);
