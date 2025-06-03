@@ -249,48 +249,61 @@ private void init() {
     private javax.swing.JTextField txtUsername;
     // End of variables declaration//GEN-END:variables
 
-   
-    private void setupRFIDListener() {
-        RFID.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyReleased(KeyEvent e) {
+private void setupRFIDListener() {
+    RFID.addKeyListener(new KeyAdapter() {
+        @Override
+        public void keyPressed(KeyEvent e) {
+            if (e.getKeyCode() == KeyEvent.VK_ENTER) { 
                 String rfid = RFID.getText().trim();
                 if (!rfid.isEmpty()) {
-                    modelUser user = servis.loginByRFID(rfid);
-                    if (user != null) {
-                        // Set username dan password
-                        txtUsername.setText(user.getUsername());
-                        txtPassword.setText(""); // Kosongkan password karena sudah di-hash di database
-                        
-                        // Buat model untuk login
-                        modelUser model = new modelUser();
-                        model.setUsername(user.getUsername());
-                        model.setPassword(""); // Password tidak diperlukan karena sudah divalidasi oleh RFID
-                        
-                        // Proses login otomatis
-                        modelUser hasilLogin = servis.prosesLoginByRFID(rfid);
-                        if (hasilLogin != null) {
-                            // Login berhasil
-                            session sess = session.getInstance();
-                            sess.setUserSession(hasilLogin.getIdUser(), hasilLogin.getUsername(), hasilLogin.getRole());
-                            Application.login(hasilLogin);
-                            
-                            JOptionPane.showMessageDialog(
-                                null, 
-                                "Login berhasil via RFID! Selamat datang, " + hasilLogin.getNama() + ".", 
-                                "Login Sukses", 
-                                JOptionPane.INFORMATION_MESSAGE
-                            );
-                            resetForm();
-                        }
-                    } else {
-                        JOptionPane.showMessageDialog(null, "RFID tidak terdaftar!");
-                        RFID.setText(""); // Reset field RFID
-                    }
+                    processRFIDLogin(rfid);
                 }
             }
-        });
+        }
+    });
+}
+private void processRFIDLogin(String rfid) {
+    modelUser user = servis.loginByRFID(rfid);
+    if (user != null && user.getIdUser() > 0) {
+        String role = user.getRole() != null ? user.getRole().trim().toLowerCase() : "";
+        
+        if (role.equals("admin") || role.equals("kasir") || role.equals("manajemen stok")) {
+            // Set session properly
+            session sess = session.getInstance();
+            sess.setUserSession(
+                user.getIdUser(), 
+                user.getUsername(), 
+                user.getRole()
+            );
+            
+            Application.login(user);
+            JOptionPane.showMessageDialog(
+                null, 
+                "Login berhasil via RFID! Selamat datang, " + user.getNama() + ".", 
+                "Login Sukses", 
+                JOptionPane.INFORMATION_MESSAGE
+            );
+            resetForm();
+            RFID.setText("");
+        } else {
+            JOptionPane.showMessageDialog(
+                null, 
+                "Role tidak valid atau tidak diizinkan untuk login.", 
+                "Login Gagal", 
+                JOptionPane.ERROR_MESSAGE
+            );
+            RFID.setText("");
+        }
+    } else {
+        JOptionPane.showMessageDialog(
+            null, 
+            "RFID tidak terdaftar atau data user tidak lengkap!", 
+            "Login Gagal", 
+            JOptionPane.ERROR_MESSAGE
+        );
+        RFID.setText("");
     }
+}
               private boolean autentikasiRFID(String uid) {
             
     boolean isValid = false;

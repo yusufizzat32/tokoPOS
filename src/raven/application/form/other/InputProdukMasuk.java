@@ -44,6 +44,12 @@ public class InputProdukMasuk extends javax.swing.JDialog {
         barangMap = new HashMap<>();
         this.formMasterProduk = formMasterProduk;
         initComponents();
+        txtBarcode.addActionListener(new java.awt.event.ActionListener() {
+    public void actionPerformed(java.awt.event.ActionEvent evt) {
+        txtBarcodeActionPerformed(evt);
+    }
+});
+      
         ambilNamaObat();
         setLocationRelativeTo(null);
         if(barang != null){
@@ -69,6 +75,25 @@ public class InputProdukMasuk extends javax.swing.JDialog {
     }
     return valid;
 }
+//        private void txtBarcodeActionPerformed(java.awt.event.ActionEvent evt) {                                       
+//    String barcode = txtBarcode.getText().trim();
+//    if (!barcode.isEmpty()) {
+//        cariBarangDariBarcode(barcode);
+//    }
+//}  
+
+// Tambahkan method untuk mencari barang berdasarkan barcode
+private void cariBarangDariBarcode(String barcode) {
+    modelBarang barang = servis_Barang.cariBarangByBarcode(barcode);
+    if (barang != null) {
+        // Set nilai ke komponen form
+        cbxNamaBarang.setSelectedItem(barang.getNamaProduk());
+        txtIdBarang.setText(barang.getIdProduk());
+        // Jika ada field lain yang perlu diisi, tambahkan di sini
+    } else {
+        JOptionPane.showMessageDialog(this, "Barang dengan barcode " + barcode + " tidak ditemukan", "Peringatan", JOptionPane.WARNING_MESSAGE);
+    }
+}   
         private void tambahData() {
     if (validasiInput() == true) {
         String namaObat = cbxNamaBarang.getSelectedItem().toString();
@@ -107,29 +132,31 @@ public class InputProdukMasuk extends javax.swing.JDialog {
         txtJumlahMasuk.setText("");
         tglKadaluarsa.setDate(null); // Reset tanggal kadaluarsa
     }
-        private void ambilNamaObat(){
-        DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>();
-        model.addElement("pilih barang"); // Tambahkan item default
-        List<modelBarang> list = servis_Barang.ambilNamaBarang(); // Ambil data nama obat dari database/service
+        private void ambilNamaObat() {
+    DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>();
+    model.addElement("pilih barang"); // Tambahkan item default
+    List<modelBarang> list = servis_Barang.ambilNamaBarang(); // Ambil data nama obat dari database/service
 
-        for (modelBarang barang : list) {
-            model.addElement(barang.getNamaProduk()); // Tambahkan nama obat ke dalam model ComboBox
-            barangMap.put(barang.getNamaProduk(), barang.getIdProduk()); // Simpan mapping namaObat -> idObat ke dalam Map
-        }
-
-        cbxNamaBarang.setModel(model); // Atur model ke ComboBox
-
-        // Tambahkan ActionListener untuk menangani perubahan pilihan
-        cbxNamaBarang.addActionListener(e -> {
-            String namaProduk = cbxNamaBarang.getSelectedItem().toString(); // Ambil pilihan dari ComboBox
-            if (!"Pilih Obat".equals(namaProduk)) {
-                idProduk = barangMap.get(namaProduk); // Dapatkan ID Obat berdasarkan namaObat dari Map
-                txtIdBarang.setText(idProduk); // Tampilkan ID Obat di text field
-            } else {
-                txtIdBarang.setText(""); // Kosongkan text field jika tidak ada pilihan valid
-            }
-        });
+    for (modelBarang barang : list) {
+        model.addElement(barang.getNamaProduk()); // Tambahkan nama obat ke dalam model ComboBox
+        barangMap.put(barang.getNamaProduk(), barang.getIdProduk()); // Simpan mapping namaObat -> idObat ke dalam Map
     }
+
+    cbxNamaBarang.setModel(model); // Atur model ke ComboBox
+
+    // Tambahkan ActionListener untuk menangani perubahan pilihan
+    cbxNamaBarang.addActionListener(e -> {
+        String namaProduk = cbxNamaBarang.getSelectedItem().toString(); // Ambil pilihan dari ComboBox
+        if (!"pilih barang".equals(namaProduk)) {
+            idProduk = barangMap.get(namaProduk); // Dapatkan ID Obat berdasarkan namaObat dari Map
+            txtIdBarang.setText(idProduk); // Tampilkan ID Obat di text field
+            txtIdBarang.setEditable(false); // Set text field tidak bisa diedit
+        } else {
+            txtIdBarang.setText(""); // Kosongkan text field jika tidak ada pilihan valid
+            txtIdBarang.setEditable(true); // Biarkan bisa diedit jika tidak ada pilihan
+        }
+    });
+}
          private void updateData(){
 //            if (!validasiInput()) {
 //                return;
@@ -182,6 +209,8 @@ public class InputProdukMasuk extends javax.swing.JDialog {
         jLabel5 = new javax.swing.JLabel();
         tglKadaluarsa = new com.toedter.calendar.JDateChooser();
         jLabel6 = new javax.swing.JLabel();
+        jLabel9 = new javax.swing.JLabel();
+        txtBarcode = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -244,6 +273,14 @@ public class InputProdukMasuk extends javax.swing.JDialog {
 
         jLabel6.setText("TGL KADALUARSA");
 
+        jLabel9.setText("BARCODE");
+
+        txtBarcode.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtBarcodeActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -263,15 +300,17 @@ public class InputProdukMasuk extends javax.swing.JDialog {
                             .addComponent(jLabel4)
                             .addComponent(jLabel8)
                             .addComponent(jLabel5)
-                            .addComponent(jLabel6))
-                        .addGap(18, 18, 18)
+                            .addComponent(jLabel6)
+                            .addComponent(jLabel9))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(cbxNamaBarang, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(txtIdBarang)
                             .addComponent(txtJumlahMasuk)
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addComponent(tglKadaluarsa, javax.swing.GroupLayout.PREFERRED_SIZE, 154, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(0, 0, Short.MAX_VALUE)))))
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addComponent(txtBarcode, javax.swing.GroupLayout.Alignment.TRAILING))))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -283,6 +322,13 @@ public class InputProdukMasuk extends javax.swing.JDialog {
                     .addComponent(cbxNamaBarang, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel8))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jLabel9)
+                        .addGap(13, 13, 13))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addComponent(txtBarcode, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txtIdBarang, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel4))
@@ -293,8 +339,8 @@ public class InputProdukMasuk extends javax.swing.JDialog {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(tglKadaluarsa, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 131, Short.MAX_VALUE)
+                    .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 99, Short.MAX_VALUE)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -338,6 +384,15 @@ public class InputProdukMasuk extends javax.swing.JDialog {
             dispose();
         }
     }//GEN-LAST:event_batalActionPerformed
+
+    private void txtBarcodeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtBarcodeActionPerformed
+         String barcode = txtBarcode.getText().trim();
+        if (barcode.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Barcode tidak boleh kosong", "Peringatan", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        cariBarangDariBarcode(barcode);
+    }//GEN-LAST:event_txtBarcodeActionPerformed
 
     /**
      * @param args the command line arguments
@@ -405,11 +460,13 @@ public class InputProdukMasuk extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JSeparator jSeparator1;
     private com.raven.swing.ButtonGradient simpan;
     private com.toedter.calendar.JDateChooser tglKadaluarsa;
+    private javax.swing.JTextField txtBarcode;
     private javax.swing.JTextField txtIdBarang;
     private javax.swing.JTextField txtJumlahMasuk;
     // End of variables declaration//GEN-END:variables

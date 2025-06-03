@@ -237,6 +237,8 @@ private void perbaruiData() {
     private void initComponents() {
 
         jSeparator1 = new javax.swing.JSeparator();
+        txtIDUser = new javax.swing.JTextField();
+        jLNama1 = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
@@ -255,8 +257,8 @@ private void perbaruiData() {
         txtAlamat = new javax.swing.JTextField();
         simpan = new com.raven.swing.ButtonGradient();
         batal = new com.raven.swing.ButtonGradient();
-        jLNama1 = new javax.swing.JLabel();
-        txtIDUser = new javax.swing.JTextField();
+
+        jLNama1.setText("ID User");
 
         jPanel2.setBackground(new java.awt.Color(46, 203, 112));
 
@@ -335,8 +337,6 @@ private void perbaruiData() {
             }
         });
 
-        jLNama1.setText("ID User");
-
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -374,22 +374,14 @@ private void perbaruiData() {
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addComponent(jLAlamat)
                                 .addGap(54, 54, 54)
-                                .addComponent(txtAlamat))
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(jLNama1)
-                                .addGap(54, 54, 54)
-                                .addComponent(txtIDUser)))))
+                                .addComponent(txtAlamat)))))
                 .addGap(0, 0, 0))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLNama1)
-                    .addComponent(txtIDUser, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(4, 4, 4)
+                .addGap(29, 29, 29)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLNama)
                     .addComponent(txtNama, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -435,7 +427,7 @@ private void perbaruiData() {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 16, Short.MAX_VALUE))
+                .addGap(0, 19, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
