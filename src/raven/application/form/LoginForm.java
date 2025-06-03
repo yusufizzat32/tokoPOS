@@ -268,6 +268,14 @@ private void processRFIDLogin(String rfid) {
         String role = user.getRole() != null ? user.getRole().trim().toLowerCase() : "";
         
         if (role.equals("admin") || role.equals("kasir") || role.equals("manajemen stok")) {
+            // Set session properly
+            session sess = session.getInstance();
+            sess.setUserSession(
+                user.getIdUser(), 
+                user.getUsername(), 
+                user.getRole()
+            );
+            
             Application.login(user);
             JOptionPane.showMessageDialog(
                 null, 
